@@ -1,2 +1,2 @@
-# al-hind
+# alhind-ngo
 Charitable Trust
