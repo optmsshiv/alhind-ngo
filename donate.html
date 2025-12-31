@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Donate | AL Education and Trust Charitable</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <div id="header"></div>
+
+    <section class="donation-hero">
+        <div class="donation-hero-overlay">
+            <h1>Make a Meaningful Donation</h1>
+            <p>Every contribution helps educate, empower, and uplift communities.</p>
+        </div>
+    </section>
+
+
+    <section class="donation-section">
+        <div class="container">
+
+            <!-- HEADER -->
+            <div class="donation-header reveal">
+                <h2>Support Our Mission</h2>
+                <p>Your contribution directly funds education, welfare, and community upliftment.</p>
+            </div>
+
+            <!-- IMPACT STATS -->
+            <div class="impact-stats reveal">
+                <div>
+                    <span class="count" data-target="250">0</span>
+                    <p>Students Supported</p>
+                </div>
+                <div>
+                    <span class="count" data-target="35">0</span>
+                    <p>Community Programs</p>
+                </div>
+                <div>
+                    <span class="count" data-target="12">0</span>
+                    <p>Years of Service</p>
+                </div>
+            </div>
+
+            <div class="why-donate reveal">
+                <div>
+                    <h4>📚 Education First</h4>
+                    <p>Help children access books, schools, and learning resources.</p>
+                </div>
+                <div>
+                    <h4>🤝 Community Impact</h4>
+                    <p>Support skill programs and social welfare initiatives.</p>
+                </div>
+                <div>
+                    <h4>🔍 Full Transparency</h4>
+                    <p>Every rupee is used responsibly and ethically.</p>
+                </div>
+            </div>
+
+            <div class="donation-grid">
+
+                <!-- LEFT: FORM -->
+                <div class="donation-box reveal-left">
+
+                    <h3>Choose Donation Amount</h3>
+
+                    <!-- PRESET AMOUNTS -->
+                    <div class="donation-presets">
+                        <button data-amount="500">₹500<br><small></small></button>
+                        <button data-amount="1000" class="popular">₹1000<br><small></small><span>Most
+                                Popular</span></button>
+                        <button data-amount="2500">₹2500<br><small></small></button>
+                        <button data-amount="5000">₹5000<br><small></small></button>
+                    </div>
+
+
+                    <!-- FORM -->
+                    <form id="donationForm">
+                        <input type="text" id="donorName" placeholder="Full Name" required>
+                        <input type="email" id="donorEmail" placeholder="Email Address" required>
+                        <input type="number" id="donationAmount" placeholder="Enter Amount (INR)" required>
+
+                        <button type="submit" class="btn-donate-main">
+                            Donate Securely
+                        </button>
+                    </form>
+
+                    <p class="human-note">
+                        💚 Even a small donation creates real impact. Thank you for standing with us.
+                    </p>
+
+
+                    <p class="payment-note">
+                        Secure payments via Razorpay • UPI • Cards • Net Banking
+                    </p>
+
+                    <p class="tax-note">
+                        ✔ Donations are eligible for tax exemption under Section 80G (if applicable)
+                    </p>
+
+                    <div class="donation-flow reveal">
+                        <h3>What Happens After You Donate?</h3>
+                        <ol>
+                            <li>Payment is securely processed</li>
+                            <li>Funds are allocated to programs</li>
+                            <li>You receive confirmation & updates</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- RIGHT: TRUST / QR -->
+                <div class="donation-trust reveal-right">
+
+                    <div class="qr-card">
+                        <img src="assets/upi-qr.jpeg" alt="UPI QR Donation">
+                        <p class="qr-note">Scan to donate via UPI</p>
+                    </div>
+
+
+                    <div class="trust-badges reveal">
+                        <img src="assets/sbi-logo-hd.png" alt="SBI">
+                        <img src="assets/upi-logo-hd.png" alt="UPI">
+                        <img src="assets/razorpay-logo-hd.png" alt="Razorpay">
+                        <img src="assets/secure-payment.png" alt="Secure Payments">
+                    </div>
+
+
+                    <div class="bank-strip">
+                        <h4>Direct Bank Transfer</h4>
+                        <ul>
+                            <li><strong>Account No:</strong> 30881874461</li>
+                            <li><strong>IFSC:</strong> SBIN0003052</li>
+                            <li><strong>Bank:</strong> SBI (ADB), Madhepura, Bihar</li>
+                        </ul>
+                    </div>
+
+
+                    <p class="trust-note">
+                        Registered NGO • Transparent Use of Funds
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+<!-- NGO PROOF 
+    <div class="ngo-proof">
+        <img src="assets/cert.jpeg" alt="Registered NGO">
+        <img src="assets/80g.png" alt="80G Certified">
+        <img src="assets/transparent.png" alt="Transparent NGO">
+    </div>
+
+    <div class="impact-images">
+        <img src="images/impact1.jpg">
+        <img src="images/impact2.jpg">
+        <img src="images/impact3.jpg">
+    </div>
+-->
+    
+    
+    <div class="sticky-donate" id="stickyDonate">
+        <span>Support our mission</span>
+        <button onclick="scrollToDonate()">Donate Now</button>
+    </div>
+
+
+    <!-- SUCCESS POPUP -->
+    <div class="success-overlay" id="successPopup">
+        <div class="success-box">
+            <h3>Thank You for Your Support 🙏</h3>
+            <p>Your donation was successful and will make a real difference.</p>
+            <button onclick="closeSuccess()">Close</button>
+        </div>
+    </div>
+
+
+    <div id="footer"></div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="js/donate.js"></script>
+    <script src="js/include.js"></script>
+    <script src="js/header-animate.js"></script>
+    <script src="js/animation.js"></script>
+    <script src="js/impact_no.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
