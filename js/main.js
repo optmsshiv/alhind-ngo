@@ -22,6 +22,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     /* =========================
+       compaign animation
+    ========================= */
+    const revealElements = document.querySelectorAll(".reveal");
+
+    const revealObserver = new IntersectionObserver(
+        (entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("visible");
+                    revealObserver.unobserve(entry.target); // animate once
+                }
+            });
+        },
+        {
+            threshold: 0.15
+        }
+    );
+
+    revealElements.forEach(el => revealObserver.observe(el));
+
+
+    /* =========================
        FOOTER YEAR
     ========================= */
     const yearEl = document.getElementById("year");
@@ -60,54 +82,14 @@ window.addEventListener("load", () => {
     });
 });
 
-/* =========================
-   SIMPLE CAROUSEL
-========================= */
-const track = document.querySelector(".carousel-track");
-const slides = document.querySelectorAll(".carousel-slide");
-const prevBtn = document.querySelector(".carousel-btn.prev");
-const nextBtn = document.querySelector(".carousel-btn.next");
 
-let index = 0;
+document.addEventListener("click", (e) => {
+    const nav = document.getElementById("mainNav");
+    const toggle = document.getElementById("menuToggle");
 
-function updateCarousel() {
-    track.style.transform = `translateX(-${index * 100}%)`;
-}
+    if (!nav || !toggle) return;
 
-nextBtn.addEventListener("click", () => {
-    index = (index + 1) % slides.length;
-    updateCarousel();
-});
-
-prevBtn.addEventListener("click", () => {
-    index = (index - 1 + slides.length) % slides.length;
-    updateCarousel();
-});
-
-/* Auto-slide */
-setInterval(() => {
-    index = (index + 1) % slides.length;
-    updateCarousel();
-}, 5000);
-
-const galleryImages = document.querySelectorAll(".gallery-item img");
-const lightbox = document.getElementById("lightbox");
-const lightboxImg = document.querySelector(".lightbox-img");
-const closeBtn = document.querySelector(".lightbox-close");
-
-galleryImages.forEach(img => {
-    img.addEventListener("click", () => {
-        lightboxImg.src = img.src;
-        lightbox.style.display = "flex";
-    });
-});
-
-closeBtn.addEventListener("click", () => {
-    lightbox.style.display = "none";
-});
-
-lightbox.addEventListener("click", (e) => {
-    if (e.target === lightbox) {
-        lightbox.style.display = "none";
+    if (!nav.contains(e.target) && !toggle.contains(e.target)) {
+        nav.classList.remove("open");
     }
 });

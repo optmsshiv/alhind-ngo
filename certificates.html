@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Certificates | AL Hind Educational & Charitable Trust</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Certificate Page Styling 
+    <style>
+        /* ---------- PAGE BACKGROUND ---------- */
+
+    body {
+            background: linear-gradient(to bottom, #f4f7fb, #ffffff);
+                }
+        /* Certificate Page Styling */
+
+        .certificates-section {
+            max-width: 1200px;
+            margin: 70px auto;
+            padding: 20px;
+        }
+
+        .certificates-section h2 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 32px;
+        }
+
+        .cert-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
+        }
+
+        .cert-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .cert-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .cert-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .cert-card h3 {
+            padding: 15px 10px 5px;
+            font-size: 18px;
+        }
+
+        .cert-card a {
+            display: inline-block;
+            margin: 10px 0 20px;
+            padding: 8px 18px;
+            background: #0a7cff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .cert-card a:hover {
+            background: #055bb5;
+        }
+    </style>-->
+
+    <style>
+        /* ---------- PAGE BACKGROUND ---------- */
+
+        body {
+            background: linear-gradient(to bottom, #f4f7fb, #ffffff);
+        }
+
+        /* ---------- CERTIFICATE SECTION ---------- */
+
+        .certificates-section {
+            max-width: 1200px;
+            margin: 70px auto;
+            padding: 20px;
+        }
+
+        /* ---------- HEADING ---------- */
+
+        .certificates-section h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 34px;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        .certificates-section h2::after {
+            content: '';
+            width: 80px;
+            height: 4px;
+            background: #0a7cff;
+            display: block;
+            margin: 12px auto 0;
+            border-radius: 10px;
+        }
+
+        /* ---------- SUB TEXT ---------- */
+
+        .cert-desc {
+            text-align: center;
+            max-width: 750px;
+            margin: 0 auto 50px;
+            color: #555;
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        /* ---------- GRID ---------- */
+
+        .cert-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px;
+        }
+
+        /* ---------- CARD ---------- */
+
+        .cert-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            text-align: center;
+
+            /* Animation setup */
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.7s ease;
+        }
+
+        /* When visible */
+        .cert-card.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ---------- HOVER EFFECT ---------- */
+
+        .cert-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(10, 124, 255, 0.2);
+        }
+
+        /* ---------- IMAGE ---------- */
+
+        .cert-card img {
+            width: 100%;
+            height: 230px;
+            object-fit: cover;
+            transition: 0.4s;
+        }
+
+        .cert-card:hover img {
+            transform: scale(1.08);
+        }
+
+        /* ---------- TITLE ---------- */
+
+        .cert-card h3 {
+            padding: 18px 10px 5px;
+            font-size: 18px;
+            color: #222;
+        }
+
+        /* ---------- BUTTON ---------- */
+
+        .cert-card a {
+            display: inline-block;
+            margin: 12px 0 22px;
+            padding: 9px 22px;
+            background: linear-gradient(to right, #0a7cff, #0056b3);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .cert-card a:hover {
+            background: linear-gradient(to right, #0056b3, #003f85);
+            transform: scale(1.05);
+        }
+
+        .cert-badge {
+            position: absolute;
+            background: #28a745;
+            color: #fff;
+            padding: 4px 10px;
+            font-size: 12px;
+            border-radius: 0 0 8px 0;
+        }
+
+        /* ---------- COMPLIANCE SECTION ---------- */
+
+        .compliance-section {
+            max-width: 1200px;
+            margin: 90px auto 60px;
+            padding: 30px 20px;
+            background: linear-gradient(to right, #f8fbff, #ffffff);
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .compliance-section h2 {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .compliance-section h2::after {
+            content: '';
+            width: 70px;
+            height: 4px;
+            background: #0a7cff;
+            display: block;
+            margin: 12px auto 0;
+            border-radius: 10px;
+        }
+
+        .compliance-desc {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 50px;
+            color: #555;
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        /* ---------- GRID ---------- */
+
+        .compliance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+        }
+
+        /* ---------- CARD ---------- */
+
+        .compliance-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 5px 16px rgba(0, 0, 0, 0.08);
+            transition: 0.3s ease;
+            position: relative;
+        }
+
+        .compliance-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 15px 30px rgba(10, 124, 255, 0.18);
+        }
+
+        .compliance-card h4 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #222;
+        }
+
+        .compliance-card p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* ---------- STATUS BADGE ---------- */
+
+        .status {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 14px;
+            font-size: 12px;
+            border-radius: 20px;
+            letter-spacing: 0.4px;
+            font-weight: 500;
+        }
+
+        .status.active {
+            background: #e7f7ef;
+            color: #28a745;
+        }
+
+        .status.protected {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+
+
+        /* ---------- MOBILE ---------- */
+
+        @media (max-width: 600px) {
+
+            .certificates-section h2 {
+                font-size: 26px;
+            }
+
+            .cert-desc {
+                font-size: 15px;
+            }
+
+        }
+    </style>
+
+
+
+</head>
+
+<body>
+
+    <!-- HEADER (Same as other pages) -->
+    <div id="header"></div>
+
+    <section class="certificates-section">
+
+        <h2>Our Registration & Legal Certificates</h2>
+
+        <p class="cert-desc">
+            We believe in complete transparency. All our legal registrations,
+            compliance documents, and certifications are publicly available
+            for verification and trust.
+        </p>
+
+
+
+        <div class="cert-grid">
+
+            <!-- Certificate 1 -->
+            <div class="cert-card">
+                <span class="cert-badge">Verified</span>
+
+                <img src="/uploads/certificates/images/darpan.jpeg" alt="NGO Registration">
+                <h3>Registered with NITI Aayog, Government of India</h3>
+                <a href="/uploads/certificates/pdfs/darpan.pdf" target="_blank">
+                    View / Download
+                </a>
+            </div>
+
+            <!-- Certificate 2 -->
+            <div class="cert-card">
+                <span class="cert-badge">Verified</span>
+
+                <img src="/uploads/certificates/images/80G.jpg" alt="80G Certificate">
+                <h3>80G Tax Exemption</h3>
+                <a href="/uploads/certificates/pdfs/80G.pdf" target="_blank">
+                    View / Download
+                </a>
+            </div>
+
+            <!-- Certificate 3 -->
+            <div class="cert-card">
+                <span class="cert-badge">Verified</span>
+
+                <img src="/uploads/certificates/images/12A.jpg" alt="12A Certificate">
+                <h3>12A Registration</h3>
+                <a href="/uploads/certificates/pdfs/12A.pdf" target="_blank">
+                    View / Download
+                </a>
+            </div>
+
+            <!-- Certificate 4 -->
+            <div class="cert-card">
+                <span class="cert-badge">Verified</span>
+
+                <img src="/uploads/certificates/images/deed.jpeg" alt="Trust Deed">
+                <h3>Trust Deed</h3>
+                <a href="/uploads/certificates/pdfs/deed.pdf" target="_blank">
+                    View / Download
+                </a>
+            </div>
+
+        </div>
+
+        <!-- ================= COMPLIANCE SECTION ================= -->
+
+        <section class="compliance-section">
+
+            <h2>Compliance & Transparency</h2>
+
+            <p class="compliance-desc">
+                AL Hind Educational and Charitable Trust is fully committed to
+                ethical governance, legal compliance, and transparent operations.
+                All mandatory registrations and statutory documents are maintained
+                as per Government of India regulations.
+            </p>
+
+            <div class="compliance-grid">
+
+                <div class="compliance-card">
+                    <h4>Income Tax Compliance</h4>
+                    <p>Registered under Section 12A & 80G</p>
+                    <span class="status active">Verified</span>
+                </div>
+
+                <div class="compliance-card">
+                    <h4>Trust Registration</h4>
+                    <p>Registered under Indian Trust Act</p>
+                    <span class="status active">Active</span>
+                </div>
+
+                <div class="compliance-card">
+                    <h4>Financial Audits</h4>
+                    <p>Audited annually by certified CA</p>
+                    <span class="status active">Up-to-Date</span>
+                </div>
+
+                <div class="compliance-card">
+                    <h4>PAN & KYC Records</h4>
+                    <p>Maintained securely as per law</p>
+                    <span class="status protected">Protected</span>
+                </div>
+
+                <div class="compliance-card">
+                    <h4>Donor Accountability</h4>
+                    <p>Proper receipts & reporting</p>
+                    <span class="status active">Enabled</span>
+                </div>
+
+                <div class="compliance-card">
+                    <h4>Regulatory Monitoring</h4>
+                    <p>Continuous legal review</p>
+                    <span class="status active">Ongoing</span>
+                </div>
+
+            </div>
+
+        </section>
+
+        <p style="text-align:center; color:#666; margin-top:40px;">
+            For PAN details or compliance verification,
+            please contact us officially at
+            <a href="mailto:alhindtrust@gmail.com">alhindtrust@gmail.com</a>.
+        </p>
+
+
+
+    </section>
+
+    <!-- FOOTER -->
+    <div id="footer"></div>
+
+   
+    <!-- SCRIPTS -->
+    <script src="js/include.js"></script>
+    <script src="js/main.js" defer></script>
+    <script src="js/header-animate.js" defer></script>
+    <srcript src="js/animation.js"></script>
+
+
+    <script>
+
+        /* ---------- SCROLL ANIMATION ---------- */
+
+        const cards = document.querySelectorAll('.cert-card, .compliance-card');
+
+        const observer = new IntersectionObserver(entries => {
+
+            entries.forEach(entry => {
+
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('show');
+                }
+
+            });
+
+        }, {
+            threshold: 0.2
+        });
+
+        cards.forEach(card => {
+            observer.observe(card);
+        });
+
+    </script>
+
+    <!--js-->
+    
+    
+</body>
+
+</html>

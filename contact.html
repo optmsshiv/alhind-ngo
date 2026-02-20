@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Contact Us | AL Education and Trust Charitable</title>
+    <title>Contact Us | AL Hind Educational and Charitable Trust</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -12,41 +12,122 @@
 
     <div id="header"></div>
 
+    <!-- CONTACT US SECTION -->
     <section>
         <div class="container">
-            <h2>Contact Us</h2>
+            <div class="card-grid-2">
 
-            <p>
-                We welcome donors, volunteers, partners, and well-wishers to connect with us.
-                Please feel free to reach out for any information or collaboration.
-            </p>
-
-            <div class="card-grid">
-
+                <!-- LEFT CARD – JOIN WITH US FORM -->
                 <div class="card">
-                    <h3>Email</h3>
-                    <p>alhindtrust@gmail.com</p>
+                    <h3>Join Hands With Us</h3>
+                    <form class="ngo-form" method="POST">
+                        <!-- TWO COLUMN ROW -->
+                        <div class="form-row-2">
+
+                            <div class="form-group">
+                                <label>Your Name</label>
+                                <input type="text" name="name" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" name="email" required>
+                            </div>
+
+                        </div>
+
+                        <div class="form-row-2">
+
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="text" name="phone" required>
+                            </div>
+
+                            <!---
+                            <div class="form-group">
+                                <label>I want to</label>
+                                <select name="interest">
+                                    <option value="volunteer">Become Volunteer</option>
+                                    <option value="donor">Donate</option>
+                                    <option value="csr">CSR Partnership</option>
+                                    <option value="partner">Collaborate</option>
+                                </select>
+                            </div> -->
+
+                            <div class="form-group">
+                                <label>I want to join as</label>
+                                <select name="interest" id="joinType" required>
+                                    <option value="">-- Select --</option>
+                                    <option value="volunteer">Volunteer</option>
+                                    <option value="team">Member</option>
+                                    <option value="partner">Partner / Collaborator</option>
+                                    <option value="general">General Inquiry</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- JOIN FEE INFO -->
+                        <div class="form-group" id="joinFeeBox" style="display:none;">
+                            <p class="fee-note trust-badge">
+                                <strong>Joining Contribution:</strong>
+                                <span id="feeAmount"></span><br>
+                                <small>
+                                    This one-time contribution supports onboarding,
+                                    ID card, training material, and program coordination.
+                                </small>
+                            </p>
+                        </div>
+
+
+
+
+                        <div class="form-group">
+                            <label>Message</label>
+                            <textarea name="message" rows="5" required></textarea>
+                        </div>
+
+                        <button id="joinBtn" class="btn btn-primary">Send Message</button>
                 </div>
+                </form>
 
+                <!-- RIGHT CARD – SINGLE CONTACT US -->
                 <div class="card">
-                    <h3>Phone</h3>
-                    <p>+91-9263190568</p>
-                </div>
+                    <h3>Contact Us</h3>
+                    <h3> AL Hind Education & Trust Charitable</h3>
 
-                <div class="card">
-                    <h3>Registered Office:</h3>
-                       <b> Al HIND EDUCATIONAL AND CHARITABLE TRUST</b><br>
-                        Ward No-04 kohinoor Complex College Chowk Madhepura Dist- Madhepura Pin- 852113 ( Bihar)
+                    <p class="lead">
+                        We welcome donors, volunteers, partners, and
+                        well-wishers to connect with us.
                     </p>
+
+                    <hr>
+
+                    <p>
+                        <strong>Email</strong><br>
+                        <a href="mailto:alhindtrust@gmail.com">alhindtrust@gmail.com</a>
+                    </p>
+
+                    <p>
+                        <strong>Phone</strong><br>
+                        <a href="tel:+919263190568">+91-9263190568</a>
+                    </p>
+
+                    <p>
+                        <strong>Registered Office</strong><br>
+                        Kohinoor Complex, College Chowk,<br>
+                        Madhepura – 852113, Bihar
+                    </p>
+
+                    <p class="mt-30">
+                        Response time: <strong>24–48 hours</strong>
+                    </p>
+
                 </div>
 
             </div>
-
-            <p style="margin-top:30px;">
-                We aim to respond to all queries within 24–48 hours.
-            </p>
         </div>
     </section>
+    <!-- END CONTACT US SECTION -->
 
     <!-- LOCATION MAP -->
     <div class="footer-map">
@@ -65,6 +146,11 @@
     <script src="js/include.js"></script>
     <script src="js/main.js"></script>
     <script src="js/header-animate.js"></script>
+    <script src="js/success.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
 </body>
 
 </html>
