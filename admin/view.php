@@ -1,19 +1,98 @@
 <?php
+
 session_start();
+
+if(!isset($_SESSION['admin'])){
+header("location:login.php");
+exit;
+}
+
 include '../config/db.php';
 
 $id=$_GET['id'];
 
-$r=$conn->query("SELECT * FROM ngo_inquiries WHERE id=$id")->fetch_assoc();
+$q=$conn->query("SELECT * FROM ngo_inquiries WHERE id='$id'");
+
+$r=$q->fetch_assoc();
+
 ?>
 
-<h2>View Lead</h2>
+<!DOCTYPE html>
+<html>
+<head>
 
-<p><b>Name:</b> <?php echo $r['name']; ?></p>
-<p><b>Email:</b> <?php echo $r['email']; ?></p>
-<p><b>Phone:</b> <?php echo $r['phone']; ?></p>
-<p><b>Interest:</b> <?php echo $r['interest']; ?></p>
+<title>View Lead</title>
 
-<hr>
+<link rel="stylesheet" href="/css/admin-style.css">
 
-<p><?php echo nl2br($r['message']); ?></p>
+</head>
+
+<body>
+
+<div class="main">
+
+<h2>Inquiry Details</h2>
+
+<div class="view-card">
+
+<p>
+
+<strong>Name :</strong>
+
+<?= $r['name'] ?>
+
+</p>
+
+<p>
+
+<strong>Email :</strong>
+
+<?= $r['email'] ?>
+
+</p>
+
+<p>
+
+<strong>Phone :</strong>
+
+<?= $r['phone'] ?>
+
+</p>
+
+<p>
+
+<strong>Interest :</strong>
+
+<?= $r['interest'] ?>
+
+</p>
+
+<p>
+
+<strong>Status :</strong>
+
+<?= ucfirst($r['status']) ?>
+
+</p>
+
+<p>
+
+<strong>Date :</strong>
+
+<?= $r['created_at'] ?>
+
+</p>
+
+</div>
+
+<a class="btn" href="join-leads.php">
+
+Back
+
+</a>
+
+</div>
+
+</body>
+
+</html>

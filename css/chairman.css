@@ -219,3 +219,177 @@
         transform: none;
     }
 }
+
+
+.chairman-badge {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #fff;
+
+    border-radius: 12px;
+
+    padding: 35px;
+
+    box-shadow: 0 10px 35px rgba(0, 0, 0, .08);
+
+    border: 1px solid #d4af37;
+
+}
+
+
+.chairman-badge img {
+
+    width: 160px;
+
+    opacity: .95;
+
+}
+
+
+.founder-badge {
+
+    margin-top: 18px;
+
+    background: #0a7c42;
+
+    color: white;
+
+    padding: 7px 18px;
+
+    border-radius: 30px;
+
+    font-size: 14px;
+
+    letter-spacing: 1px;
+
+}
+
+/* ===== ROYAL CHAIRMAN ===== */
+
+.royal-chairman {
+
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-direction: column;
+
+    background: #fffef8;
+
+    border-radius: 14px;
+
+    padding: 40px;
+
+    overflow: hidden;
+
+    border: 1px solid #d4af37;
+
+    box-shadow:
+        0 25px 60px rgba(0, 0, 0, .15);
+
+}
+
+
+/* LIGHT GLOW */
+
+.royal-glow {
+
+    position: absolute;
+
+    width: 320px;
+
+    height: 320px;
+
+    background:
+        radial-gradient(circle,
+            rgba(212, 175, 55, .35),
+            transparent);
+
+    top: 50%;
+
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    animation: royalGlow 5s ease-in-out infinite;
+
+}
+
+@keyframes royalGlow {
+
+    0% {
+        opacity: .6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: .6;
+    }
+
+}
+
+/* SILHOUETTE */
+
+.royal-chairman img {
+
+    height: 310px;
+
+    position: relative;
+
+    z-index: 2;
+
+    filter: drop-shadow(0 10px 18px rgba(0, 0, 0, .25));
+
+}
+
+
+/* GOLD TITLE */
+
+.royal-title {
+
+    margin-top: 20px;
+
+    background: linear-gradient(45deg,
+            #d4af37,
+            #ffd700);
+
+    color: #083b2d;
+
+    padding: 8px 20px;
+
+    border-radius: 30px;
+
+    font-weight: 600;
+
+    letter-spacing: 1px;
+
+    z-index: 2;
+
+}
+
+
+/* MOBILE */
+
+@media(max-width:768px) {
+
+    .royal-chairman img {
+
+        height: 470px;
+
+    }
+
+}

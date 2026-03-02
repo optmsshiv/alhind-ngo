@@ -311,3 +311,451 @@ a[href*="logout"]:hover {
         flex-direction: column;
     }
 }
+
+
+/*new css*/
+/* ==========================
+ADMIN GLOBAL
+========================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+body {
+
+    background: #f4f7fb;
+    color: #333;
+
+}
+
+
+
+/* ==========================
+ADMIN WRAPPER
+========================== */
+
+.admin-wrapper {
+
+    display: flex;
+    min-height: 100vh;
+
+}
+
+
+
+/* ==========================
+MAIN AREA
+========================== */
+
+.main {
+
+    flex: 1;
+    padding: 25px;
+    margin-left: 250px;
+    /* sidebar width */
+    transition: .3s;
+
+}
+
+
+
+
+/* ==========================
+CARDS
+========================== */
+
+.cards {
+
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 20px;
+    margin-bottom: 25px;
+
+}
+
+
+.card {
+
+    background: #fff;
+    border-radius: 14px;
+    padding: 22px;
+
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    box-shadow:
+
+        0 6px 18px rgba(0, 0, 0, .06);
+
+    transition: .3s;
+
+    cursor: pointer;
+
+}
+
+.card:hover {
+
+    transform: translateY(-5px);
+
+}
+
+
+.card i {
+
+    font-size: 30px;
+
+    padding: 15px;
+
+    border-radius: 50%;
+
+    color: #fff;
+
+}
+
+
+/* CARD COLORS */
+
+.pending i {
+
+    background: #f39c12;
+
+}
+
+
+.approved i {
+
+    background: #27ae60;
+
+}
+
+
+.rejected i {
+
+    background: #e74c3c;
+
+}
+
+
+.card h4 {
+
+    font-size: 15px;
+    color: #888;
+
+}
+
+
+.card span {
+
+    font-size: 28px;
+    font-weight: bold;
+
+    color: #111;
+
+}
+
+
+
+
+/* ==========================
+SEARCH FILTER
+========================== */
+
+.table-tools {
+
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+
+}
+
+
+.table-tools input,
+.table-tools select {
+
+    padding: 10px 14px;
+
+    border-radius: 8px;
+
+    border: 1px solid #ddd;
+
+    outline: none;
+
+    background: #fff;
+
+}
+
+
+.table-tools input {
+
+    flex: 1;
+
+}
+
+
+
+/* ==========================
+TABLE WRAPPER
+========================== */
+
+.table-wrapper {
+
+    background: #fff;
+
+    border-radius: 14px;
+
+    box-shadow:
+
+        0 6px 18px rgba(0, 0, 0, .05);
+
+    overflow: auto;
+
+}
+
+
+
+/* ==========================
+TABLE
+========================== */
+
+.table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 900px;
+
+}
+
+
+.table th {
+
+    background: #fafafa;
+
+    padding: 14px;
+
+    text-align: left;
+
+    font-size: 14px;
+
+    border-bottom: 1px solid #eee;
+
+}
+
+
+.table td {
+
+    padding: 14px;
+
+    border-bottom: 1px solid #eee;
+
+    font-size: 14px;
+
+}
+
+
+.table tr:hover {
+
+    background: #f7fbff;
+
+}
+
+
+
+
+/* ==========================
+STATUS BADGE
+========================== */
+
+.status {
+
+    padding: 6px 12px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    text-transform: capitalize;
+
+}
+
+
+
+.status.pending {
+
+    background: #fff4d8;
+
+    color: #e67e22;
+
+}
+
+
+.status.approved {
+
+    background: #e9f9ef;
+
+    color: #27ae60;
+
+}
+
+
+.status.rejected {
+
+    background: #fdeaea;
+
+    color: #e74c3c;
+
+}
+
+
+
+
+/* ==========================
+BUTTONS
+========================== */
+
+.btn {
+
+    display: inline-block;
+
+    padding: 7px 12px;
+
+    border-radius: 6px;
+
+    text-decoration: none;
+
+    font-size: 13px;
+
+    margin: 2px;
+
+    transition: .3s;
+
+    background: #3498db;
+
+    color: #fff;
+
+}
+
+
+.btn:hover {
+
+    opacity: .9;
+
+}
+
+
+
+.btn-primary {
+
+    background: #27ae60;
+
+    color: #fff;
+
+}
+
+
+.btn-outline {
+
+    background: #fff;
+
+    border: 1px solid #ccc;
+
+    color: #333;
+
+}
+
+
+.btn-outline:hover {
+
+    background: #f1f1f1;
+
+}
+
+
+.btn-danger {
+
+    background: #e74c3c;
+
+    color: #fff;
+
+}
+
+
+
+/* ==========================
+SCROLLBAR
+========================== */
+
+::-webkit-scrollbar {
+
+    width: 8px;
+    height: 8px;
+
+}
+
+
+::-webkit-scrollbar-thumb {
+
+    background: #bbb;
+
+    border-radius: 10px;
+
+}
+
+
+
+/* ==========================
+RESPONSIVE
+========================== */
+
+@media(max-width:900px) {
+
+    .main {
+
+        margin-left: 0;
+        padding: 15px;
+
+    }
+
+}
+
+
+/* ==========================
+TOPBAR (IF NOT ADDED)
+========================== */
+
+.topbar {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 20px;
+
+}
+
+
+.admin-name {
+
+    background: #fff;
+
+    padding: 8px 14px;
+
+    border-radius: 8px;
+
+    box-shadow:
+
+        0 4px 10px rgba(0, 0, 0, .05);
+
+}
+/*end here*/

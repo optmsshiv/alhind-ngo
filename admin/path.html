@@ -322,3 +322,68 @@ box-shadow: 0 8px 20px rgba(0,0,0,.05);
 font-size: 28px;
 font-weight: bold;
 }
+
+
+/*view php working code*/
+
+<?php
+session_start();
+include '../config/db.php';
+
+$id=$_GET['id'];
+
+$r=$conn->query("SELECT * FROM ngo_inquiries WHERE id=$id")->fetch_assoc();
+?>
+
+<h2>View Lead</h2>
+
+<p><b>Name:</b>
+    <?php echo $r['name']; ?>
+</p>
+<p><b>Email:</b>
+    <?php echo $r['email']; ?>
+</p>
+<p><b>Phone:</b>
+    <?php echo $r['phone']; ?>
+</p>
+<p><b>Interest:</b>
+    <?php echo $r['interest']; ?>
+</p>
+
+<hr>
+
+<p>
+    <?php echo nl2br($r['message']); ?>
+</p>
+
+
+/*view php working code*/
+
+/*reply code*/
+
+<?php
+session_start();
+include '../config/db.php';
+
+$id=$_GET['id'];
+
+$r=$conn->query("SELECT * FROM ngo_inquiries WHERE id=$id")->fetch_assoc();
+?>
+
+<h2>Reply to
+    <?php echo $r['name']; ?>
+</h2>
+
+<form action="send.php" method="POST">
+
+    <input type="hidden" name="id" value="<?php echo $id; ?>">
+
+    <textarea name="reply" rows="6" style="width:100%;"></textarea>
+
+    <br><br>
+
+    <button class="btn btn-primary">Send Reply</button>
+
+</form>
+
+/*end here*/
