@@ -1,0 +1,246 @@
+/* ─── Events Page ─────────────────────────────────────────── */
+
+.events-hero {
+  text-align: center;
+  padding: 2.5rem 1rem 1rem;
+}
+
+.events-subtitle {
+  max-width: 640px;
+  margin: .5rem auto 0;
+  color: #64748b;
+  font-size: .975rem;
+}
+
+/* ─── Filter Bar ──────────────────────────────────────────── */
+.events-filter {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: .5rem;
+  padding: 1.25rem 1rem;
+}
+
+.filter-btn {
+  padding: .55rem 1.4rem;
+  border: 2px solid #0f766e;
+  background: transparent;
+  color: #0f766e;
+  border-radius: 99px;
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s, color .2s, transform .15s;
+  font-family: inherit;
+}
+
+.filter-btn:hover {
+  background: #f0fdf4;
+  transform: translateY(-1px);
+}
+
+.filter-btn.active {
+  background: #0f766e;
+  color: #fff;
+}
+
+/* ─── Grid ────────────────────────────────────────────────── */
+.event-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.75rem;
+  padding-bottom: 3rem;
+}
+
+.events-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #94a3b8;
+  font-size: 1.05rem;
+}
+
+/* ─── Card ────────────────────────────────────────────────── */
+.event-card {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0,0,0,.07);
+  transition: transform .3s ease, box-shadow .3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.event-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 32px rgba(0,0,0,.12);
+}
+
+.past-event { opacity: .82; }
+
+/* ─── Image ───────────────────────────────────────────────── */
+.event-img-wrap {
+  position: relative;
+  overflow: hidden;
+}
+
+.event-img-wrap img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+  transition: transform .4s ease;
+}
+
+.event-card:hover .event-img-wrap img {
+  transform: scale(1.04);
+}
+
+.event-img-placeholder {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  background: linear-gradient(135deg, #e0f2f1, #f0fdf4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+}
+
+/* ─── Status Badge ────────────────────────────────────────── */
+.event-status-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: .25rem .7rem;
+  border-radius: 99px;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.badge-upcoming {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge-past {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+/* ─── Body ────────────────────────────────────────────────── */
+.event-body {
+  padding: 1.1rem 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.event-category {
+  display: inline-block;
+  background: #f0fdf4;
+  color: #0f766e;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  font-size: .75rem;
+  font-weight: 700;
+  padding: .2rem .6rem;
+  margin-bottom: .6rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.event-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 .6rem;
+}
+
+.event-meta {
+  font-size: .875rem;
+  color: #475569;
+  margin: .2rem 0;
+}
+
+.event-badge {
+  background: #0f766e;
+  color: #fff;
+  padding: .2rem .65rem;
+  border-radius: 6px;
+  font-size: .8rem;
+  font-weight: 600;
+}
+
+.event-desc {
+  font-size: .9rem;
+  color: #64748b;
+  margin: .75rem 0 .5rem;
+  flex: 1;
+}
+
+/* ─── Map ─────────────────────────────────────────────────── */
+.event-map {
+  width: 100%;
+  height: 200px;
+  border: 0;
+  border-radius: 10px;
+  margin: .75rem 0;
+  display: block;
+}
+
+/* ─── Buttons ─────────────────────────────────────────────── */
+.btn-join {
+  display: inline-block;
+  background: #0f766e;
+  color: #fff;
+  padding: .6rem 1.25rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: .875rem;
+  font-weight: 600;
+  margin-top: .5rem;
+  align-self: flex-start;
+  transition: background .2s, transform .15s;
+}
+
+.btn-join:hover {
+  background: #0d6561;
+  transform: translateY(-1px);
+}
+
+.btn-past {
+  display: inline-block;
+  background: #f1f5f9;
+  color: #94a3b8;
+  padding: .6rem 1.25rem;
+  border-radius: 8px;
+  font-size: .875rem;
+  font-weight: 600;
+  margin-top: .5rem;
+  cursor: default;
+}
+
+/* ─── Breadcrumb ──────────────────────────────────────────── */
+.breadcrumb {
+  background: #f1f5f9;
+  padding: .6rem 0;
+  font-size: .9rem;
+}
+
+.breadcrumb a {
+  color: #0f766e;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.breadcrumb a:hover { text-decoration: underline; }
+
+/* ─── Responsive ──────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .event-grid {
+    grid-template-columns: 1fr;
+    padding: 0 1rem 2rem;
+  }
+}

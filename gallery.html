@@ -5,9 +5,7 @@
     <meta charset="UTF-8">
     <title>Gallery | AL Hind Educational and Charitable Trust</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <meta name="description" content="Explore photos from our education, welfare, and community development programs.">
-
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/gallery.css">
 </head>
@@ -26,88 +24,42 @@
     </section>
 
     <!-- PAGE HERO -->
-    <section>
+    <section style="text-align:center;padding:2.5rem 1rem 1rem;">
         <h1 class="section-title">Our Work in Action</h1>
-        <p style="max-width:700px;margin:auto;color:#64748b;">
+        <p style="max-width:700px;margin:1rem auto 0;color:#64748b;">
             Moments from our educational programs, health camps, community outreach,
             and volunteer activities.
         </p>
     </section>
+
     <!-- CAROUSEL -->
     <section class="gallery-carousel">
-        <button class="carousel-btn prev">‹</button>
-    
+        <button class="carousel-btn prev" aria-label="Previous">&#8249;</button>
         <div class="carousel-track">
-            <div class="carousel-slide">
-                <img src="/assets/gallery/1.jpeg" alt="Education Program">
-                <p>Education Support Program</p>
-            </div>
-            <div class="carousel-slide">
-                <img src="/assets/gallery/3.jpeg" alt="Health Camp">
-                <p>Free Medical Camp</p>
-            </div>
+            <!-- Dynamically populated by gallery.js -->
         </div>
-    
-        <button class="carousel-btn next">›</button>
+        <button class="carousel-btn next" aria-label="Next">&#8250;</button>
     </section>
-
 
     <!-- GALLERY GRID -->
     <section class="section">
         <div class="gallery-grid container">
-
-            <!-- ITEM -->
-            <div class="gallery-item skeleton">
-                <img src="/assets/gallery/1.jpeg" alt="Education Program" loading="lazy" decoding="async"
-                    class="skeleton-hidden">
-            </div>
-
-            <div class="gallery-item skeleton">
-                <img src="/assets/gallery/7.jpeg" alt="Classroom Activity" loading="lazy" decoding="async"
-                    class="skeleton-hidden">
-            </div>
-
-            <div class="gallery-item skeleton">
-                <img src="/assets/gallery/3.jpeg" alt="Community Outreach" loading="lazy" decoding="async"
-                    class="skeleton-hidden">
-            </div>
-
-            <div class="gallery-item skeleton">
-                <img src="/assets/gallery/4.jpeg" alt="Health Camp" loading="lazy" decoding="async"
-                    class="skeleton-hidden">
-            </div>
-
-            <div class="gallery-item skeleton">
-                <img src="/assets/gallery/5.jpeg" alt="Volunteer Activity" loading="lazy" decoding="async"
-                    class="skeleton-hidden">
-            </div>
-
-            <div class="gallery-item skeleton">
-                <img src="/assets/gallery/6.jpeg" alt="Distribution Drive" loading="lazy" decoding="async"
-                    class="skeleton-hidden">
-            </div>
-
-            <div class="gallery-item skeleton">
-                <img src="/assets/gallery/8.jpeg" alt="Skill Development" loading="lazy" decoding="async"
-                    class="skeleton-hidden">
-            </div>
-            <div class="gallery-item skeleton">
-                <img src="/assets/gallery/9.jpeg" alt="Awareness Campaign" loading="lazy" decoding="async"
-                    class="skeleton-hidden">
-            </div>
-
-            <div class="gallery-item skeleton">
-                <img src="/assets/gallery/10.jpeg" alt="Health Camp" loading="lazy" decoding="async"
-                    class="skeleton-hidden">
-            </div>
-
+            <!-- Dynamically populated by gallery.js -->
         </div>
     </section>
 
     <!-- LIGHTBOX -->
-    <div id="lightbox">
-        <span class="lightbox-close">&times;</span>
-        <img class="lightbox-img" alt="">
+    <div id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+        <button class="lightbox-nav lightbox-prev" aria-label="Previous image">&#8249;</button>
+        <div class="lightbox-content">
+            <button class="lightbox-close" aria-label="Close">&times;</button>
+            <img class="lightbox-img" alt="">
+            <div class="lightbox-meta">
+                <p class="lightbox-caption"></p>
+                <span class="lightbox-counter"></span>
+            </div>
+        </div>
+        <button class="lightbox-nav lightbox-next" aria-label="Next image">&#8250;</button>
     </div>
 
     <!-- FOOTER -->
@@ -120,5 +72,4 @@
     <script src="js/gallery.js" defer></script>
 
 </body>
-
 </html>
