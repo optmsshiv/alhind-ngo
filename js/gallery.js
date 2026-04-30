@@ -57,7 +57,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const lightboxImg = document.querySelector(".lightbox-img");
     const closeBtn = document.querySelector(".lightbox-close");
 
-    if (!lightbox || !lightboxImg || !closeBtn) return;
+    if (!lightbox || !lightboxImg || !closeBtn) {
+        console.warn("Lightbox elements not found. Check #lightbox, .lightbox-img, .lightbox-close in HTML.");
+        return;
+    }
 
     document.querySelectorAll(".gallery-item img").forEach(img => {
         img.addEventListener("click", () => {
