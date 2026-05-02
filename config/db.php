@@ -17,7 +17,7 @@
 //  AL Hind Educational and Charitable Trust
 // ============================================================
 
-define('DB_HOST', 'localhost');        // Usually 'localhost' on shared hosting
+define('DB_HOST', '127.0.0.1');        // Usually 'localhost' on shared hosting
 define('DB_NAME', 'u699609112_alhind');        // Your cPanel database name (e.g. user_alhind_db)
 define('DB_USER', 'u699609112_alhind');      // Your cPanel database username
 define('DB_PASS', '123@Alhindtrust'); // ← Change this
