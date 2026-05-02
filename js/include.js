@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     // LOAD HEADER
-    fetch("partials/header.html")
+    fetch("/partials/header.html")
         .then(res => res.text())
         .then(html => {
             document.getElementById("header").innerHTML = html;
@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
     // LOAD FOOTER
-    fetch("partials/footer.html")
+    fetch("/partials/footer.html")
         .then(res => res.text())
         .then(data => {
             document.getElementById("footer").innerHTML = data;

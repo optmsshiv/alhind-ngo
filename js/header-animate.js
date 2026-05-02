@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    fetch("partials/header.html")
+    fetch("/partials/header.html")
         .then(res => res.text())
         .then(html => {
 
