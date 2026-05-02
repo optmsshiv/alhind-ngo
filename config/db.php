@@ -32,8 +32,8 @@ define('ALLOWED_ORIGINS', [
     'https://alhindtrust.com',
     'https://www.alhindtrust.com',
     'https://admin.alhindtrust.com',
-    'http://localhost',         // for local dev
-    'http://127.0.0.1',
+    'https://api.alhindtrust.com',
+    'http://localhost',
 ]);
  
 // ── Create PDO connection ────────────────────────────────────
@@ -53,7 +53,7 @@ function getDB(): PDO {
             );
         } catch (PDOException $e) {
             http_response_code(500);
-            die(json_encode(['error' => 'Database connection failed']));
+            die(json_encode(['error' => 'Database connection failed: ' . $e->getMessage()]));
         }
     }
     return $pdo;
