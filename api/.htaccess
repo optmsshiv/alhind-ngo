@@ -1,0 +1,32 @@
+# ============================================================
+#  .htaccess — API subdomain (api.alhindtrust.com)
+#  Routes all requests to index.php
+# ============================================================
+
+Options -Indexes
+RewriteEngine On
+
+# Block direct access to config files
+<Files "db.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Route everything to index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# PHP settings (shared hosting)
+<IfModule mod_php.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 12M
+    php_value max_execution_time 60
+</IfModule>
