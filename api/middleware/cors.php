@@ -1,16 +1,20 @@
 <?php
-// middleware/cors.php
-
 function applyCors(): void {
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
-    if (in_array($origin, ALLOWED_ORIGINS, true)) {
+    $allowed = [
+        'https://alhindtrust.com',
+        'https://www.alhindtrust.com',
+        'https://admin.alhindtrust.com',
+        'https://api.alhindtrust.com',
+        'http://localhost',
+        'http://127.0.0.1',
+    ];
+
+    if (in_array($origin, $allowed, true)) {
         header("Access-Control-Allow-Origin: $origin");
     } else {
-        // Allow in dev if no origin sent (e.g. Postman, curl)
-        if (empty($origin)) {
-            header("Access-Control-Allow-Origin: *");
-        }
+        header("Access-Control-Allow-Origin: *");
     }
 
     header('Access-Control-Allow-Credentials: true');
