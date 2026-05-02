@@ -1,0 +1,14 @@
+Options -Indexes
+DirectoryIndex index.html
+
+# Block direct access to sensitive files
+<FilesMatch "\.(sql|php|env|log|bak)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Allow everything else
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+</IfModule>
