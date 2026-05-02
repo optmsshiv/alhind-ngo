@@ -1,7 +1,4 @@
 <?php
-// endpoints/events.php
-// Compatible with u699609112_alhind existing events table structure
-
 function getPublicEvents(): void {
     $db  = getDB();
     $cat = $_GET['category'] ?? null;
@@ -38,19 +35,16 @@ function getAllEvents(): void {
 function createEvent(): void {
     $b = body();
     if (empty($b['title']) || empty($b['event_date'])) error('Title and date are required');
-
-    $db      = getDB();
-    $slug    = makeSlug($b['title'] . '-' . date('Y', strtotime($b['event_date'])));
-    $check   = $db->prepare("SELECT COUNT(*) FROM events WHERE slug = ?");
+    $db       = getDB();
+    $slug     = makeEvtSlug($b['title'] . '-' . date('Y', strtotime($b['event_date'])));
+    $check    = $db->prepare("SELECT COUNT(*) FROM events WHERE slug = ?");
     $check->execute([$slug]);
     if ((int)$check->fetchColumn() > 0) $slug .= '-' . time();
-
     $maxOrder = (int)$db->query("SELECT COALESCE(MAX(sort_order),0) FROM events")->fetchColumn();
     $imgPath  = sanitize($b['image_path'] ?? $b['image'] ?? '');
     $desc     = sanitize($b['description'] ?? '');
     $link     = sanitize($b['join_link'] ?? '');
     $status   = ($b['event_date'] >= date('Y-m-d')) ? 'upcoming' : 'completed';
-
     $stmt = $db->prepare("
         INSERT INTO events (slug, title, event_date, location, image, image_path,
              short_desc, description, map_query, register_link, join_link,
@@ -64,8 +58,7 @@ function createEvent(): void {
         $link, $link, sanitize($b['category'] ?? ''),
         $status, $maxOrder + 1,
     ]);
-
-    $id = $db->lastInsertId();
+    $id   = $db->lastInsertId();
     $stmt = $db->prepare("SELECT * FROM events WHERE id = ?");
     $stmt->execute([$id]);
     ok(formatEvent($stmt->fetch()), 'Event created', 201);
@@ -90,10 +83,14 @@ function updateEvent(string $id): void {
         if (!array_key_exists($input, $b)) continue;
         foreach ($cols as $col) {
             $set[]  = "`$col` = ?";
-            $vals[] = in_array($col, ['sort_order','is_active','event_date']) ? $b[$input] : sanitize((string)$b[$input]);
+            $vals[] = in_array($col, ['sort_order','is_active','event_date'])
+                ? $b[$input] : sanitize((string)$b[$input]);
         }
     }
-    if (isset($b['event_date'])) { $set[] = "`status` = ?"; $vals[] = ($b['event_date'] >= date('Y-m-d')) ? 'upcoming' : 'completed'; }
+    if (isset($b['event_date'])) {
+        $set[]  = "`status` = ?";
+        $vals[] = ($b['event_date'] >= date('Y-m-d')) ? 'upcoming' : 'completed';
+    }
     if (empty($set)) error('No fields to update');
     $vals[] = $id;
     $db->prepare("UPDATE events SET " . implode(', ', $set) . " WHERE id = ?")->execute($vals);
@@ -105,7 +102,7 @@ function updateEvent(string $id): void {
 }
 
 function deleteEvent(string $id): void {
-    $db = getDB();
+    $db   = getDB();
     $stmt = $db->prepare("UPDATE events SET is_active = 0 WHERE id = ?");
     $stmt->execute([$id]);
     if ($stmt->rowCount() === 0) error('Event not found', 404);
@@ -121,7 +118,10 @@ function reorderEvents(): void {
         $stmt = $db->prepare("UPDATE events SET sort_order = ? WHERE id = ?");
         foreach ($ids as $i => $eid) $stmt->execute([$i + 1, $eid]);
         $db->commit();
-    } catch (Exception $e) { $db->rollBack(); error('Reorder failed', 500); }
+    } catch (Exception $e) {
+        $db->rollBack();
+        error('Reorder failed', 500);
+    }
     ok(null, 'Order saved');
 }
 
@@ -144,7 +144,7 @@ function formatEvent(array $r): array {
     ];
 }
 
-function makeSlug(string $text): string {
+function makeEvtSlug(string $text): string {
     $text = strtolower(trim($text));
     $text = preg_replace('/[^a-z0-9\s-]/', '', $text);
     $text = preg_replace('/[\s-]+/', '-', $text);
