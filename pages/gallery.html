@@ -15,61 +15,93 @@
     <!-- HEADER -->
     <div id="header"></div>
 
-    <!-- BREADCRUMB 
-    <section class="breadcrumb">
-        <div class="container">
-            <a href="index.html">Home</a> /
-            <span>Gallery</span>
+    <!-- HERO -->
+    <section class="gallery-hero">
+        <div class="gallery-hero-inner">
+            <div class="gallery-hero-badge">📸 Our Work</div>
+            <h1>Moments That Matter</h1>
+            <p>Snapshots from our educational programs, health camps, community outreach, and volunteer activities
+                across Bihar.</p>
+            <div class="gallery-hero-stats" id="gallery-stats">
+                <div class="ghs-item"><span class="ghs-num" id="stat-photos">—</span><span class="ghs-lbl">Photos</span>
+                </div>
+                <div class="ghs-divider"></div>
+                <div class="ghs-item"><span class="ghs-num" id="stat-cats">—</span><span
+                        class="ghs-lbl">Categories</span></div>
+                <div class="ghs-divider"></div>
+                <div class="ghs-item"><span class="ghs-num">12+</span><span class="ghs-lbl">Years of Work</span></div>
+            </div>
         </div>
-    </section>-->
-
-    <!-- PAGE HERO -->
-    <section style="text-align:center;padding:2.5rem 1rem 1rem;">
-        <h1 class="section-title">Our Work in Action</h1>
-        <p style="max-width:700px;margin:1rem auto 0;color:#64748b;">
-            Moments from our educational programs, health camps, community outreach,
-            and volunteer activities.
-        </p>
     </section>
 
     <!-- CAROUSEL -->
-    <section class="gallery-carousel">
-        <button class="carousel-btn prev" aria-label="Previous">&#8249;</button>
-        <div class="carousel-track">
-            <!-- Dynamically populated by gallery.js -->
+    <section class="gallery-carousel-wrap">
+        <div class="gallery-carousel">
+            <button class="carousel-btn prev" aria-label="Previous">&#8249;</button>
+            <div class="carousel-track">
+                <!-- populated by gallery.js -->
+            </div>
+            <button class="carousel-btn next" aria-label="Next">&#8250;</button>
+            <div class="carousel-dots" id="carousel-dots"></div>
         </div>
-        <button class="carousel-btn next" aria-label="Next">&#8250;</button>
     </section>
 
-    <!-- GALLERY GRID -->
-    <section class="section">
-        <div class="gallery-grid container">
-            <!-- Dynamically populated by gallery.js -->
+    <!-- FILTER BAR -->
+    <section class="gallery-filter-section">
+        <div class="container">
+            <div class="gallery-filter-bar" id="gallery-filter-bar">
+                <button class="gfb-btn active" data-cat="all">
+                    <span class="gfb-icon">🌐</span> All
+                    <span class="gfb-count" id="fcount-all">0</span>
+                </button>
+                <!-- category buttons populated by gallery.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- MASONRY GALLERY -->
+    <section class="gallery-section">
+        <div class="container">
+            <div class="masonry-grid" id="masonry-grid">
+                <!-- skeleton placeholders -->
+                <div class="masonry-skeleton"></div>
+                <div class="masonry-skeleton tall"></div>
+                <div class="masonry-skeleton"></div>
+                <div class="masonry-skeleton wide"></div>
+                <div class="masonry-skeleton"></div>
+                <div class="masonry-skeleton tall"></div>
+            </div>
+            <div class="gallery-load-more" id="load-more-wrap" style="display:none">
+                <button class="btn-load-more" id="load-more-btn" onclick="loadMore()">Load More Photos</button>
+            </div>
         </div>
     </section>
 
     <!-- LIGHTBOX -->
     <div id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
-        <button class="lightbox-nav lightbox-prev" aria-label="Previous image">&#8249;</button>
+        <button class="lightbox-nav lightbox-prev" aria-label="Previous">&#8249;</button>
         <div class="lightbox-content">
-            <button class="lightbox-close" aria-label="Close">&times;</button>
+            <div class="lightbox-topbar">
+                <span class="lightbox-counter"></span>
+                <button class="lightbox-close" aria-label="Close">&times;</button>
+            </div>
             <img class="lightbox-img" alt="">
             <div class="lightbox-meta">
                 <p class="lightbox-caption"></p>
-                <span class="lightbox-counter"></span>
+                <span class="lightbox-cat-badge"></span>
             </div>
         </div>
-        <button class="lightbox-nav lightbox-next" aria-label="Next image">&#8250;</button>
+        <button class="lightbox-nav lightbox-next" aria-label="Next">&#8250;</button>
     </div>
 
     <!-- FOOTER -->
     <div id="footer"></div>
 
-    <!-- SCRIPTS -->
     <script src="/js/include.js" defer></script>
     <script src="/js/main.js" defer></script>
     <script src="/js/header-animate.js" defer></script>
     <script src="/js/gallery.js" defer></script>
 
 </body>
+
 </html>

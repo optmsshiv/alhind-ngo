@@ -1922,7 +1922,7 @@
       <div class="tab-panel" id="page-gallery">
         <div class="pg-header">
           <h1>🖼️ Gallery</h1>
-          <p>Manage images — drag to reorder, toggle visibility, edit captions.</p>
+          <p>Drag cards to reorder. Changes save automatically.</p>
         </div>
         <div class="sec-bar">
           <h2>All Images</h2>
@@ -1930,43 +1930,12 @@
             <span class="cpill" id="gal-cpill">0 images</span>
             <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;" onclick="goTo('upload')">📤
               Upload</button>
-            <div class="gal-view-toggle">
-              <button class="gvt-btn active" id="gvt-grid" onclick="switchGalView('grid')" title="Grid view">⊞</button>
-              <button class="gvt-btn" id="gvt-table" onclick="switchGalView('table')" title="Table view">☰</button>
-            </div>
             <button
               style="background:var(--danger-bg);color:var(--danger);border:none;border-radius:8px;padding:.42rem .95rem;font-size:.8rem;cursor:pointer;font-weight:700;"
               onclick="clearAllGal()">Clear All</button>
           </div>
         </div>
-
-        <!-- GRID VIEW -->
-        <div id="gal-grid-view">
-          <p style="color:var(--muted);font-size:.82rem;margin-bottom:1.1rem;">💡 Drag cards to reorder · Toggle 👁 to
-            show/hide on public site</p>
-          <div class="adm-grid" id="gal-grid"></div>
-        </div>
-
-        <!-- TABLE VIEW -->
-        <div id="gal-table-view" style="display:none">
-          <div class="tbl-wrap" style="margin-top:.5rem">
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Image</th>
-                  <th>Caption</th>
-                  <th>Category</th>
-                  <th>Featured</th>
-                  <th>Visible</th>
-                  <th>Uploaded</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="gal-tbody"></tbody>
-            </table>
-          </div>
-        </div>
+        <div class="adm-grid" id="gal-grid"></div>
       </div>
 
       <!-- UPLOAD -->
@@ -2489,99 +2458,6 @@
       btn.disabled = false; btn.textContent = '＋ Add to Gallery';
     }
 
-    /* ══════════════════════════════════════
-       GALLERY VIEW SWITCH
-    ══════════════════════════════════════ */
-    let galView = 'grid'; // 'grid' | 'table'
-
-    function switchGalView(view) {
-      galView = view;
-      document.getElementById('gal-grid-view').style.display = view === 'grid' ? 'block' : 'none';
-      document.getElementById('gal-table-view').style.display = view === 'table' ? 'block' : 'none';
-      document.getElementById('gvt-grid').classList.toggle('active', view === 'grid');
-      document.getElementById('gvt-table').classList.toggle('active', view === 'table');
-      if (view === 'table') renderGalTable();
-    }
-
-    /* ── Gallery Table ───────────────────────────────────────── */
-    function renderGalTable() {
-      const tb = document.getElementById('gal-tbody');
-      if (!tb) return;
-      if (!gallery.length) {
-        tb.innerHTML = `<tr class="empty-r"><td colspan="8">No images yet.</td></tr>`;
-        return;
-      }
-      tb.innerHTML = gallery.map((item, idx) => {
-        const src = item.filepath || item.src || '';
-        const cap = item.title || item.alt_text || item.caption || '';
-        const catName = item.category_name || '—';
-        const isFeat = item.is_featured == 1 || item.is_featured === true;
-        const isVis = item.is_active == 1 || item.is_active === true || item.is_active === undefined;
-        const date = item.created_at ? new Date(item.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
-        return `<tr id="gal-row-${item.id}" class="${!isVis ? 'row-hidden' : ''}">
-      <td style="color:var(--muted);font-size:.78rem">#${idx + 1}</td>
-      <td><img src="${esc(src)}" style="width:60px;height:44px;object-fit:cover;border-radius:7px;display:block" alt=""></td>
-      <td>
-        <input type="text" value="${esc(cap)}" class="caption-input" style="width:160px"
-          id="tbl-cap-${item.id}" onkeydown="if(event.key==='Enter'){event.preventDefault();saveCapById(${item.id})}">
-      </td>
-      <td><span class="cat-tag">${esc(catName)}</span></td>
-      <td>
-        <button onclick="toggleFeatured(${item.id},${isFeat ? 0 : 1})"
-          class="feat-star ${isFeat ? 'on' : ''}" title="${isFeat ? 'Remove from featured' : 'Mark as featured'}">
-          ${isFeat ? '⭐ Featured' : '☆ Feature'}
-        </button>
-      </td>
-      <td>
-        <button onclick="toggleVisibility(${item.id},${isVis ? 0 : 1})"
-          class="vis-toggle ${isVis ? 'visible' : 'hidden'}">
-          ${isVis ? '👁 Visible' : '🙈 Hidden'}
-        </button>
-      </td>
-      <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">${date}</td>
-      <td><div class="tbl-acts">
-        <button class="btn-sv" onclick="saveCapById(${item.id})">💾</button>
-        <button class="btn-rm" onclick="delGal(${item.id})">🗑</button>
-      </div></td>
-    </tr>`;
-      }).join('');
-    }
-
-    async function saveCapById(id) {
-      const inp = document.getElementById(`tbl-cap-${id}`);
-      if (!inp) return;
-      const caption = inp.value.trim();
-      try {
-        await apiFetch('PUT', `gallery/${id}`, { title: caption, alt_text: caption });
-        const item = gallery.find(g => g.id === id);
-        if (item) { item.title = caption; item.alt_text = caption; }
-        toast('Caption saved ✓', 'success');
-      } catch (e) { toast('Failed to save', 'error'); }
-    }
-
-    async function toggleVisibility(id, newVal) {
-      try {
-        await apiFetch('PUT', `gallery/${id}`, { is_active: newVal });
-        const item = gallery.find(g => g.id === id);
-        if (item) item.is_active = newVal;
-        toast(newVal ? 'Image is now visible ✓' : 'Image hidden from public ✓', 'success');
-        renderGalGrid();
-        renderGalTable();
-      } catch (e) { toast('Failed', 'error'); }
-    }
-
-    async function toggleFeatured(id, newVal) {
-      try {
-        await apiFetch('PUT', `gallery/${id}`, { is_featured: newVal });
-        const item = gallery.find(g => g.id === id);
-        if (item) item.is_featured = newVal;
-        toast(newVal ? '⭐ Marked as featured' : 'Removed from featured', 'success');
-        renderGalTable();
-        if (galView === 'grid') renderGalGrid();
-      } catch (e) { toast('Failed', 'error'); }
-    }
-
-
     function renderGalGrid() {
       const g = document.getElementById('gal-grid'); g.innerHTML = '';
       if (!gallery.length) {
@@ -2593,25 +2469,15 @@
         card.className = 'adm-card'; card.draggable = true; card.dataset.idx = idx;
         const src = item.filepath || item.src || '';
         const cap = item.title || item.caption || '';
-        const isFeat = item.is_featured == 1 || item.is_featured === true;
-        const isVis = item.is_active === undefined || item.is_active == 1 || item.is_active === true;
-        card.style.opacity = isVis ? '1' : '0.45';
         card.innerHTML = `
       <div class="drag-h">⠿⠿</div>
       <div class="ord-b">#${idx + 1}</div>
-      ${isFeat ? '<div style="position:absolute;top:7px;left:36px;background:#fef08a;color:#854d0e;border-radius:6px;padding:2px 6px;font-size:.62rem;font-weight:700;">⭐ Featured</div>' : ''}
-      ${!isVis ? '<div style="position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.75rem;font-weight:700;border-radius:12px 12px 0 0;">🙈 HIDDEN</div>' : ''}
       <img src="${src}" alt="${esc(cap)}" loading="lazy">
       <div class="acb">
         <input class="cap-inp" type="text" value="${esc(cap)}" placeholder="Caption…" data-id="${item.id}" data-idx="${idx}">
-        <div class="card-acts" style="flex-wrap:wrap;gap:.3rem">
-          <button class="btn-sv" onclick="saveCap(${idx})" title="Save caption">💾</button>
-          <button onclick="toggleVisibility(${item.id},${isVis ? 0 : 1})"
-            style="flex:1;background:${isVis ? '#f0fdf4' : '#f8fafc'};color:${isVis ? 'var(--teal)' : '#94a3b8'};border:1.5px solid ${isVis ? 'var(--teal)' : '#e2e8f0'};border-radius:7px;padding:.33rem;font-size:.72rem;font-weight:700;cursor:pointer;"
-            title="${isVis ? 'Hide from public' : 'Show on public site'}">
-            ${isVis ? '👁' : '🙈'}
-          </button>
-          <button class="btn-dl" onclick="delGal(${item.id})" title="Delete">🗑</button>
+        <div class="card-acts">
+          <button class="btn-sv" onclick="saveCap(${idx})">💾</button>
+          <button class="btn-dl" onclick="delGal(${item.id})">🗑</button>
         </div>
       </div>`;
         card.addEventListener('dragstart', () => { galDragI = idx; card.classList.add('dragging'); });
@@ -2634,8 +2500,6 @@
         });
         g.appendChild(card);
       });
-      // Keep table in sync if visible
-      if (galView === 'table') renderGalTable();
     }
 
     async function saveCap(idx) {

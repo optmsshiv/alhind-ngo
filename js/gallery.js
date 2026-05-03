@@ -1,15 +1,41 @@
 /**
- * gallery.js — AL Hind Trust
- * Fetches gallery images from the real API and renders them dynamically.
+ * gallery.js — AL Hind Trust Premium Gallery
+ * Masonry layout · Category filters · Lightbox · API-powered
  */
 
 const GALLERY_API = 'https://api.alhindtrust.com';
+const PAGE_SIZE = 12; // images per page
+let allItems = [];
+let filteredItems = [];
+let visibleCount = PAGE_SIZE;
+let activeCategory = 'all';
+let lbItems = [];
+let lbIndex = 0;
+let carouselCurrent = 0;
+let carouselTimer = null;
 
-let allGalleryItems = [];
-let lbItems = [], lbIndex = 0;
-const today = new Date().toISOString().split('T')[0];
+/* ── Category config ─────────────────────────────────────── */
+const CAT_CONFIG = {
+  'education-programs': { icon: '📚', label: 'Education', cls: 'cat-education' },
+  'health-camps': { icon: '🏥', label: 'Health', cls: 'cat-health' },
+  'community-outreach': { icon: '🤝', label: 'Community', cls: 'cat-community' },
+  'volunteer-activities': { icon: '🙌', label: 'Volunteer', cls: 'cat-volunteer' },
+  'skill-development': { icon: '⚙️', label: 'Skills', cls: 'cat-skill' },
+  'awareness-campaigns': { icon: '📢', label: 'Awareness', cls: 'cat-awareness' },
+  'welfare': { icon: '💚', label: 'Welfare', cls: 'cat-welfare' },
+};
 
-/* ── Fetch from API ────────────────────────────────────────── */
+function getCatInfo(catSlug, catName) {
+  if (!catSlug && !catName) return { icon: '📷', label: 'General', cls: 'cat-default' };
+  const key = catSlug || slugify(catName || '');
+  return CAT_CONFIG[key] || { icon: '📷', label: catName || 'General', cls: 'cat-default' };
+}
+
+function slugify(s) {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+/* ── Fetch ───────────────────────────────────────────────── */
 async function fetchGallery() {
   try {
     const res = await fetch(`${GALLERY_API}/gallery`);
@@ -21,102 +47,217 @@ async function fetchGallery() {
   }
 }
 
-/* ── Render Grid ───────────────────────────────────────────── */
-function renderGrid(items) {
-  const grid = document.querySelector('.gallery-grid');
+/* ── Build filter bar ────────────────────────────────────── */
+function buildFilterBar(items) {
+  const bar = document.getElementById('gallery-filter-bar');
+  if (!bar) return;
+
+  // Count per category
+  const catCounts = {};
+  items.forEach(item => {
+    const key = item.category_slug || slugify(item.category_name || '');
+    if (key) catCounts[key] = (catCounts[key] || 0) + 1;
+  });
+
+  // Update all count
+  const allCount = document.getElementById('fcount-all');
+  if (allCount) allCount.textContent = items.length;
+
+  // Update stats
+  const statPhotos = document.getElementById('stat-photos');
+  const statCats = document.getElementById('stat-cats');
+  if (statPhotos) statPhotos.textContent = items.length;
+  if (statCats) statCats.textContent = Object.keys(catCounts).length;
+
+  // Add category buttons
+  Object.entries(catCounts).forEach(([slug, count]) => {
+    const info = getCatInfo(slug, slug.replace(/-/g, ' '));
+    const btn = document.createElement('button');
+    btn.className = 'gfb-btn';
+    btn.dataset.cat = slug;
+    btn.innerHTML = `<span class="gfb-icon">${info.icon}</span> ${info.label} <span class="gfb-count">${count}</span>`;
+    btn.addEventListener('click', () => filterGallery(slug));
+    bar.appendChild(btn);
+  });
+
+  // All button click
+  bar.querySelector('[data-cat="all"]')?.addEventListener('click', () => filterGallery('all'));
+}
+
+/* ── Filter ──────────────────────────────────────────────── */
+function filterGallery(cat) {
+  activeCategory = cat;
+  visibleCount = PAGE_SIZE;
+
+  // Update button states
+  document.querySelectorAll('.gfb-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.cat === cat);
+  });
+
+  filteredItems = cat === 'all'
+    ? [...allItems]
+    : allItems.filter(item => {
+      const slug = item.category_slug || slugify(item.category_name || '');
+      return slug === cat;
+    });
+
+  renderMasonry();
+}
+
+/* ── Masonry render ──────────────────────────────────────── */
+function renderMasonry() {
+  const grid = document.getElementById('masonry-grid');
   if (!grid) return;
 
-  if (!items.length) {
-    grid.innerHTML = `<p class="gallery-empty">No images available yet.</p>`;
+  const toShow = filteredItems.slice(0, visibleCount);
+
+  if (!toShow.length) {
+    grid.innerHTML = `<p class="gallery-empty">No images in this category yet.</p>`;
+    document.getElementById('load-more-wrap').style.display = 'none';
     return;
   }
 
   grid.innerHTML = '';
-  items.forEach((item, i) => {
+  toShow.forEach((item, i) => {
     const src = item.filepath || item.src || '';
-    const cap = item.title || item.caption || item.alt_text || '';
+    const cap = item.title || item.alt_text || '';
+    const catSlug = item.category_slug || slugify(item.category_name || '');
+    const catInfo = getCatInfo(catSlug, item.category_name);
 
     const div = document.createElement('div');
-    div.className = 'gallery-item skeleton';
+    div.className = 'masonry-item';
+    div.innerHTML = `
+      <img src="" data-src="${esc(src)}" alt="${esc(cap)}" class="skeleton-hidden" loading="lazy">
+      <div class="masonry-zoom">🔍</div>
+      <div class="masonry-overlay">
+        ${catInfo.label !== 'General'
+        ? `<span class="masonry-cat-badge ${catInfo.cls}">${catInfo.icon} ${catInfo.label}</span>`
+        : ''}
+        ${cap ? `<div class="masonry-overlay-title">${esc(cap)}</div>` : ''}
+      </div>`;
 
-    const img = document.createElement('img');
-    img.alt = cap;
-    img.loading = 'lazy';
-    img.decoding = 'async';
-    img.className = 'skeleton-hidden';
+    const img = div.querySelector('img');
 
-    img.addEventListener('load', () => {
-      img.classList.add('loaded');
-      img.classList.remove('skeleton-hidden');
-      div.classList.remove('skeleton');
+    // Lazy load with IntersectionObserver
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          img.src = img.dataset.src;
+          img.addEventListener('load', () => {
+            img.classList.add('loaded');
+            img.classList.remove('skeleton-hidden');
+          });
+          observer.unobserve(img);
+        }
+      });
+    }, { rootMargin: '200px' });
+
+    observer.observe(img);
+
+    div.addEventListener('click', () => {
+      const lightboxItems = filteredItems.slice(0, visibleCount);
+      openLightbox(lightboxItems, i);
     });
-    img.addEventListener('error', () => {
-      div.classList.remove('skeleton');
-      img.classList.remove('skeleton-hidden');
-    });
 
-    // Stagger load
-    setTimeout(() => { img.src = src; }, i * 50);
-
-    div.appendChild(img);
     grid.appendChild(div);
-    div.addEventListener('click', () => openLightbox(items, i));
   });
+
+  // Load more button
+  const wrap = document.getElementById('load-more-wrap');
+  if (wrap) wrap.style.display = visibleCount < filteredItems.length ? 'block' : 'none';
 }
 
-/* ── Render Carousel ───────────────────────────────────────── */
-function renderCarousel(items) {
+/* ── Load more ───────────────────────────────────────────── */
+function loadMore() {
+  visibleCount += PAGE_SIZE;
+  renderMasonry();
+  // Smooth scroll to new items
+  const grid = document.getElementById('masonry-grid');
+  const items = grid.querySelectorAll('.masonry-item');
+  items[visibleCount - PAGE_SIZE]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ── Carousel ────────────────────────────────────────────── */
+function buildCarousel(items) {
   const track = document.querySelector('.carousel-track');
+  const dots = document.getElementById('carousel-dots');
   if (!track) return;
 
-  const featured = items.slice(0, 6);
-  track.innerHTML = '';
+  const featured = items.filter(item => item.is_featured == 1 || item.is_featured === true).slice(0, 8);
+  const slides = featured.length ? featured : items.slice(0, 6);
 
-  featured.forEach(item => {
-    const src = item.filepath || item.src || '';
-    const cap = item.title || item.caption || '';
-    const slide = document.createElement('div');
-    slide.className = 'carousel-slide';
-    slide.innerHTML = `<img src="${src}" alt="${esc(cap)}"><p>${esc(cap)}</p>`;
-    track.appendChild(slide);
-  });
-
-  initCarousel();
-}
-
-/* ── Carousel Logic ────────────────────────────────────────── */
-function initCarousel() {
-  const carousel = document.querySelector('.gallery-carousel');
-  const track = document.querySelector('.carousel-track');
-  if (!carousel || !track) return;
-
-  const slides = track.querySelectorAll('.carousel-slide');
-  if (!slides.length) return;
-
-  let current = 0;
-  const total = slides.length;
-
-  function goTo(i) {
-    current = (i + total) % total;
-    track.style.transform = `translateX(-${current * 100}%)`;
+  if (!slides.length) {
+    document.querySelector('.gallery-carousel-wrap')?.style.setProperty('display', 'none');
+    return;
   }
 
-  carousel.querySelector('.carousel-btn.prev')?.addEventListener('click', () => goTo(current - 1));
-  carousel.querySelector('.carousel-btn.next')?.addEventListener('click', () => goTo(current + 1));
+  track.innerHTML = '';
+  if (dots) dots.innerHTML = '';
 
-  let autoplay = setInterval(() => goTo(current + 1), 4500);
-  carousel.addEventListener('mouseenter', () => clearInterval(autoplay));
-  carousel.addEventListener('mouseleave', () => { autoplay = setInterval(() => goTo(current + 1), 4500); });
+  slides.forEach((item, i) => {
+    const src = item.filepath || item.src || '';
+    const cap = item.title || item.alt_text || '';
+    const catSlug = item.category_slug || slugify(item.category_name || '');
+    const catInfo = getCatInfo(catSlug, item.category_name);
 
+    const slide = document.createElement('div');
+    slide.className = 'carousel-slide';
+    slide.innerHTML = `
+      <img src="${esc(src)}" alt="${esc(cap)}" loading="${i === 0 ? 'eager' : 'lazy'}">
+      <div class="carousel-slide-overlay">
+        ${catInfo.label !== 'General'
+        ? `<div class="carousel-slide-badge">${catInfo.icon} ${catInfo.label}</div>`
+        : ''}
+        ${cap ? `<div class="carousel-slide-caption">${esc(cap)}</div>` : ''}
+      </div>`;
+    track.appendChild(slide);
+
+    // Dot
+    if (dots) {
+      const dot = document.createElement('button');
+      dot.className = `carousel-dot${i === 0 ? ' active' : ''}`;
+      dot.addEventListener('click', () => goToSlide(i));
+      dots.appendChild(dot);
+    }
+  });
+
+  initCarousel(slides.length);
+}
+
+function initCarousel(total) {
+  const carousel = document.querySelector('.gallery-carousel');
+  const track = document.querySelector('.carousel-track');
+  if (!carousel || !track || total === 0) return;
+
+  function goToSlide(i) {
+    carouselCurrent = (i + total) % total;
+    track.style.transform = `translateX(-${carouselCurrent * 100}%)`;
+    document.querySelectorAll('.carousel-dot').forEach((d, idx) => {
+      d.classList.toggle('active', idx === carouselCurrent);
+    });
+  }
+
+  carousel.querySelector('.carousel-btn.prev')?.addEventListener('click', () => goToSlide(carouselCurrent - 1));
+  carousel.querySelector('.carousel-btn.next')?.addEventListener('click', () => goToSlide(carouselCurrent + 1));
+
+  // Auto-play
+  function startAuto() {
+    carouselTimer = setInterval(() => goToSlide(carouselCurrent + 1), 5000);
+  }
+  startAuto();
+  carousel.addEventListener('mouseenter', () => clearInterval(carouselTimer));
+  carousel.addEventListener('mouseleave', startAuto);
+
+  // Touch swipe
   let startX = 0;
   track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
   track.addEventListener('touchend', e => {
     const diff = startX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) goTo(current + (diff > 0 ? 1 : -1));
+    if (Math.abs(diff) > 40) goToSlide(carouselCurrent + (diff > 0 ? 1 : -1));
   });
 }
 
-/* ── Lightbox ──────────────────────────────────────────────── */
+/* ── Lightbox ────────────────────────────────────────────── */
 function openLightbox(items, index) {
   lbItems = items; lbIndex = index;
   const box = document.getElementById('lightbox');
@@ -127,17 +268,23 @@ function openLightbox(items, index) {
 }
 
 function updateLightbox() {
-  const box = document.getElementById('lightbox');
   const item = lbItems[lbIndex];
   if (!item) return;
   const src = item.filepath || item.src || '';
-  const cap = item.title || item.caption || '';
-  box.querySelector('.lightbox-img').src = src;
-  box.querySelector('.lightbox-img').alt = cap;
-  const capEl = box.querySelector('.lightbox-caption');
-  if (capEl) capEl.textContent = cap;
-  const counter = box.querySelector('.lightbox-counter');
-  if (counter) counter.textContent = `${lbIndex + 1} / ${lbItems.length}`;
+  const cap = item.title || item.alt_text || '';
+  const catSlug = item.category_slug || slugify(item.category_name || '');
+  const catInfo = getCatInfo(catSlug, item.category_name);
+
+  document.querySelector('.lightbox-img').src = src;
+  document.querySelector('.lightbox-img').alt = cap;
+  document.querySelector('.lightbox-caption').textContent = cap;
+  document.querySelector('.lightbox-counter').textContent = `${lbIndex + 1} / ${lbItems.length}`;
+
+  const catBadge = document.querySelector('.lightbox-cat-badge');
+  if (catBadge) {
+    catBadge.textContent = `${catInfo.icon} ${catInfo.label}`;
+    catBadge.className = `lightbox-cat-badge ${catInfo.cls}`;
+  }
 }
 
 function lightboxNav(dir) {
@@ -155,33 +302,44 @@ function closeLightbox() {
 function initLightbox() {
   const box = document.getElementById('lightbox');
   if (!box) return;
+
   box.querySelector('.lightbox-close')?.addEventListener('click', closeLightbox);
   box.querySelector('.lightbox-prev')?.addEventListener('click', () => lightboxNav(-1));
   box.querySelector('.lightbox-next')?.addEventListener('click', () => lightboxNav(1));
   box.addEventListener('click', e => { if (e.target === box) closeLightbox(); });
+
   document.addEventListener('keydown', e => {
     if (box.style.display !== 'flex') return;
     if (e.key === 'Escape') closeLightbox();
     if (e.key === 'ArrowLeft') lightboxNav(-1);
     if (e.key === 'ArrowRight') lightboxNav(1);
   });
-  let lbTouchX = 0;
-  box.addEventListener('touchstart', e => { lbTouchX = e.touches[0].clientX; }, { passive: true });
+
+  let lbTx = 0;
+  box.addEventListener('touchstart', e => { lbTx = e.touches[0].clientX; }, { passive: true });
   box.addEventListener('touchend', e => {
-    const diff = lbTouchX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) lightboxNav(diff > 0 ? 1 : -1);
+    const d = lbTx - e.changedTouches[0].clientX;
+    if (Math.abs(d) > 40) lightboxNav(d > 0 ? 1 : -1);
   });
 }
 
+/* ── Escape helper ───────────────────────────────────────── */
 function esc(s) {
   return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-/* ── Init ──────────────────────────────────────────────────── */
+/* ── Init ────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
   initLightbox();
+
   const items = await fetchGallery();
-  allGalleryItems = items;
-  renderGrid(items);
-  renderCarousel(items);
+  allItems = items;
+  filteredItems = [...items];
+
+  // Remove skeleton
+  document.getElementById('masonry-grid').innerHTML = '';
+
+  buildFilterBar(items);
+  buildCarousel(items);
+  renderMasonry();
 });
