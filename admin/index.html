@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <title>Admin Panel — AL Hind Trust</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -642,19 +642,23 @@
     }
 
     .si-green {
-      background: #dcfce7
+      background: #dcfce7;
+      color: #16a34a
     }
 
     .si-blue {
-      background: #dbeafe
+      background: #dbeafe;
+      color: #2563eb
     }
 
     .si-amber {
-      background: #fef3c7
+      background: #fef3c7;
+      color: #d97706
     }
 
     .si-purple {
-      background: #ede9fe
+      background: #ede9fe;
+      color: #7c3aed
     }
 
     .stat-val {
@@ -1200,8 +1204,20 @@
 
     .dzi {
       font-size: 2.1rem;
-      display: block;
-      margin-bottom: .55rem
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      margin: 0 auto .75rem;
+      color: var(--teal);
+    }
+
+    .dzi i {
+      font-size: 1.3rem;
     }
 
     .dz-strong {
@@ -1561,6 +1577,37 @@
       white-space: pre-wrap;
     }
 
+    /* Gallery action icon buttons */
+    .gal-act-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      transition: background .15s, border-color .15s;
+    }
+
+    .gal-act-btn:hover {
+      background: var(--bg);
+      border-color: #cbd5e1;
+      color: #1e293b;
+    }
+
+    .gal-act-del:hover {
+      background: var(--danger-bg) !important;
+      border-color: #fca5a5 !important;
+      color: var(--danger) !important;
+    }
+
+    .gal-tbl {
+      table-layout: fixed;
+    }
+
     /* Stat red sub */
     .stat-sub.red {
       color: var(--danger);
@@ -1695,19 +1742,20 @@
       <button class="tb-toggle" onclick="toggleSidebar()">☰</button>
       <div class="tb-space"></div>
       <div class="tb-search">
-        <span>🔍</span>
+        <i class="fa-solid fa-magnifying-glass"></i>
         <input type="text" placeholder="Search events…" id="gsearch" oninput="gSearch()">
       </div>
       <div class="tb-right">
-        <a href="gallery.html" target="_blank" class="ext-link">🖼️ Gallery ↗</a>
-        <a href="events.html" target="_blank" class="ext-link">📅 Events ↗</a>
+        <a href="gallery.html" target="_blank" class="ext-link"><i class="fa-solid fa-images"></i> Gallery ↗</a>
+        <a href="events.html" target="_blank" class="ext-link"><i class="fa-solid fa-calendar-days"></i> Events ↗</a>
         <div class="avatar-wrap">
           <div class="avatar" onclick="toggleAvMenu()" id="av-btn">A
             <div class="av-menu" id="av-menu">
               <div class="am-meta">Signed in as</div>
               <div class="am-name">Admin</div>
               <hr>
-              <button class="danger" onclick="doLogout()">🚪 Sign Out</button>
+              <button class="danger" onclick="doLogout()"><i class="fa-solid fa-right-from-bracket"></i> Sign
+                Out</button>
             </div>
           </div>
         </div>
@@ -1719,7 +1767,7 @@
       <div class="sb-section">
         <div class="sb-sec-lbl">Main</div>
         <button class="nav-item active" onclick="goTo('dashboard')" data-page="dashboard">
-          <span class="ni-icon"><i class="fa-solid fa-gauge"></i></span>Dashboard
+          <span class="ni-icon"><i class="fa-solid fa-gauge-high"></i></span>Dashboard
         </button>
       </div>
       <div class="sb-section">
@@ -1747,7 +1795,7 @@
       <div class="sb-section">
         <div class="sb-sec-lbl">Actions</div>
         <button class="nav-item" onclick="goTo('add-event')" data-page="add-event">
-          <span class="ni-icon"><i class="fa-solid fa-plus"></i></span>Add Event
+          <span class="ni-icon"><i class="fa-solid fa-calendar-plus"></i></span>Add Event
         </button>
         <button class="nav-item" onclick="goTo('upload')" data-page="upload">
           <span class="ni-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>Upload Images
@@ -1775,13 +1823,13 @@
         </div>
         <div class="stats-grid">
           <div class="stat-card sc-green">
-            <div class="stat-icon si-green">📅</div>
+            <div class="stat-icon si-green"><i class="fa-solid fa-calendar-days"></i></div>
             <div class="stat-val" id="sv-total">0</div>
             <div class="stat-lbl">Total Events</div>
             <div class="stat-sub" id="sv-up">↑ 0 upcoming</div>
           </div>
           <div class="stat-card sc-blue">
-            <div class="stat-icon si-blue">🖼️</div>
+            <div class="stat-icon si-blue"><i class="fa-solid fa-images"></i></div>
             <div class="stat-val" id="sv-gal">0</div>
             <div class="stat-lbl">Gallery Images</div>
             <div class="stat-sub mu">Across all categories</div>
@@ -1799,13 +1847,13 @@
             <div class="stat-sub mu">Unique locations</div>
           </div>
           <div class="stat-card sc-amber">
-            <div class="stat-icon si-amber">💰</div>
+            <div class="stat-icon si-amber"><i class="fa-solid fa-hand-holding-dollar"></i></div>
             <div class="stat-val" id="sv-don">0</div>
             <div class="stat-lbl">Total Donations</div>
             <div class="stat-sub" id="sv-don-amt">₹0 raised</div>
           </div>
           <div class="stat-card sc-blue">
-            <div class="stat-icon si-blue">📬</div>
+            <div class="stat-icon si-blue"><i class="fa-solid fa-envelope-open-text"></i></div>
             <div class="stat-val" id="sv-msg">0</div>
             <div class="stat-lbl">Messages</div>
             <div class="stat-sub mu" id="sv-msg-unread">0 unread</div>
@@ -1813,20 +1861,24 @@
         </div>
         <div class="dash-grid">
           <div class="dash-card">
-            <div class="dc-title">📅 Recent Events <span class="dc-ct" id="dc-ec">0</span></div>
+            <div class="dc-title"><i class="fa-solid fa-calendar-days"></i> Recent Events <span class="dc-ct"
+                id="dc-ec">0</span></div>
             <div class="recent-list" id="dash-events"></div>
           </div>
           <div style="display:flex;flex-direction:column;gap:1.1rem">
             <div class="dash-card">
-              <div class="dc-title">🖼️ Gallery Preview</div>
+              <div class="dc-title"><i class="fa-solid fa-images"></i> Gallery Preview</div>
               <div class="gal-strip" id="dash-gal-strip"></div>
             </div>
             <div class="dash-card">
               <div class="dc-title">⚡ Quick Actions</div>
               <div class="qa-list">
-                <button class="qa-btn" onclick="goTo('add-event')"><span>➕</span> Add New Event</button>
-                <button class="qa-btn" onclick="goTo('upload')"><span>📤</span> Upload Gallery Images</button>
-                <button class="qa-btn" onclick="goTo('events')"><span>📋</span> Manage All Events</button>
+                <button class="qa-btn" onclick="goTo('add-event')"><i class="fa-solid fa-calendar-plus"></i> Add New
+                  Event</button>
+                <button class="qa-btn" onclick="goTo('upload')"><i class="fa-solid fa-cloud-arrow-up"></i> Upload
+                  Gallery Images</button>
+                <button class="qa-btn" onclick="goTo('events')"><i class="fa-solid fa-list-check"></i> Manage All
+                  Events</button>
                 <button class="qa-btn" onclick="goTo('gallery')"><span>🗂️</span> Manage Gallery</button>
               </div>
             </div>
@@ -1837,14 +1889,15 @@
       <!-- EVENTS LIST -->
       <div class="tab-panel" id="page-events">
         <div class="pg-header">
-          <h1>📅 Events</h1>
+          <h1><i class="fa-solid fa-calendar-days"></i> Events</h1>
           <p>Manage all events and activities.</p>
         </div>
         <div class="sec-bar">
           <h2>All Events</h2>
           <div style="display:flex;gap:.7rem;align-items:center;flex-wrap:wrap">
             <span class="cpill" id="evt-cnt">0 events</span>
-            <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;" onclick="goTo('add-event')">➕ Add
+            <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;" onclick="goTo('add-event')"><i
+                class="fa-solid fa-plus"></i> Add
               Event</button>
           </div>
         </div>
@@ -1869,7 +1922,7 @@
       <!-- ADD EVENT -->
       <div class="tab-panel" id="page-add-event">
         <div class="pg-header">
-          <h1 id="ae-title">➕ Add New Event</h1>
+          <h1 id="ae-title"><i class="fa-solid fa-calendar-plus"></i> Add New Event</h1>
           <p>Fill in the details to publish an event on the public page.</p>
         </div>
         <div class="panel-card">
@@ -1904,7 +1957,7 @@
                 <input type="file" id="ef-img-file" accept="image/*" onchange="handleEvtImg(this)">
                 <div class="ip-wrap" id="ef-ip-wrap" style="display:none">
                   <img id="ef-ip" class="ip-img" alt="">
-                  <button class="ip-clr" onclick="clearEvtImg(event)">✕</button>
+                  <button class="ip-clr" onclick="clearEvtImg(event)"><i class="fa-solid fa-xmark"></i></button>
                 </div>
               </div>
               <input type="text" id="ef-img-url"
@@ -1913,7 +1966,8 @@
             </div>
           </div>
           <div class="f-actions">
-            <button class="btn-sub" id="ef-sub" onclick="submitEvent()">➕ Add Event</button>
+            <button class="btn-sub" id="ef-sub" onclick="submitEvent()"><i class="fa-solid fa-plus"></i> Add
+              Event</button>
             <button class="btn-canc" id="ef-canc" style="display:none" onclick="cancelEdit()">Cancel</button>
           </div>
         </div>
@@ -1922,14 +1976,15 @@
       <!-- GALLERY -->
       <div class="tab-panel" id="page-gallery">
         <div class="pg-header">
-          <h1>🖼️ Gallery</h1>
+          <h1><i class="fa-solid fa-images"></i> Gallery</h1>
           <p>Manage images — drag to reorder, toggle visibility, edit captions.</p>
         </div>
         <div class="sec-bar">
           <h2>All Images</h2>
           <div style="display:flex;gap:.65rem;align-items:center;flex-wrap:wrap">
             <span class="cpill" id="gal-cpill">0 images</span>
-            <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;" onclick="goTo('upload')">📤
+            <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;" onclick="goTo('upload')"><i
+                class="fa-solid fa-cloud-arrow-up"></i>
               Upload</button>
             <div class="gal-view-toggle">
               <button class="gvt-btn active" id="gvt-grid" onclick="switchGalView('grid')" title="Grid view">⊞</button>
@@ -1943,31 +1998,36 @@
 
         <!-- GRID VIEW -->
         <div id="gal-grid-view">
-          <p style="color:var(--muted);font-size:.82rem;margin-bottom:1.1rem;">💡 Drag cards to reorder · Toggle 👁 to
+          <p style="color:var(--muted);font-size:.82rem;margin-bottom:1.1rem;"><i class="fa-solid fa-circle-info"></i>
+            Drag cards to reorder · Toggle <i class="fa-solid fa-eye"></i> to
             show/hide on public site</p>
           <div class="adm-grid" id="gal-grid"></div>
         </div>
 
         <!-- TABLE VIEW -->
         <div id="gal-table-view" style="display:none">
-          <div
-            style="color:var(--muted);font-size:.78rem;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem;">
-            <i class="fa-solid fa-circle-info" style="color:var(--teal)"></i>
-            Hover any row for tooltip · Click <strong>Show / Hide</strong> to toggle public visibility · Click
-            <strong>Feature</strong> to add to carousel
-          </div>
           <div class="tbl-wrap" style="margin-top:.5rem">
-            <table>
+            <table class="gal-tbl">
+              <colgroup>
+                <col style="width:42px">
+                <col style="width:72px">
+                <col style="width:180px">
+                <col style="width:140px">
+                <col style="width:100px">
+                <col style="width:96px">
+                <col style="width:100px">
+                <col style="width:96px">
+              </colgroup>
               <thead>
                 <tr>
-                  <th title="Sort order">#</th>
-                  <th title="Uploaded image">Image</th>
-                  <th title="Caption shown on website">Caption / Alt Text</th>
-                  <th title="Gallery category">Category</th>
-                  <th title="Show in featured carousel">Featured</th>
-                  <th title="Visible on public gallery">Visibility</th>
-                  <th title="Date uploaded to server"><i class="fa-solid fa-calendar"></i> Uploaded</th>
-                  <th title="Save caption or delete image">Actions</th>
+                  <th>#</th>
+                  <th>Image</th>
+                  <th>Title</th>
+                  <th>Caption</th>
+                  <th>Category</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="gal-tbody"></tbody>
@@ -1979,20 +2039,74 @@
       <!-- UPLOAD -->
       <div class="tab-panel" id="page-upload">
         <div class="pg-header">
-          <h1>📤 Upload Images</h1>
+          <h1><i class="fa-solid fa-cloud-arrow-up"></i> Upload Images</h1>
           <p>Add new images to the public gallery.</p>
         </div>
         <div class="panel-card">
+          <p
+            style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:.6rem;">
+            Image File</p>
           <div class="drop-zone" id="gal-dz" onclick="document.getElementById('gal-fi').click()">
-            <span class="dzi">📁</span>
-            <p><span class="dz-strong">Click to browse</span> or drag &amp; drop images here</p>
-            <small style="display:block;margin-top:.4rem;">JPG, PNG, WebP — multiple files supported</small>
+            <span class="dzi"><i class="fa-solid fa-cloud-arrow-up"></i></span>
+            <p><span class="dz-strong">Drag &amp; drop an image here, or</span> <span
+                style="color:var(--teal);font-weight:700;cursor:pointer;">click to browse</span></p>
+            <small style="display:block;margin-top:.4rem;">JPG, PNG, WEBP, GIF — Max 5 MB</small>
             <input type="file" id="gal-fi" accept="image/*" multiple onchange="handleGalFiles(this.files)">
           </div>
           <div class="prev-strip" id="gal-prev"></div>
-          <div class="upl-row" id="gal-upl-row" style="display:none">
-            <input type="text" id="gal-cap" placeholder="Caption for all (or leave blank to use filenames)">
-            <button class="btn-add" onclick="addGalImages()">＋ Add to Gallery</button>
+
+          <div id="gal-upl-row" style="display:none">
+            <div style="border-top:1px solid var(--border);margin:1.25rem 0"></div>
+            <p
+              style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:1rem;">
+              Photo Details</p>
+            <div class="fg2" style="margin-bottom:1rem;">
+              <div class="fg">
+                <label class="f-lbl">Title (English) <span style="color:#dc2626">*</span></label>
+                <input type="text" id="gal-title-en" class="f-inp" style="margin-bottom:0"
+                  placeholder="e.g. Events Name (if any)">
+              </div>
+              <div class="fg">
+                <label class="f-lbl">Title (Hindi)</label>
+                <input type="text" id="gal-title-hi" class="f-inp" style="margin-bottom:0"
+                  placeholder="e.g. आयोजन का नाम (यदि हो तो)">
+              </div>
+            </div>
+            <div class="fg2" style="margin-bottom:1rem;grid-template-columns:1fr 1fr 140px;">
+              <div class="fg">
+                <label class="f-lbl">Category <span style="color:#dc2626">*</span></label>
+                <select id="gal-cat" class="f-inp" style="margin-bottom:0">
+                  <option value="">— Select Category —</option>
+                  <option>Events</option>
+                  <option>Health</option>
+                  <option>Education</option>
+                  <option>Welfare</option>
+                  <option>Community</option>
+                  <option>Awareness</option>
+                  <option>Volunteer</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label class="f-lbl">Caption / Description</label>
+                <input type="text" id="gal-cap" class="f-inp" style="margin-bottom:0"
+                  placeholder="Brief description of the photo…">
+              </div>
+              <div class="fg">
+                <label class="f-lbl">Sort Order <small
+                    style="text-transform:none;font-size:.68rem;font-weight:400;">(lower = first)</small></label>
+                <input type="number" id="gal-sort" class="f-inp" style="margin-bottom:0" value="0" min="0">
+              </div>
+            </div>
+            <label style="display:flex;align-items:center;gap:.55rem;cursor:pointer;margin-bottom:1.25rem;">
+              <input type="checkbox" id="gal-pub" checked style="width:15px;height:15px;accent-color:var(--teal);">
+              <span style="font-size:.875rem;color:#1e293b;">Show this photo on the public gallery</span>
+            </label>
+            <div class="f-actions">
+              <button class="btn-sub btn-add" onclick="addGalImages()"><i class="fa-solid fa-cloud-arrow-up"></i> Upload
+                Photo</button>
+              <button class="btn-canc" onclick="cancelUpload()">Cancel</button>
+            </div>
           </div>
         </div>
       </div>
@@ -2000,7 +2114,7 @@
       <!-- DONATIONS -->
       <div class="tab-panel" id="page-donations">
         <div class="pg-header">
-          <h1>💰 Donations</h1>
+          <h1><i class="fa-solid fa-hand-holding-dollar"></i> Donations</h1>
           <p>All donation submissions from your website.</p>
         </div>
         <div class="sec-bar">
@@ -2039,7 +2153,7 @@
       <!-- MESSAGES -->
       <div class="tab-panel" id="page-messages">
         <div class="pg-header">
-          <h1>📬 Contact Messages</h1>
+          <h1><i class="fa-solid fa-envelope-open-text"></i> Contact Messages</h1>
           <p>Messages and inquiries submitted via your contact form.</p>
         </div>
         <div class="sec-bar">
@@ -2052,7 +2166,8 @@
             <button
               style="background:var(--danger-bg);color:var(--danger);border:none;border-radius:8px;padding:.42rem .95rem;font-size:.8rem;cursor:pointer;font-weight:700;"
               onclick="clearMessages()">Clear All</button>
-            <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;" onclick="markAllRead()">✓ Mark All
+            <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;" onclick="markAllRead()"><i
+                class="fa-solid fa-check-double"></i> Mark All
               Read</button>
             <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;background:#475569;"
               onclick="exportCSV('messages')">⬇ Export CSV</button>
@@ -2084,7 +2199,8 @@
   <div class="modal-ov" id="msg-modal">
     <div class="modal" style="max-width:520px">
       <div class="mh">
-        <h2>📬 Message Detail</h2><button class="mcl" onclick="closeMsgModal()">✕</button>
+        <h2><i class="fa-solid fa-envelope-open-text"></i> Message Detail</h2><button class="mcl"
+          onclick="closeMsgModal()"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="msg-detail" id="msg-detail-body"></div>
       <div class="f-actions" style="margin-top:1.5rem">
@@ -2098,7 +2214,8 @@
   <div class="modal-ov" id="edit-modal">
     <div class="modal">
       <div class="mh">
-        <h2>✏️ Edit Event</h2><button class="mcl" onclick="closeModal()">✕</button>
+        <h2><i class="fa-solid fa-pen-to-square"></i> Edit Event</h2><button class="mcl" onclick="closeModal()"><i
+            class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="fg2">
         <div class="fg"><label>Title *</label><input type="text" id="em-title"></div>
@@ -2123,8 +2240,60 @@
             placeholder="images/event1.jpg"></div>
       </div>
       <div class="f-actions">
-        <button class="btn-sub" onclick="saveEdit()">💾 Save Changes</button>
+        <button class="btn-sub" onclick="saveEdit()"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
         <button class="btn-canc" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GALLERY EDIT MODAL -->
+  <div class="modal-ov" id="gal-edit-modal">
+    <div class="modal" style="max-width:560px">
+      <div class="mh">
+        <h2><i class="fa-solid fa-pen-to-square"></i> Edit Image Details</h2><button class="mcl"
+          onclick="closeGalEditModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="fg2" style="margin-bottom:1rem">
+        <div class="fg">
+          <label>Title (English)</label>
+          <input type="text" id="gem-title-en" placeholder="e.g. Events Name (if any)">
+        </div>
+        <div class="fg">
+          <label>Title (Hindi)</label>
+          <input type="text" id="gem-title-hi" placeholder="e.g. आयोजन का नाम (यदि हो तो)">
+        </div>
+      </div>
+      <div class="fg2" style="margin-bottom:1rem;grid-template-columns:1fr 1fr 130px">
+        <div class="fg">
+          <label>Category</label>
+          <select id="gem-cat">
+            <option value="">— Select Category —</option>
+            <option>Events</option>
+            <option>Health</option>
+            <option>Education</option>
+            <option>Welfare</option>
+            <option>Community</option>
+            <option>Awareness</option>
+            <option>Volunteer</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Caption / Description</label>
+          <input type="text" id="gem-caption" placeholder="Brief description…">
+        </div>
+        <div class="fg">
+          <label>Sort Order</label>
+          <input type="number" id="gem-sort" value="0" min="0">
+        </div>
+      </div>
+      <label style="display:flex;align-items:center;gap:.55rem;cursor:pointer;margin-bottom:1.25rem;">
+        <input type="checkbox" id="gem-pub" checked style="width:15px;height:15px;accent-color:var(--teal);">
+        <span style="font-size:.875rem;color:#1e293b;">Show this photo on the public gallery</span>
+      </label>
+      <div class="f-actions">
+        <button class="btn-sub" onclick="saveGalEdit()"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+        <button class="btn-canc" onclick="closeGalEditModal()">Cancel</button>
       </div>
     </div>
   </div>
@@ -2257,7 +2426,7 @@
         const re = res.data.recent_events || [];
         evtList.innerHTML = re.length ? re.map(e => `
       <div class="ri">
-        ${e.image_path ? `<img src="${e.image_path}" alt="">` : `<div class="ri-ph">📅</div>`}
+        ${e.image_path ? `<img src="${e.image_path}" alt="">` : `<div class="ri-ph"><i class="fa-solid fa-calendar-days"></i></div>`}
         <div class="ri-info">
           <div class="ri-t">${esc(e.title)}</div>
           <div class="ri-s">${fmtDate(e.event_date?.substring(0, 10))} · ${esc(e.location || '—')}</div>
@@ -2299,15 +2468,15 @@
         return au ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date);
       });
       tb.innerHTML = s.map(e => `<tr>
-    <td>${e.image ? `<img src="${e.image}" class="tbl-img" alt="">` : `<div class="tbl-ph">📅</div>`}</td>
+    <td>${(e.image_path || e.image) ? `<img src="${e.image_path || e.image}" class="tbl-img" alt="">` : `<div class="tbl-ph"><i class="fa-solid fa-calendar-days"></i></div>`}</td>
     <td><strong>${esc(e.title)}</strong></td>
     <td style="white-space:nowrap;color:var(--muted);font-size:.8rem">${fmtDate(e.date)}</td>
     <td><span class="spill ${e.date < TODAY ? 'sp-past' : 'sp-up'}">${e.date < TODAY ? 'Past' : 'Upcoming'}</span></td>
     <td>${e.category ? `<span class="cat-tag">${esc(e.category)}</span>` : '-'}</td>
     <td style="color:var(--muted);font-size:.8rem">${esc(e.location || '-')}</td>
     <td><div class="tbl-acts">
-      <button class="btn-ed" onclick="openEdit(${e.id})">✏️ Edit</button>
-      <button class="btn-rm" onclick="delEvt(${e.id})">🗑</button>
+      <button class="btn-ed" onclick="openEdit(${e.id})"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+      <button class="btn-rm" onclick="delEvt(${e.id})"><i class="fa-solid fa-trash-can"></i></button>
     </div></td>
   </tr>`).join('');
     }
@@ -2361,7 +2530,7 @@
       } catch (e) {
         toast('Failed: ' + e.message, 'error');
       } finally {
-        btn.disabled = false; btn.textContent = editId ? '💾 Save Changes' : '➕ Add Event';
+        btn.disabled = false; btn.textContent = editId ? '<i class="fa-solid fa-floppy-disk"></i> Save Changes' : '<i class="fa-solid fa-plus"></i> Add Event';
       }
     }
 
@@ -2382,9 +2551,9 @@
       document.getElementById('ef-img-file').value = '';
       document.getElementById('ef-ip-wrap').style.display = 'none';
       efB64 = ''; editId = null;
-      document.getElementById('ef-sub').textContent = '➕ Add Event';
+      document.getElementById('ef-sub').textContent = '<i class="fa-solid fa-plus"></i> Add Event';
       document.getElementById('ef-canc').style.display = 'none';
-      document.getElementById('ae-title').textContent = '➕ Add New Event';
+      document.getElementById('ae-title').innerHTML = '<i class="fa-solid fa-calendar-plus"></i> Add New Event';
     }
     function cancelEdit() { resetForm(); goTo('events'); }
 
@@ -2456,12 +2625,17 @@
         const img = document.createElement('img');
         img.src = URL.createObjectURL(f); img.className = 'prev-thumb'; s.appendChild(img);
       });
-      document.getElementById('gal-upl-row').style.display = galPend.length ? 'flex' : 'none';
+      document.getElementById('gal-upl-row').style.display = galPend.length ? 'block' : 'none';
     }
 
     async function addGalImages() {
       if (!galPend.length) return;
+      const titleEn = document.getElementById('gal-title-en').value.trim();
+      const titleHi = document.getElementById('gal-title-hi').value.trim();
       const cap = document.getElementById('gal-cap').value.trim();
+      const cat = document.getElementById('gal-cat').value;
+      const sort = parseInt(document.getElementById('gal-sort').value) || 0;
+      const isPublic = document.getElementById('gal-pub').checked ? 1 : 0;
       const btn = document.querySelector('#gal-upl-row .btn-add');
       btn.disabled = true; btn.textContent = 'Uploading…';
       let done = 0;
@@ -2472,9 +2646,16 @@
             const r = new FileReader();
             r.onload = async e => {
               try {
+                const autoTitle = titleEn || f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
                 await apiFetch('POST', 'gallery', {
                   src: e.target.result,
-                  caption: cap || f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '),
+                  title: autoTitle,
+                  title_hi: titleHi,
+                  caption: cap || autoTitle,
+                  alt_text: cap || autoTitle,
+                  category: cat,
+                  sort_order: sort,
+                  is_active: isPublic,
                 });
                 done++;
                 resolve();
@@ -2487,13 +2668,27 @@
       toast(`${done} image${done !== 1 ? 's' : ''} uploaded ✓`, 'success');
       await loadGallery();
       await loadDashboard();
+      resetUploadForm();
+      goTo('gallery');
+      btn.disabled = false; btn.textContent = '<i class="fa-solid fa-cloud-arrow-up"></i> Upload Photo';
+    }
+
+    function cancelUpload() {
+      resetUploadForm();
+      goTo('gallery');
+    }
+
+    function resetUploadForm() {
       document.getElementById('gal-prev').innerHTML = '';
       document.getElementById('gal-cap').value = '';
+      document.getElementById('gal-title-en').value = '';
+      document.getElementById('gal-title-hi').value = '';
+      document.getElementById('gal-cat').value = '';
+      document.getElementById('gal-sort').value = '0';
+      document.getElementById('gal-pub').checked = true;
       document.getElementById('gal-upl-row').style.display = 'none';
       document.getElementById('gal-fi').value = '';
       galPend = [];
-      goTo('gallery');
-      btn.disabled = false; btn.textContent = '＋ Add to Gallery';
     }
 
     /* ══════════════════════════════════════
@@ -2520,50 +2715,106 @@
       }
       tb.innerHTML = gallery.map((item, idx) => {
         const src = item.filepath || item.src || '';
-        const cap = item.title || item.alt_text || item.caption || '';
-        const catName = item.category_name || '—';
-        const isFeat = item.is_featured == 1 || item.is_featured === true;
+        const titleEn = item.title || item.alt_text || item.caption || '';
+        const titleHi = item.title_hi || '';
+        const cap = item.caption || item.alt_text || '';
+        const catName = item.category_name || item.category || '';
         const isVis = item.is_active == 1 || item.is_active === true || item.is_active === undefined;
-        const date = item.created_at ? new Date(item.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+        const rawDate = item.created_at || item.uploaded_at || item.upload_date || item.date || '';
+        const date = rawDate ? new Date(rawDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
         return `<tr id="gal-row-${item.id}" class="${!isVis ? 'row-hidden' : ''}">
-      <td style="color:var(--muted);font-size:.78rem">#${idx + 1}</td>
-      <td><img src="${esc(src)}" style="width:60px;height:44px;object-fit:cover;border-radius:7px;display:block" alt=""></td>
+      <td style="color:var(--muted);font-size:.78rem;font-variant-numeric:tabular-nums">#${idx + 1}</td>
+      <td>${src ? `<img src="${esc(src)}" style="width:54px;height:40px;object-fit:cover;border-radius:7px;display:block;border:0.5px solid var(--border)" alt="">` : `<div style="width:54px;height:40px;border-radius:7px;background:var(--bg);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.9rem;"><i class="fa-solid fa-image" style="font-size:.9rem;color:var(--muted)"></i></div>`}</td>
       <td>
-        <input type="text" value="${esc(cap)}" class="caption-input" style="width:160px"
-          id="tbl-cap-${item.id}" onkeydown="if(event.key==='Enter'){event.preventDefault();saveCapById(${item.id})}">
+        <div style="font-size:.83rem;font-weight:600;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:175px">${esc(titleEn) || '—'}</div>
+        ${titleHi ? `<div style="font-size:.75rem;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:175px">${esc(titleHi)}</div>` : ''}
       </td>
-      <td><span class="cat-tag">${esc(catName)}</span></td>
-      <td>
-        <button onclick="toggleFeatured(${item.id},${isFeat ? 0 : 1})"
-          class="feat-star ${isFeat ? 'on' : ''}" title="${isFeat ? 'Remove from featured' : 'Mark as featured'}">
-          ${isFeat ? '⭐ Featured' : '☆ Feature'}
-        </button>
+      <td style="max-width:135px">
+        <span style="font-size:.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:135px">${esc(cap) || '—'}</span>
       </td>
+      <td>${catName ? `<span class="cat-tag">${esc(catName)}</span>` : '<span style="color:var(--muted);font-size:.8rem">—</span>'}</td>
       <td>
         <button onclick="toggleVisibility(${item.id},${isVis ? 0 : 1})"
-          class="vis-toggle ${isVis ? 'visible' : 'hidden'}">
-          ${isVis ? '👁 Visible' : '🙈 Hidden'}
+          style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;border:none;cursor:pointer;font-size:.72rem;font-weight:600;background:${isVis ? '#dcfce7' : 'var(--bg)'};color:${isVis ? '#166534' : 'var(--muted)'}"
+          title="${isVis ? 'Click to hide' : 'Click to show'}">
+          <span style="width:7px;height:7px;border-radius:50%;background:${isVis ? '#22c55e' : '#94a3b8'};display:inline-block;flex-shrink:0"></span>
+          ${isVis ? 'Visible' : 'Hidden'}
         </button>
       </td>
       <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">${date}</td>
-      <td><div class="tbl-acts">
-        <button class="btn-sv" onclick="saveCapById(${item.id})">💾</button>
-        <button class="btn-rm" onclick="delGal(${item.id})">🗑</button>
-      </div></td>
+      <td>
+        <div class="tbl-acts" style="gap:.3rem">
+          <button class="gal-act-btn" onclick="openGalEdit(${item.id})" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+          <button class="gal-act-btn" onclick="toggleVisibility(${item.id},${isVis ? 0 : 1})" title="${isVis ? 'Hide' : 'Show'}" style="color:${isVis ? 'var(--teal)' : 'var(--muted)'}">
+            ${isVis
+            ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`
+            : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`}
+          </button>
+          <button class="gal-act-btn gal-act-del" onclick="delGal(${item.id})" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
+      </td>
     </tr>`;
       }).join('');
     }
 
-    async function saveCapById(id) {
-      const inp = document.getElementById(`tbl-cap-${id}`);
-      if (!inp) return;
-      const caption = inp.value.trim();
+    let galEditId = null;
+
+    function openGalEdit(id) {
+      const item = gallery.find(g => g.id === id); if (!item) return;
+      galEditId = id;
+      document.getElementById('gem-title-en').value = item.title || item.alt_text || '';
+      document.getElementById('gem-title-hi').value = item.title_hi || '';
+      document.getElementById('gem-cat').value = item.category_name || item.category || '';
+      document.getElementById('gem-caption').value = item.caption || item.alt_text || '';
+      document.getElementById('gem-sort').value = item.sort_order || 0;
+      document.getElementById('gem-pub').checked = item.is_active === undefined || item.is_active == 1 || item.is_active === true;
+      document.getElementById('gal-edit-modal').classList.add('open');
+    }
+
+    function closeGalEditModal() {
+      document.getElementById('gal-edit-modal').classList.remove('open');
+      galEditId = null;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const m = document.getElementById('gal-edit-modal');
+      if (m) m.addEventListener('click', e => { if (e.target === m) closeGalEditModal(); });
+    });
+
+    async function saveGalEdit() {
+      if (!galEditId) return;
+      const titleEn = document.getElementById('gem-title-en').value.trim();
+      const titleHi = document.getElementById('gem-title-hi').value.trim();
+      const cat = document.getElementById('gem-cat').value;
+      const cap = document.getElementById('gem-caption').value.trim();
+      const sort = parseInt(document.getElementById('gem-sort').value) || 0;
+      const isActive = document.getElementById('gem-pub').checked ? 1 : 0;
       try {
-        await apiFetch('PUT', `gallery/${id}`, { title: caption, alt_text: caption });
-        const item = gallery.find(g => g.id === id);
-        if (item) { item.title = caption; item.alt_text = caption; }
-        toast('Caption saved ✓', 'success');
-      } catch (e) { toast('Failed to save', 'error'); }
+        await apiFetch('PUT', `gallery/${galEditId}`, {
+          title: titleEn,
+          title_hi: titleHi,
+          alt_text: cap || titleEn,
+          caption: cap,
+          category: cat,
+          sort_order: sort,
+          is_active: isActive,
+        });
+        const item = gallery.find(g => g.id === galEditId);
+        if (item) {
+          item.title = titleEn;
+          item.title_hi = titleHi;
+          item.category = cat;
+          item.category_name = cat;
+          item.caption = cap;
+          item.alt_text = cap || titleEn;
+          item.sort_order = sort;
+          item.is_active = isActive;
+        }
+        toast('Image updated ✓', 'success');
+        closeGalEditModal();
+        renderGalTable();
+        if (galView === 'grid') renderGalGrid();
+      } catch (e) { toast('Failed to save: ' + e.message, 'error'); }
     }
 
     async function toggleVisibility(id, newVal) {
@@ -2582,7 +2833,7 @@
         await apiFetch('PUT', `gallery/${id}`, { is_featured: newVal });
         const item = gallery.find(g => g.id === id);
         if (item) item.is_featured = newVal;
-        toast(newVal ? '⭐ Marked as featured' : 'Removed from featured', 'success');
+        toast(newVal ? 'Marked as featured ✓' : 'Removed from featured', 'success');
         renderGalTable();
         if (galView === 'grid') renderGalGrid();
       } catch (e) { toast('Failed', 'error'); }
@@ -2606,19 +2857,19 @@
         card.innerHTML = `
       <div class="drag-h">⠿⠿</div>
       <div class="ord-b">#${idx + 1}</div>
-      ${isFeat ? '<div style="position:absolute;top:7px;left:36px;background:#fef08a;color:#854d0e;border-radius:6px;padding:2px 6px;font-size:.62rem;font-weight:700;">⭐ Featured</div>' : ''}
-      ${!isVis ? '<div style="position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.75rem;font-weight:700;border-radius:12px 12px 0 0;">🙈 HIDDEN</div>' : ''}
+      ${isFeat ? '<div style="position:absolute;top:7px;left:36px;background:#fef08a;color:#854d0e;border-radius:6px;padding:2px 6px;font-size:.62rem;font-weight:700;"><i class=\"fa-solid fa-star\"></i> Featured</div>' : ''}
+      ${!isVis ? '<div style="position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.75rem;font-weight:700;border-radius:12px 12px 0 0;"><i class=\"fa-solid fa-eye-slash\"></i> Hidden</div>' : ''}
       <img src="${src}" alt="${esc(cap)}" loading="lazy">
       <div class="acb">
         <input class="cap-inp" type="text" value="${esc(cap)}" placeholder="Caption…" data-id="${item.id}" data-idx="${idx}">
         <div class="card-acts" style="flex-wrap:wrap;gap:.3rem">
-          <button class="btn-sv" onclick="saveCap(${idx})" title="Save caption">💾</button>
+          <button class="btn-sv" onclick="saveCap(${idx})" title="Save caption"><i class="fa-solid fa-floppy-disk"></i></button>
           <button onclick="toggleVisibility(${item.id},${isVis ? 0 : 1})"
             style="flex:1;background:${isVis ? '#f0fdf4' : '#f8fafc'};color:${isVis ? 'var(--teal)' : '#94a3b8'};border:1.5px solid ${isVis ? 'var(--teal)' : '#e2e8f0'};border-radius:7px;padding:.33rem;font-size:.72rem;font-weight:700;cursor:pointer;"
             title="${isVis ? 'Hide from public' : 'Show on public site'}">
-            ${isVis ? '👁' : '🙈'}
+            <i class="fa-solid fa-eye${isVis ? '' : '-slash'}"></i>
           </button>
-          <button class="btn-dl" onclick="delGal(${item.id})" title="Delete">🗑</button>
+          <button class="btn-dl" onclick="delGal(${item.id})" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
         </div>
       </div>`;
         card.addEventListener('dragstart', () => { galDragI = idx; card.classList.add('dragging'); });
@@ -2727,11 +2978,11 @@
       <td style="color:var(--muted);font-size:.8rem">${esc(d.donor_email || '—')}</td>
       <td><span class="don-amount">₹${parseFloat(d.amount || 0).toLocaleString('en-IN')}</span></td>
       <td><span class="don-method">${esc(d.payment_method || 'Online')}</span></td>
-      <td><span class="${d.payment_status === 'paid' ? 'status-paid' : 'status-pending'}">${d.payment_status === 'paid' ? '✓ Paid' : '⏳ Pending'}</span></td>
+      <td><span class="${d.payment_status === 'paid' ? 'status-paid' : 'status-pending'}">${d.payment_status === 'paid' ? '<i class="fa-solid fa-circle-check"></i> Paid' : '<i class="fa-regular fa-clock"></i> Pending'}</span></td>
       <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">${fmtDateTime(d.created_at)}</td>
       <td><div class="tbl-acts">
         ${d.donor_email ? `<a href="mailto:${esc(d.donor_email)}?subject=Thank%20you%20for%20your%20donation" class="btn-view">✉️</a>` : ''}
-        <button class="btn-rm" onclick="deleteDonation(${d.id})">🗑</button>
+        <button class="btn-rm" onclick="deleteDonation(${d.id})"><i class="fa-solid fa-trash-can"></i></button>
       </div></td>
     </tr>`).join('');
     }
@@ -2772,8 +3023,8 @@
       <td><span class="msg-preview">${esc(m.message || '—')}</span></td>
       <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">${fmtDateTime(m.created_at)}</td>
       <td><div class="tbl-acts">
-        <button class="btn-view" onclick="viewMessage(${m.id})">👁 View</button>
-        <button class="btn-rm"   onclick="deleteMessage(${m.id})">🗑</button>
+        <button class="btn-view" onclick="viewMessage(${m.id})"><i class="fa-solid fa-eye"></i> View</button>
+        <button class="btn-rm"   onclick="deleteMessage(${m.id})"><i class="fa-solid fa-trash-can"></i></button>
       </div></td>
     </tr>`).join('');
     }
@@ -2897,7 +3148,7 @@
     let ttmr;
     function toast(msg, type = 'success') {
       const el = document.getElementById('toast');
-      el.textContent = (type === 'success' ? '✓ ' : '✕ ') + msg;
+      el.innerHTML = (type === 'success' ? '<i class="fa-solid fa-circle-check"></i> ' : '<i class="fa-solid fa-circle-xmark"></i> ') + msg;
       el.className = `show ${type}`;
       clearTimeout(ttmr);
       ttmr = setTimeout(() => el.className = '', 3000);
