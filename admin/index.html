@@ -2038,12 +2038,12 @@
               <div class="fg">
                 <label class="f-lbl">Title (English) <span style="color:#dc2626">*</span></label>
                 <input type="text" id="gal-title-en" class="f-inp" style="margin-bottom:0"
-                  placeholder="e.g. Annual Mahasabha 2024">
+                  placeholder="e.g. Events Name (if any)">
               </div>
               <div class="fg">
                 <label class="f-lbl">Title (Hindi)</label>
                 <input type="text" id="gal-title-hi" class="f-inp" style="margin-bottom:0"
-                  placeholder="e.g. वार्षिक महासभा 2024">
+                  placeholder="e.g. आयोजन का नाम (यदि हो तो)">
               </div>
             </div>
             <div class="fg2" style="margin-bottom:1rem;grid-template-columns:1fr 1fr 140px;">
@@ -2212,6 +2212,57 @@
       <div class="f-actions">
         <button class="btn-sub" onclick="saveEdit()">💾 Save Changes</button>
         <button class="btn-canc" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GALLERY EDIT MODAL -->
+  <div class="modal-ov" id="gal-edit-modal">
+    <div class="modal" style="max-width:560px">
+      <div class="mh">
+        <h2>🖼️ Edit Image Details</h2><button class="mcl" onclick="closeGalEditModal()">✕</button>
+      </div>
+      <div class="fg2" style="margin-bottom:1rem">
+        <div class="fg">
+          <label>Title (English)</label>
+          <input type="text" id="gem-title-en" placeholder="e.g. Events Name (if any)">
+        </div>
+        <div class="fg">
+          <label>Title (Hindi)</label>
+          <input type="text" id="gem-title-hi" placeholder="e.g. आयोजन का नाम (यदि हो तो)">
+        </div>
+      </div>
+      <div class="fg2" style="margin-bottom:1rem;grid-template-columns:1fr 1fr 130px">
+        <div class="fg">
+          <label>Category</label>
+          <select id="gem-cat">
+            <option value="">— Select Category —</option>
+            <option>Events</option>
+            <option>Health</option>
+            <option>Education</option>
+            <option>Welfare</option>
+            <option>Community</option>
+            <option>Awareness</option>
+            <option>Volunteer</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Caption / Description</label>
+          <input type="text" id="gem-caption" placeholder="Brief description…">
+        </div>
+        <div class="fg">
+          <label>Sort Order</label>
+          <input type="number" id="gem-sort" value="0" min="0">
+        </div>
+      </div>
+      <label style="display:flex;align-items:center;gap:.55rem;cursor:pointer;margin-bottom:1.25rem;">
+        <input type="checkbox" id="gem-pub" checked style="width:15px;height:15px;accent-color:var(--teal);">
+        <span style="font-size:.875rem;color:#1e293b;">Show this photo on the public gallery</span>
+      </label>
+      <div class="f-actions">
+        <button class="btn-sub" onclick="saveGalEdit()">💾 Save Changes</button>
+        <button class="btn-canc" onclick="closeGalEditModal()">Cancel</button>
       </div>
     </div>
   </div>
@@ -2636,9 +2687,10 @@
         const titleEn = item.title || item.alt_text || item.caption || '';
         const titleHi = item.title_hi || '';
         const cap = item.caption || item.alt_text || '';
-        const catName = item.category_name || item.category || '—';
+        const catName = item.category_name || item.category || '';
         const isVis = item.is_active == 1 || item.is_active === true || item.is_active === undefined;
-        const date = item.created_at ? new Date(item.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+        const rawDate = item.created_at || item.uploaded_at || item.upload_date || item.date || '';
+        const date = rawDate ? new Date(rawDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
         return `<tr id="gal-row-${item.id}" class="${!isVis ? 'row-hidden' : ''}">
       <td style="color:var(--muted);font-size:.78rem;font-variant-numeric:tabular-nums">#${idx + 1}</td>
       <td>${src ? `<img src="${esc(src)}" style="width:54px;height:40px;object-fit:cover;border-radius:7px;display:block;border:0.5px solid var(--border)" alt="">` : `<div style="width:54px;height:40px;border-radius:7px;background:var(--bg);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.9rem;">🖼️</div>`}</td>
@@ -2649,7 +2701,7 @@
       <td style="max-width:135px">
         <span style="font-size:.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:135px">${esc(cap) || '—'}</span>
       </td>
-      <td>${catName !== '—' ? `<span class="cat-tag">${esc(catName)}</span>` : '<span style="color:var(--muted);font-size:.8rem">—</span>'}</td>
+      <td>${catName ? `<span class="cat-tag">${esc(catName)}</span>` : '<span style="color:var(--muted);font-size:.8rem">—</span>'}</td>
       <td>
         <button onclick="toggleVisibility(${item.id},${isVis ? 0 : 1})"
           style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;border:none;cursor:pointer;font-size:.72rem;font-weight:600;background:${isVis ? '#dcfce7' : 'var(--bg)'};color:${isVis ? '#166534' : 'var(--muted)'}"
@@ -2678,22 +2730,64 @@
       }).join('');
     }
 
+    let galEditId = null;
+
     function openGalEdit(id) {
       const item = gallery.find(g => g.id === id); if (!item) return;
-      const newTitle = prompt('Edit title (English):', item.title || item.alt_text || '');
-      if (newTitle === null) return;
-      saveGalTitleById(id, newTitle.trim());
+      galEditId = id;
+      document.getElementById('gem-title-en').value = item.title || item.alt_text || '';
+      document.getElementById('gem-title-hi').value = item.title_hi || '';
+      document.getElementById('gem-cat').value = item.category_name || item.category || '';
+      document.getElementById('gem-caption').value = item.caption || item.alt_text || '';
+      document.getElementById('gem-sort').value = item.sort_order || 0;
+      document.getElementById('gem-pub').checked = item.is_active === undefined || item.is_active == 1 || item.is_active === true;
+      document.getElementById('gal-edit-modal').classList.add('open');
     }
 
-    async function saveGalTitleById(id, title) {
+    function closeGalEditModal() {
+      document.getElementById('gal-edit-modal').classList.remove('open');
+      galEditId = null;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const m = document.getElementById('gal-edit-modal');
+      if (m) m.addEventListener('click', e => { if (e.target === m) closeGalEditModal(); });
+    });
+
+    async function saveGalEdit() {
+      if (!galEditId) return;
+      const titleEn = document.getElementById('gem-title-en').value.trim();
+      const titleHi = document.getElementById('gem-title-hi').value.trim();
+      const cat = document.getElementById('gem-cat').value;
+      const cap = document.getElementById('gem-caption').value.trim();
+      const sort = parseInt(document.getElementById('gem-sort').value) || 0;
+      const isActive = document.getElementById('gem-pub').checked ? 1 : 0;
       try {
-        await apiFetch('PUT', `gallery/${id}`, { title, alt_text: title });
-        const item = gallery.find(g => g.id === id);
-        if (item) { item.title = title; item.alt_text = title; }
-        toast('Saved ✓', 'success');
+        await apiFetch('PUT', `gallery/${galEditId}`, {
+          title: titleEn,
+          title_hi: titleHi,
+          alt_text: cap || titleEn,
+          caption: cap,
+          category: cat,
+          sort_order: sort,
+          is_active: isActive,
+        });
+        const item = gallery.find(g => g.id === galEditId);
+        if (item) {
+          item.title = titleEn;
+          item.title_hi = titleHi;
+          item.category = cat;
+          item.category_name = cat;
+          item.caption = cap;
+          item.alt_text = cap || titleEn;
+          item.sort_order = sort;
+          item.is_active = isActive;
+        }
+        toast('Image updated ✓', 'success');
+        closeGalEditModal();
         renderGalTable();
         if (galView === 'grid') renderGalGrid();
-      } catch (e) { toast('Failed to save', 'error'); }
+      } catch (e) { toast('Failed to save: ' + e.message, 'error'); }
     }
 
     async function toggleVisibility(id, newVal) {
