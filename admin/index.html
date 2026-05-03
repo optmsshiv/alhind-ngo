@@ -1,1222 +1,2770 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>Admin Panel — AL Hind Trust</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --teal:#0f766e;--teal-dark:#0d6561;--teal-deep:#0a4e48;
-  --teal-pale:#f0fdf4;--teal-light:#ccfbf1;
-  --border:#e2e8f0;--muted:#64748b;--bg:#f1f5f9;--card:#fff;
-  --danger:#dc2626;--danger-bg:#fee2e2;
-  --sw:260px;--hh:64px;
-}
-body{font-family:'Inter','Segoe UI',sans-serif;background:var(--bg);color:#1e293b;line-height:1.5}
+  <meta charset="UTF-8">
+  <title>Admin Panel — AL Hind Trust</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-/* ── LOGIN ──────────────────────────── */
-#login-screen{
-  display:flex;align-items:center;justify-content:center;min-height:100vh;
-  background:linear-gradient(135deg,#0f766e 0%,#0a4e48 50%,#0f172a 100%);
-  position:relative;overflow:hidden;
-}
-#login-screen::before{
-  content:"";position:absolute;inset:0;
-  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fff' fill-opacity='.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
-}
-.login-wrap{
-  position:relative;z-index:1;display:flex;width:100%;max-width:880px;
-  border-radius:24px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.4);
-}
-.login-left{
-  flex:1;background:rgba(255,255,255,.07);backdrop-filter:blur(12px);
-  padding:3rem 2.5rem;display:flex;flex-direction:column;justify-content:center;
-  border-right:1px solid rgba(255,255,255,.1);color:#fff;
-}
-.ll-icon{font-size:3rem;margin-bottom:1.5rem;display:block}
-.login-left h1{font-size:1.75rem;font-weight:800;margin-bottom:.5rem;line-height:1.2}
-.login-left p{font-size:.9rem;opacity:.7;margin-bottom:2rem}
-.feat-list{list-style:none;display:flex;flex-direction:column;gap:.7rem}
-.feat-list li{display:flex;align-items:center;gap:.7rem;font-size:.875rem;opacity:.85}
-.feat-list li::before{
-  content:"✓";width:20px;height:20px;border-radius:50%;
-  background:rgba(255,255,255,.15);display:flex;align-items:center;
-  justify-content:center;font-size:.7rem;flex-shrink:0;
-}
-.login-right{
-  width:380px;background:#fff;padding:3rem 2.5rem;
-  display:flex;flex-direction:column;justify-content:center;
-}
-.login-right h2{font-size:1.35rem;font-weight:800;margin-bottom:.3rem}
-.lr-sub{color:var(--muted);font-size:.875rem;margin-bottom:2rem}
-.f-lbl{display:block;font-size:.78rem;font-weight:700;color:#374151;margin-bottom:.4rem;letter-spacing:.02em;text-transform:uppercase}
-.f-inp{
-  width:100%;padding:.75rem 1rem;border:1.5px solid var(--border);border-radius:10px;
-  font-size:.95rem;font-family:inherit;margin-bottom:1.25rem;transition:border-color .2s,box-shadow .2s;
-}
-.f-inp:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(15,118,110,.12)}
-.btn-login{
-  width:100%;padding:.85rem;background:var(--teal);color:#fff;border:none;
-  border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;
-  box-shadow:0 4px 14px rgba(15,118,110,.35);transition:background .2s,transform .1s;
-}
-.btn-login:hover{background:var(--teal-dark)}
-.btn-login:active{transform:scale(.98)}
-.l-err{color:var(--danger);font-size:.82rem;margin-top:.7rem;min-height:1.1rem}
-@media(max-width:680px){.login-left{display:none}.login-right{width:100%;border-radius:24px}.login-wrap{max-width:400px}}
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
 
-/* ── SHELL ──────────────────────────── */
-#admin{display:none}
+    :root {
+      --teal: #0f766e;
+      --teal-dark: #0d6561;
+      --teal-deep: #0a4e48;
+      --teal-pale: #f0fdf4;
+      --teal-light: #ccfbf1;
+      --border: #e2e8f0;
+      --muted: #64748b;
+      --bg: #f1f5f9;
+      --card: #fff;
+      --danger: #dc2626;
+      --danger-bg: #fee2e2;
+      --sw: 260px;
+      --hh: 64px;
+    }
 
-/* Topbar */
-.topbar{
-  position:fixed;top:0;left:0;right:0;height:var(--hh);
-  background:#fff;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;z-index:300;
-  box-shadow:0 1px 4px rgba(0,0,0,.05);
-}
-.tb-brand{
-  width:var(--sw);height:var(--hh);background:var(--teal);flex-shrink:0;
-  display:flex;align-items:center;gap:.75rem;padding:0 1.25rem;
-}
-.tb-brand .bi{font-size:1.4rem}
-.tb-brand .bt{color:#fff;font-weight:700;font-size:.9rem;line-height:1.2}
-.tb-brand .bt small{display:block;font-size:.68rem;font-weight:400;opacity:.7}
-.tb-toggle{background:none;border:none;cursor:pointer;padding:.5rem .75rem;color:var(--muted);font-size:1.25rem;display:none}
-.tb-space{flex:1}
-.tb-search{
-  display:flex;align-items:center;gap:.5rem;background:var(--bg);
-  border:1.5px solid var(--border);border-radius:10px;padding:.42rem .9rem;
-}
-.tb-search input{border:none;background:none;font-size:.85rem;width:190px;font-family:inherit;color:#1e293b}
-.tb-search input:focus{outline:none}
-.tb-search input::placeholder{color:var(--muted)}
-.tb-right{display:flex;align-items:center;gap:.65rem;padding:0 1.25rem}
-.ext-link{
-  display:flex;align-items:center;gap:.35rem;background:var(--bg);
-  border:1.5px solid var(--border);border-radius:8px;padding:.38rem .8rem;
-  font-size:.78rem;font-weight:600;color:#475569;text-decoration:none;white-space:nowrap;transition:all .2s;
-}
-.ext-link:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-pale)}
-.avatar-wrap{position:relative}
-.avatar{
-  width:34px;height:34px;border-radius:50%;
-  background:linear-gradient(135deg,var(--teal),var(--teal-deep));
-  color:#fff;display:flex;align-items:center;justify-content:center;
-  font-weight:700;font-size:.8rem;cursor:pointer;user-select:none;
-}
-.av-menu{
-  position:absolute;top:42px;right:0;background:#fff;border:1px solid var(--border);
-  border-radius:12px;padding:.5rem;min-width:165px;
-  box-shadow:0 8px 24px rgba(0,0,0,.12);display:none;z-index:400;
-}
-.av-menu.open{display:block}
-.av-menu .am-meta{padding:.4rem .7rem;font-size:.75rem;color:var(--muted)}
-.av-menu .am-name{padding:.1rem .7rem .5rem;font-size:.85rem;font-weight:700}
-.av-menu hr{border:none;border-top:1px solid var(--border);margin:.3rem 0}
-.av-menu button{
-  display:block;width:100%;text-align:left;padding:.5rem .7rem;
-  font-size:.84rem;border-radius:7px;border:none;background:none;
-  cursor:pointer;color:#1e293b;font-family:inherit;transition:background .15s;
-}
-.av-menu button:hover{background:var(--bg)}
-.av-menu button.danger{color:var(--danger)}
-.av-menu button.danger:hover{background:var(--danger-bg)}
+    body {
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: #1e293b;
+      line-height: 1.5
+    }
 
-/* Sidebar */
-.sidebar{
-  position:fixed;top:var(--hh);left:0;bottom:0;width:var(--sw);
-  background:#fff;border-right:1px solid var(--border);
-  overflow-y:auto;z-index:200;display:flex;flex-direction:column;
-  transition:transform .3s ease;
-}
-.sb-section{padding:1.1rem 1rem .4rem}
-.sb-sec-lbl{
-  font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-  color:#94a3b8;padding:0 .5rem;margin-bottom:.4rem;
-}
-.nav-item{
-  display:flex;align-items:center;gap:.7rem;padding:.58rem .75rem;
-  border-radius:10px;cursor:pointer;color:var(--muted);font-size:.855rem;font-weight:500;
-  transition:all .15s;user-select:none;border:none;background:none;
-  width:100%;text-align:left;font-family:inherit;position:relative;
-}
-.nav-item:hover{background:var(--bg);color:#1e293b}
-.nav-item.active{background:var(--teal-pale);color:var(--teal);font-weight:700}
-.nav-item.active::before{
-  content:"";position:absolute;left:0;top:18%;bottom:18%;
-  width:3px;background:var(--teal);border-radius:0 4px 4px 0;
-}
-.ni-icon{font-size:1.05rem;flex-shrink:0;width:20px;text-align:center}
-.ni-badge{
-  margin-left:auto;background:var(--teal-light);color:var(--teal);
-  border-radius:99px;padding:.1rem .5rem;font-size:.7rem;font-weight:700;
-}
-.ni-badge.red{background:var(--danger-bg);color:var(--danger)}
-.sb-foot{margin-top:auto;padding:1rem;border-top:1px solid var(--border)}
-.sb-user{display:flex;align-items:center;gap:.7rem;padding:.5rem}
-.su-av{
-  width:32px;height:32px;border-radius:50%;
-  background:linear-gradient(135deg,var(--teal),var(--teal-deep));
-  display:flex;align-items:center;justify-content:center;
-  color:#fff;font-weight:700;font-size:.78rem;flex-shrink:0;
-}
-.su-name{font-size:.84rem;font-weight:700;color:#1e293b}
-.su-role{font-size:.72rem;color:var(--muted)}
+    /* ── LOGIN ──────────────────────────── */
+    #login-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f766e 0%, #0a4e48 50%, #0f172a 100%);
+      position: relative;
+      overflow: hidden;
+    }
 
-/* Main */
-.main{
-  margin-left:var(--sw);margin-top:var(--hh);
-  min-height:calc(100vh - var(--hh));padding:2rem;
-}
-.pg-header{margin-bottom:1.75rem}
-.pg-header h1{font-size:1.45rem;font-weight:800;color:#0f172a;margin-bottom:.2rem}
-.pg-header p{color:var(--muted);font-size:.875rem}
+    #login-screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fff' fill-opacity='.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
+    }
 
-/* Panels */
-.tab-panel{display:none}
-.tab-panel.active{display:block}
+    .login-wrap {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      width: 100%;
+      max-width: 880px;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0, 0, 0, .4);
+    }
 
-/* Stats */
-.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;margin-bottom:1.75rem}
-.stat-card{
-  background:#fff;border-radius:16px;padding:1.4rem;
-  box-shadow:0 1px 6px rgba(0,0,0,.06);border:1px solid var(--border);
-  position:relative;overflow:hidden;
-}
-.stat-card::after{content:"";position:absolute;bottom:0;left:0;right:0;height:3px}
-.sc-green::after{background:linear-gradient(90deg,#0f766e,#5eead4)}
-.sc-blue::after{background:linear-gradient(90deg,#3b82f6,#93c5fd)}
-.sc-amber::after{background:linear-gradient(90deg,#f59e0b,#fde68a)}
-.sc-purple::after{background:linear-gradient(90deg,#8b5cf6,#c4b5fd)}
-.stat-icon{
-  width:42px;height:42px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.2rem;margin-bottom:.9rem;
-}
-.si-green{background:#dcfce7} .si-blue{background:#dbeafe}
-.si-amber{background:#fef3c7} .si-purple{background:#ede9fe}
-.stat-val{font-size:1.9rem;font-weight:800;color:#0f172a;line-height:1}
-.stat-lbl{font-size:.78rem;color:var(--muted);margin-top:.3rem;font-weight:500}
-.stat-sub{font-size:.73rem;font-weight:600;margin-top:.65rem;color:#059669}
-.stat-sub.mu{color:var(--muted)}
+    .login-left {
+      flex: 1;
+      background: rgba(255, 255, 255, .07);
+      backdrop-filter: blur(12px);
+      padding: 3rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-right: 1px solid rgba(255, 255, 255, .1);
+      color: #fff;
+    }
 
-/* Dash grid */
-.dash-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:1.1rem;margin-bottom:1.1rem}
-.dash-card{
-  background:#fff;border-radius:16px;padding:1.4rem;
-  box-shadow:0 1px 6px rgba(0,0,0,.06);border:1px solid var(--border);
-}
-.dc-title{
-  font-size:.875rem;font-weight:700;color:#1e293b;
-  margin-bottom:1.1rem;display:flex;align-items:center;gap:.45rem;
-}
-.dc-title .dc-ct{
-  margin-left:auto;background:var(--bg);color:var(--muted);
-  border-radius:6px;padding:.1rem .5rem;font-size:.72rem;
-}
-.recent-list{display:flex;flex-direction:column;gap:.65rem}
-.ri{display:flex;align-items:center;gap:.85rem;padding:.65rem;border-radius:10px;background:var(--bg)}
-.ri img{width:44px;height:34px;object-fit:cover;border-radius:7px;flex-shrink:0}
-.ri-ph{width:44px;height:34px;border-radius:7px;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
-.ri-info{flex:1;min-width:0}
-.ri-t{font-size:.83rem;font-weight:700;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ri-s{font-size:.72rem;color:var(--muted);margin-top:.1rem}
-.sdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.sd-green{background:#22c55e} .sd-gray{background:#94a3b8}
+    .ll-icon {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      display: block
+    }
 
-.gal-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem}
-.gal-strip img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;display:block}
-.gal-more{
-  aspect-ratio:4/3;background:var(--bg);border-radius:8px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:.78rem;font-weight:700;color:var(--muted);cursor:pointer;flex-direction:column;gap:.15rem;
-}
-.gal-more:hover{background:var(--teal-pale);color:var(--teal)}
+    .login-left h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: .5rem;
+      line-height: 1.2
+    }
 
-.qa-list{display:flex;flex-direction:column;gap:.5rem}
-.qa-btn{
-  display:flex;align-items:center;gap:.7rem;padding:.75rem .9rem;
-  border-radius:10px;background:var(--bg);border:none;cursor:pointer;
-  font-family:inherit;font-size:.855rem;font-weight:600;color:#1e293b;
-  width:100%;text-align:left;transition:all .15s;
-}
-.qa-btn:hover{background:var(--teal-pale);color:var(--teal)}
+    .login-left p {
+      font-size: .9rem;
+      opacity: .7;
+      margin-bottom: 2rem
+    }
 
-/* Panel card */
-.panel-card{
-  background:#fff;border-radius:16px;padding:1.6rem;
-  box-shadow:0 1px 6px rgba(0,0,0,.06);border:1px solid var(--border);margin-bottom:1.4rem;
-}
-.pc-title{font-size:.9rem;font-weight:700;color:#1e293b;margin-bottom:1.1rem;display:flex;align-items:center;gap:.4rem}
+    .feat-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: .7rem
+    }
 
-/* Form */
-.fg2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-.fg2 .full{grid-column:1/-1}
-.fg{display:flex;flex-direction:column;gap:.32rem}
-.fg label{font-size:.75rem;font-weight:700;color:#374151;letter-spacing:.02em;text-transform:uppercase}
-.fg input,.fg textarea,.fg select{
-  padding:.62rem .9rem;border:1.5px solid var(--border);border-radius:10px;
-  font-size:.875rem;font-family:inherit;background:#fff;transition:border-color .2s,box-shadow .2s;
-}
-.fg input:focus,.fg textarea:focus,.fg select:focus{
-  outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(15,118,110,.1);
-}
-.fg textarea{resize:vertical;min-height:80px}
-.f-actions{display:flex;gap:.7rem;margin-top:1.1rem;flex-wrap:wrap}
-.btn-sub{
-  background:var(--teal);color:#fff;border:none;border-radius:10px;
-  padding:.68rem 1.4rem;font-size:.875rem;font-weight:700;cursor:pointer;font-family:inherit;
-  box-shadow:0 3px 10px rgba(15,118,110,.28);transition:background .2s;
-}
-.btn-sub:hover{background:var(--teal-dark)}
-.btn-canc{
-  background:var(--bg);color:#475569;border:1.5px solid var(--border);
-  border-radius:10px;padding:.68rem 1.1rem;font-size:.875rem;font-weight:600;cursor:pointer;font-family:inherit;
-}
-.btn-canc:hover{background:var(--border)}
+    .feat-list li {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      font-size: .875rem;
+      opacity: .85
+    }
 
-.img-uz{
-  border:2px dashed #cbd5e1;border-radius:10px;padding:1.25rem;text-align:center;
-  cursor:pointer;color:var(--muted);font-size:.84rem;transition:border-color .2s,background .2s;
-}
-.img-uz:hover,.img-uz.drag-over{border-color:var(--teal);background:var(--teal-pale)}
-.img-uz input[type=file]{display:none}
-.ip-wrap{position:relative;display:inline-block;margin-top:.7rem}
-.ip-img{width:110px;height:74px;object-fit:cover;border-radius:8px;display:block}
-.ip-clr{
-  position:absolute;top:-7px;right:-7px;background:var(--danger);color:#fff;
-  border:none;border-radius:50%;width:19px;height:19px;font-size:.6rem;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-}
+    .feat-list li::before {
+      content: "✓";
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .7rem;
+      flex-shrink: 0;
+    }
 
-/* Table */
-.sec-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.1rem;flex-wrap:wrap;gap:.7rem}
-.sec-bar h2{font-size:.9rem;font-weight:700;color:#1e293b}
-.cpill{background:#e0f2fe;color:#0369a1;border-radius:99px;padding:.22rem .75rem;font-size:.75rem;font-weight:700}
-.tbl-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--border)}
-table{width:100%;border-collapse:collapse;font-size:.83rem}
-thead{background:#f8fafc}
-th{padding:.75rem 1rem;text-align:left;font-weight:700;color:#374151;border-bottom:1px solid var(--border);white-space:nowrap;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em}
-td{padding:.75rem 1rem;border-bottom:1px solid var(--border);vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tbody tr{transition:background .12s}
-tbody tr:hover td{background:#f8fafc}
-.tbl-img{width:50px;height:36px;object-fit:cover;border-radius:7px;display:block}
-.tbl-ph{width:50px;height:36px;background:var(--bg);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.95rem}
-.spill{border-radius:99px;padding:.22rem .65rem;font-size:.7rem;font-weight:700;white-space:nowrap;letter-spacing:.03em}
-.sp-up{background:#dcfce7;color:#166534}
-.sp-past{background:#f1f5f9;color:#64748b}
-.cat-tag{background:var(--teal-pale);color:var(--teal);border:1px solid var(--teal-light);border-radius:6px;font-size:.7rem;padding:.14rem .5rem;white-space:nowrap;font-weight:700}
-.tbl-acts{display:flex;gap:.35rem}
-.btn-ed{background:#eff6ff;color:#1d4ed8;border:none;border-radius:7px;padding:.28rem .65rem;font-size:.76rem;font-weight:700;cursor:pointer;transition:background .15s}
-.btn-ed:hover{background:#dbeafe}
-.btn-rm{background:var(--danger-bg);color:var(--danger);border:none;border-radius:7px;padding:.28rem .65rem;font-size:.76rem;font-weight:700;cursor:pointer;transition:background .15s}
-.btn-rm:hover{background:#fecaca}
-.empty-r td{text-align:center;padding:3rem;color:#94a3b8;font-size:.875rem}
+    .login-right {
+      width: 380px;
+      background: #fff;
+      padding: 3rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
 
-/* Gallery */
-.drop-zone{
-  border:2.5px dashed #cbd5e1;border-radius:14px;padding:2.25rem 1.5rem;
-  text-align:center;cursor:pointer;color:var(--muted);transition:border-color .2s,background .2s;
-}
-.drop-zone:hover,.drop-zone.drag-over{border-color:var(--teal);background:var(--teal-pale)}
-.drop-zone input[type=file]{display:none}
-.dzi{font-size:2.1rem;display:block;margin-bottom:.55rem}
-.dz-strong{color:var(--teal);font-weight:700}
-.prev-strip{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.9rem}
-.prev-thumb{width:66px;height:50px;border-radius:8px;object-fit:cover;border:2px solid var(--border)}
-.upl-row{display:flex;gap:.7rem;margin-top:.9rem;flex-wrap:wrap}
-.upl-row input{flex:1;min-width:160px;padding:.6rem .9rem;border:1.5px solid var(--border);border-radius:10px;font-size:.875rem;font-family:inherit}
-.upl-row input:focus{outline:none;border-color:var(--teal)}
-.btn-add{
-  background:var(--teal);color:#fff;border:none;border-radius:10px;
-  padding:.6rem 1.2rem;font-size:.875rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;
-  box-shadow:0 3px 10px rgba(15,118,110,.25);
-}
-.btn-add:hover{background:var(--teal-dark)}
-.adm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:1.05rem}
-.adm-card{
-  background:#fff;border-radius:14px;overflow:hidden;cursor:grab;
-  box-shadow:0 1px 6px rgba(0,0,0,.07);border:2px solid transparent;
-  position:relative;transition:box-shadow .2s,border-color .2s;
-}
-.adm-card:hover{box-shadow:0 4px 18px rgba(0,0,0,.11)}
-.adm-card.dragging{opacity:.42;cursor:grabbing}
-.adm-card.drop-target{border-color:var(--teal);background:var(--teal-pale)}
-.adm-card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;pointer-events:none}
-.drag-h{position:absolute;top:7px;left:7px;background:rgba(0,0,0,.55);color:#fff;border-radius:6px;padding:3px 6px;font-size:.62rem;letter-spacing:.05em}
-.ord-b{position:absolute;top:7px;right:7px;background:rgba(0,0,0,.55);color:#fff;border-radius:6px;padding:2px 7px;font-size:.68rem;font-weight:700}
-.acb{padding:.75rem}
-.cap-inp{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:.38rem .58rem;font-size:.8rem;margin-bottom:.55rem;font-family:inherit;transition:border-color .2s}
-.cap-inp:focus{outline:none;border-color:var(--teal)}
-.card-acts{display:flex;gap:.4rem}
-.btn-sv{flex:1;background:var(--teal);color:#fff;border:none;border-radius:7px;padding:.33rem;font-size:.76rem;font-weight:700;cursor:pointer}
-.btn-sv:hover{background:var(--teal-dark)}
-.btn-dl{flex:1;background:var(--danger-bg);color:var(--danger);border:none;border-radius:7px;padding:.33rem;font-size:.76rem;font-weight:700;cursor:pointer}
-.btn-dl:hover{background:#fecaca}
-.gal-empty{grid-column:1/-1;text-align:center;padding:4rem 2rem;color:#94a3b8}
+    .login-right h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      margin-bottom: .3rem
+    }
 
-/* Modal */
-.modal-ov{
-  position:fixed;inset:0;background:rgba(15,23,42,.6);
-  display:none;align-items:center;justify-content:center;
-  z-index:500;padding:1rem;backdrop-filter:blur(3px);
-}
-.modal-ov.open{display:flex}
-.modal{
-  background:#fff;border-radius:20px;padding:2rem;width:100%;max-width:620px;
-  max-height:92vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.25);
-}
-.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.4rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
-.mh h2{font-size:1.05rem;font-weight:700;color:var(--teal)}
-.mcl{background:var(--bg);border:none;border-radius:8px;width:30px;height:30px;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted)}
-.mcl:hover{background:var(--danger-bg);color:var(--danger)}
+    .lr-sub {
+      color: var(--muted);
+      font-size: .875rem;
+      margin-bottom: 2rem
+    }
 
-/* Donation / Message rows */
-.row-unread td { background: #fffbeb !important; font-weight: 600; }
-.row-unread td:first-child { border-left: 3px solid var(--warning, #f59e0b); }
-.msg-preview { max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--muted); font-size: .8rem; }
-.btn-view { background: var(--teal-pale); color: var(--teal); border: none; border-radius: 7px; padding: .28rem .65rem; font-size: .76rem; font-weight: 700; cursor: pointer; }
-.btn-view:hover { background: var(--teal-light); }
-.don-amount { font-weight: 800; color: #059669; font-size: .9rem; }
-.don-method { background: #f0f9ff; color: #0369a1; border-radius: 6px; padding: .14rem .5rem; font-size: .72rem; font-weight: 700; }
-.msg-type { background: var(--teal-pale); color: var(--teal); border: 1px solid var(--teal-light); border-radius: 6px; font-size: .7rem; padding: .14rem .5rem; font-weight: 700; }
-.status-paid { background: #dcfce7; color: #166534; border-radius: 99px; padding: .2rem .6rem; font-size: .7rem; font-weight: 700; }
-.status-pending { background: #fef3c7; color: #92400e; border-radius: 99px; padding: .2rem .6rem; font-size: .7rem; font-weight: 700; }
-/* Message detail modal */
-.msg-detail { line-height: 1.7; }
-.msg-detail .md-label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: .2rem; }
-.msg-detail .md-val { font-size: .9rem; color: #1e293b; margin-bottom: 1rem; }
-.msg-detail .md-body { background: var(--bg); border-radius: 10px; padding: 1rem; font-size: .875rem; color: #1e293b; line-height: 1.6; margin-top: .2rem; white-space: pre-wrap; }
-/* Stat red sub */
-.stat-sub.red { color: var(--danger); }
+    .f-lbl {
+      display: block;
+      font-size: .78rem;
+      font-weight: 700;
+      color: #374151;
+      margin-bottom: .4rem;
+      letter-spacing: .02em;
+      text-transform: uppercase
+    }
 
-/* Toast */
-#toast{
-  position:fixed;bottom:1.5rem;right:1.5rem;background:#0f172a;color:#fff;
-  padding:.72rem 1.2rem;border-radius:12px;font-size:.858rem;opacity:0;
-  transform:translateY(10px);transition:opacity .3s,transform .3s;
-  pointer-events:none;z-index:9999;display:flex;align-items:center;gap:.55rem;
-  box-shadow:0 8px 24px rgba(0,0,0,.2);max-width:310px;
-}
-#toast.show{opacity:1;transform:translateY(0)}
-#toast.success{background:#059669}
-#toast.error{background:var(--danger)}
+    .f-inp {
+      width: 100%;
+      padding: .75rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: .95rem;
+      font-family: inherit;
+      margin-bottom: 1.25rem;
+      transition: border-color .2s, box-shadow .2s;
+    }
 
-/* Responsive */
-@media(max-width:1100px){
-  .stats-grid{grid-template-columns:repeat(2,1fr)}
-  .dash-grid{grid-template-columns:1fr}
-}
-@media(max-width:900px){
-  .sidebar{transform:translateX(-100%)}
-  .sidebar.open{transform:translateX(0);box-shadow:4px 0 20px rgba(0,0,0,.15)}
-  .main{margin-left:0}
-  .tb-brand{width:auto}
-  .tb-toggle{display:block}
-  .tb-search{display:none}
-  .fg2{grid-template-columns:1fr}
-}
-@media(max-width:600px){
-  .stats-grid{grid-template-columns:1fr 1fr}
-  .main{padding:1.1rem 1rem}
-}
-</style>
+    .f-inp:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, .12)
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: .85rem;
+      background: var(--teal);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: .95rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 4px 14px rgba(15, 118, 110, .35);
+      transition: background .2s, transform .1s;
+    }
+
+    .btn-login:hover {
+      background: var(--teal-dark)
+    }
+
+    .btn-login:active {
+      transform: scale(.98)
+    }
+
+    .l-err {
+      color: var(--danger);
+      font-size: .82rem;
+      margin-top: .7rem;
+      min-height: 1.1rem
+    }
+
+    @media(max-width:680px) {
+      .login-left {
+        display: none
+      }
+
+      .login-right {
+        width: 100%;
+        border-radius: 24px
+      }
+
+      .login-wrap {
+        max-width: 400px
+      }
+    }
+
+    /* ── SHELL ──────────────────────────── */
+    #admin {
+      display: none
+    }
+
+    /* Topbar */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--hh);
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      z-index: 300;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .05);
+    }
+
+    .tb-brand {
+      width: var(--sw);
+      height: var(--hh);
+      background: var(--teal);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: 0 1.25rem;
+    }
+
+    .tb-brand .bi {
+      font-size: 1.4rem
+    }
+
+    .tb-brand .bt {
+      color: #fff;
+      font-weight: 700;
+      font-size: .9rem;
+      line-height: 1.2
+    }
+
+    .tb-brand .bt small {
+      display: block;
+      font-size: .68rem;
+      font-weight: 400;
+      opacity: .7
+    }
+
+    .tb-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: .5rem .75rem;
+      color: var(--muted);
+      font-size: 1.25rem;
+      display: none
+    }
+
+    .tb-space {
+      flex: 1
+    }
+
+    .tb-search {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: .42rem .9rem;
+    }
+
+    .tb-search input {
+      border: none;
+      background: none;
+      font-size: .85rem;
+      width: 190px;
+      font-family: inherit;
+      color: #1e293b
+    }
+
+    .tb-search input:focus {
+      outline: none
+    }
+
+    .tb-search input::placeholder {
+      color: var(--muted)
+    }
+
+    .tb-right {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      padding: 0 1.25rem
+    }
+
+    .ext-link {
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: .38rem .8rem;
+      font-size: .78rem;
+      font-weight: 600;
+      color: #475569;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: all .2s;
+    }
+
+    .ext-link:hover {
+      border-color: var(--teal);
+      color: var(--teal);
+      background: var(--teal-pale)
+    }
+
+    .avatar-wrap {
+      position: relative
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--teal), var(--teal-deep));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: .8rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .av-menu {
+      position: absolute;
+      top: 42px;
+      right: 0;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: .5rem;
+      min-width: 165px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+      display: none;
+      z-index: 400;
+    }
+
+    .av-menu.open {
+      display: block
+    }
+
+    .av-menu .am-meta {
+      padding: .4rem .7rem;
+      font-size: .75rem;
+      color: var(--muted)
+    }
+
+    .av-menu .am-name {
+      padding: .1rem .7rem .5rem;
+      font-size: .85rem;
+      font-weight: 700
+    }
+
+    .av-menu hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: .3rem 0
+    }
+
+    .av-menu button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: .5rem .7rem;
+      font-size: .84rem;
+      border-radius: 7px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: #1e293b;
+      font-family: inherit;
+      transition: background .15s;
+    }
+
+    .av-menu button:hover {
+      background: var(--bg)
+    }
+
+    .av-menu button.danger {
+      color: var(--danger)
+    }
+
+    .av-menu button.danger:hover {
+      background: var(--danger-bg)
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: var(--hh);
+      left: 0;
+      bottom: 0;
+      width: var(--sw);
+      background: #fff;
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      transition: transform .3s ease;
+    }
+
+    .sb-section {
+      padding: 1.1rem 1rem .4rem
+    }
+
+    .sb-sec-lbl {
+      font-size: .66rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #94a3b8;
+      padding: 0 .5rem;
+      margin-bottom: .4rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      padding: .58rem .75rem;
+      border-radius: 10px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: .855rem;
+      font-weight: 500;
+      transition: all .15s;
+      user-select: none;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+      position: relative;
+    }
+
+    .nav-item:hover {
+      background: var(--bg);
+      color: #1e293b
+    }
+
+    .nav-item.active {
+      background: var(--teal-pale);
+      color: var(--teal);
+      font-weight: 700
+    }
+
+    .nav-item.active::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 18%;
+      bottom: 18%;
+      width: 3px;
+      background: var(--teal);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .ni-icon {
+      font-size: 1.05rem;
+      flex-shrink: 0;
+      width: 20px;
+      text-align: center
+    }
+
+    .ni-badge {
+      margin-left: auto;
+      background: var(--teal-light);
+      color: var(--teal);
+      border-radius: 99px;
+      padding: .1rem .5rem;
+      font-size: .7rem;
+      font-weight: 700;
+    }
+
+    .ni-badge.red {
+      background: var(--danger-bg);
+      color: var(--danger)
+    }
+
+    .sb-foot {
+      margin-top: auto;
+      padding: 1rem;
+      border-top: 1px solid var(--border)
+    }
+
+    .sb-user {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      padding: .5rem
+    }
+
+    .su-av {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--teal), var(--teal-deep));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: .78rem;
+      flex-shrink: 0;
+    }
+
+    .su-name {
+      font-size: .84rem;
+      font-weight: 700;
+      color: #1e293b
+    }
+
+    .su-role {
+      font-size: .72rem;
+      color: var(--muted)
+    }
+
+    /* Main */
+    .main {
+      margin-left: var(--sw);
+      margin-top: var(--hh);
+      min-height: calc(100vh - var(--hh));
+      padding: 2rem;
+    }
+
+    .pg-header {
+      margin-bottom: 1.75rem
+    }
+
+    .pg-header h1 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: .2rem
+    }
+
+    .pg-header p {
+      color: var(--muted);
+      font-size: .875rem
+    }
+
+    /* Panels */
+    .tab-panel {
+      display: none
+    }
+
+    .tab-panel.active {
+      display: block
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.1rem;
+      margin-bottom: 1.75rem
+    }
+
+    .stat-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 1.4rem;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, .06);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px
+    }
+
+    .sc-green::after {
+      background: linear-gradient(90deg, #0f766e, #5eead4)
+    }
+
+    .sc-blue::after {
+      background: linear-gradient(90deg, #3b82f6, #93c5fd)
+    }
+
+    .sc-amber::after {
+      background: linear-gradient(90deg, #f59e0b, #fde68a)
+    }
+
+    .sc-purple::after {
+      background: linear-gradient(90deg, #8b5cf6, #c4b5fd)
+    }
+
+    .stat-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      margin-bottom: .9rem;
+    }
+
+    .si-green {
+      background: #dcfce7
+    }
+
+    .si-blue {
+      background: #dbeafe
+    }
+
+    .si-amber {
+      background: #fef3c7
+    }
+
+    .si-purple {
+      background: #ede9fe
+    }
+
+    .stat-val {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1
+    }
+
+    .stat-lbl {
+      font-size: .78rem;
+      color: var(--muted);
+      margin-top: .3rem;
+      font-weight: 500
+    }
+
+    .stat-sub {
+      font-size: .73rem;
+      font-weight: 600;
+      margin-top: .65rem;
+      color: #059669
+    }
+
+    .stat-sub.mu {
+      color: var(--muted)
+    }
+
+    /* Dash grid */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 1.1rem;
+      margin-bottom: 1.1rem
+    }
+
+    .dash-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 1.4rem;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, .06);
+      border: 1px solid var(--border);
+    }
+
+    .dc-title {
+      font-size: .875rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+    }
+
+    .dc-title .dc-ct {
+      margin-left: auto;
+      background: var(--bg);
+      color: var(--muted);
+      border-radius: 6px;
+      padding: .1rem .5rem;
+      font-size: .72rem;
+    }
+
+    .recent-list {
+      display: flex;
+      flex-direction: column;
+      gap: .65rem
+    }
+
+    .ri {
+      display: flex;
+      align-items: center;
+      gap: .85rem;
+      padding: .65rem;
+      border-radius: 10px;
+      background: var(--bg)
+    }
+
+    .ri img {
+      width: 44px;
+      height: 34px;
+      object-fit: cover;
+      border-radius: 7px;
+      flex-shrink: 0
+    }
+
+    .ri-ph {
+      width: 44px;
+      height: 34px;
+      border-radius: 7px;
+      background: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .9rem;
+      flex-shrink: 0
+    }
+
+    .ri-info {
+      flex: 1;
+      min-width: 0
+    }
+
+    .ri-t {
+      font-size: .83rem;
+      font-weight: 700;
+      color: #1e293b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .ri-s {
+      font-size: .72rem;
+      color: var(--muted);
+      margin-top: .1rem
+    }
+
+    .sdot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0
+    }
+
+    .sd-green {
+      background: #22c55e
+    }
+
+    .sd-gray {
+      background: #94a3b8
+    }
+
+    .gal-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .55rem
+    }
+
+    .gal-strip img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      border-radius: 8px;
+      display: block
+    }
+
+    .gal-more {
+      aspect-ratio: 4/3;
+      background: var(--bg);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .78rem;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      flex-direction: column;
+      gap: .15rem;
+    }
+
+    .gal-more:hover {
+      background: var(--teal-pale);
+      color: var(--teal)
+    }
+
+    .qa-list {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem
+    }
+
+    .qa-btn {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      padding: .75rem .9rem;
+      border-radius: 10px;
+      background: var(--bg);
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: .855rem;
+      font-weight: 600;
+      color: #1e293b;
+      width: 100%;
+      text-align: left;
+      transition: all .15s;
+    }
+
+    .qa-btn:hover {
+      background: var(--teal-pale);
+      color: var(--teal)
+    }
+
+    /* Panel card */
+    .panel-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 1.6rem;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, .06);
+      border: 1px solid var(--border);
+      margin-bottom: 1.4rem;
+    }
+
+    .pc-title {
+      font-size: .9rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: .4rem
+    }
+
+    /* Form */
+    .fg2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem
+    }
+
+    .fg2 .full {
+      grid-column: 1/-1
+    }
+
+    .fg {
+      display: flex;
+      flex-direction: column;
+      gap: .32rem
+    }
+
+    .fg label {
+      font-size: .75rem;
+      font-weight: 700;
+      color: #374151;
+      letter-spacing: .02em;
+      text-transform: uppercase
+    }
+
+    .fg input,
+    .fg textarea,
+    .fg select {
+      padding: .62rem .9rem;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: .875rem;
+      font-family: inherit;
+      background: #fff;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .fg input:focus,
+    .fg textarea:focus,
+    .fg select:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, .1);
+    }
+
+    .fg textarea {
+      resize: vertical;
+      min-height: 80px
+    }
+
+    .f-actions {
+      display: flex;
+      gap: .7rem;
+      margin-top: 1.1rem;
+      flex-wrap: wrap
+    }
+
+    .btn-sub {
+      background: var(--teal);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: .68rem 1.4rem;
+      font-size: .875rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 3px 10px rgba(15, 118, 110, .28);
+      transition: background .2s;
+    }
+
+    .btn-sub:hover {
+      background: var(--teal-dark)
+    }
+
+    .btn-canc {
+      background: var(--bg);
+      color: #475569;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: .68rem 1.1rem;
+      font-size: .875rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-canc:hover {
+      background: var(--border)
+    }
+
+    .img-uz {
+      border: 2px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-align: center;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: .84rem;
+      transition: border-color .2s, background .2s;
+    }
+
+    .img-uz:hover,
+    .img-uz.drag-over {
+      border-color: var(--teal);
+      background: var(--teal-pale)
+    }
+
+    .img-uz input[type=file] {
+      display: none
+    }
+
+    .ip-wrap {
+      position: relative;
+      display: inline-block;
+      margin-top: .7rem
+    }
+
+    .ip-img {
+      width: 110px;
+      height: 74px;
+      object-fit: cover;
+      border-radius: 8px;
+      display: block
+    }
+
+    .ip-clr {
+      position: absolute;
+      top: -7px;
+      right: -7px;
+      background: var(--danger);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 19px;
+      height: 19px;
+      font-size: .6rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Table */
+    .sec-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.1rem;
+      flex-wrap: wrap;
+      gap: .7rem
+    }
+
+    .sec-bar h2 {
+      font-size: .9rem;
+      font-weight: 700;
+      color: #1e293b
+    }
+
+    .cpill {
+      background: #e0f2fe;
+      color: #0369a1;
+      border-radius: 99px;
+      padding: .22rem .75rem;
+      font-size: .75rem;
+      font-weight: 700
+    }
+
+    .tbl-wrap {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid var(--border)
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .83rem
+    }
+
+    thead {
+      background: #f8fafc
+    }
+
+    th {
+      padding: .75rem 1rem;
+      text-align: left;
+      font-weight: 700;
+      color: #374151;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .04em
+    }
+
+    td {
+      padding: .75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle
+    }
+
+    tr:last-child td {
+      border-bottom: none
+    }
+
+    tbody tr {
+      transition: background .12s
+    }
+
+    tbody tr:hover td {
+      background: #f8fafc
+    }
+
+    .tbl-img {
+      width: 50px;
+      height: 36px;
+      object-fit: cover;
+      border-radius: 7px;
+      display: block
+    }
+
+    .tbl-ph {
+      width: 50px;
+      height: 36px;
+      background: var(--bg);
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .95rem
+    }
+
+    .spill {
+      border-radius: 99px;
+      padding: .22rem .65rem;
+      font-size: .7rem;
+      font-weight: 700;
+      white-space: nowrap;
+      letter-spacing: .03em
+    }
+
+    .sp-up {
+      background: #dcfce7;
+      color: #166534
+    }
+
+    .sp-past {
+      background: #f1f5f9;
+      color: #64748b
+    }
+
+    .cat-tag {
+      background: var(--teal-pale);
+      color: var(--teal);
+      border: 1px solid var(--teal-light);
+      border-radius: 6px;
+      font-size: .7rem;
+      padding: .14rem .5rem;
+      white-space: nowrap;
+      font-weight: 700
+    }
+
+    .tbl-acts {
+      display: flex;
+      gap: .35rem
+    }
+
+    .btn-ed {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: none;
+      border-radius: 7px;
+      padding: .28rem .65rem;
+      font-size: .76rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .15s
+    }
+
+    .btn-ed:hover {
+      background: #dbeafe
+    }
+
+    .btn-rm {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: none;
+      border-radius: 7px;
+      padding: .28rem .65rem;
+      font-size: .76rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .15s
+    }
+
+    .btn-rm:hover {
+      background: #fecaca
+    }
+
+    .empty-r td {
+      text-align: center;
+      padding: 3rem;
+      color: #94a3b8;
+      font-size: .875rem
+    }
+
+    /* Gallery */
+    .drop-zone {
+      border: 2.5px dashed #cbd5e1;
+      border-radius: 14px;
+      padding: 2.25rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      color: var(--muted);
+      transition: border-color .2s, background .2s;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.drag-over {
+      border-color: var(--teal);
+      background: var(--teal-pale)
+    }
+
+    .drop-zone input[type=file] {
+      display: none
+    }
+
+    .dzi {
+      font-size: 2.1rem;
+      display: block;
+      margin-bottom: .55rem
+    }
+
+    .dz-strong {
+      color: var(--teal);
+      font-weight: 700
+    }
+
+    .prev-strip {
+      display: flex;
+      gap: .55rem;
+      flex-wrap: wrap;
+      margin-top: .9rem
+    }
+
+    .prev-thumb {
+      width: 66px;
+      height: 50px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 2px solid var(--border)
+    }
+
+    .upl-row {
+      display: flex;
+      gap: .7rem;
+      margin-top: .9rem;
+      flex-wrap: wrap
+    }
+
+    .upl-row input {
+      flex: 1;
+      min-width: 160px;
+      padding: .6rem .9rem;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: .875rem;
+      font-family: inherit
+    }
+
+    .upl-row input:focus {
+      outline: none;
+      border-color: var(--teal)
+    }
+
+    .btn-add {
+      background: var(--teal);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: .6rem 1.2rem;
+      font-size: .875rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+      box-shadow: 0 3px 10px rgba(15, 118, 110, .25);
+    }
+
+    .btn-add:hover {
+      background: var(--teal-dark)
+    }
+
+    .adm-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+      gap: 1.05rem
+    }
+
+    .adm-card {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: grab;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, .07);
+      border: 2px solid transparent;
+      position: relative;
+      transition: box-shadow .2s, border-color .2s;
+    }
+
+    .adm-card:hover {
+      box-shadow: 0 4px 18px rgba(0, 0, 0, .11)
+    }
+
+    .adm-card.dragging {
+      opacity: .42;
+      cursor: grabbing
+    }
+
+    .adm-card.drop-target {
+      border-color: var(--teal);
+      background: var(--teal-pale)
+    }
+
+    .adm-card img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      display: block;
+      pointer-events: none
+    }
+
+    .drag-h {
+      position: absolute;
+      top: 7px;
+      left: 7px;
+      background: rgba(0, 0, 0, .55);
+      color: #fff;
+      border-radius: 6px;
+      padding: 3px 6px;
+      font-size: .62rem;
+      letter-spacing: .05em
+    }
+
+    .ord-b {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      background: rgba(0, 0, 0, .55);
+      color: #fff;
+      border-radius: 6px;
+      padding: 2px 7px;
+      font-size: .68rem;
+      font-weight: 700
+    }
+
+    .acb {
+      padding: .75rem
+    }
+
+    .cap-inp {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: .38rem .58rem;
+      font-size: .8rem;
+      margin-bottom: .55rem;
+      font-family: inherit;
+      transition: border-color .2s
+    }
+
+    .cap-inp:focus {
+      outline: none;
+      border-color: var(--teal)
+    }
+
+    .card-acts {
+      display: flex;
+      gap: .4rem
+    }
+
+    .btn-sv {
+      flex: 1;
+      background: var(--teal);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: .33rem;
+      font-size: .76rem;
+      font-weight: 700;
+      cursor: pointer
+    }
+
+    .btn-sv:hover {
+      background: var(--teal-dark)
+    }
+
+    .btn-dl {
+      flex: 1;
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: none;
+      border-radius: 7px;
+      padding: .33rem;
+      font-size: .76rem;
+      font-weight: 700;
+      cursor: pointer
+    }
+
+    .btn-dl:hover {
+      background: #fecaca
+    }
+
+    .gal-empty {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #94a3b8
+    }
+
+    /* Modal */
+    .modal-ov {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, .6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 500;
+      padding: 1rem;
+      backdrop-filter: blur(3px);
+    }
+
+    .modal-ov.open {
+      display: flex
+    }
+
+    .modal {
+      background: #fff;
+      border-radius: 20px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 620px;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, .25);
+    }
+
+    .mh {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.4rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .mh h2 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--teal)
+    }
+
+    .mcl {
+      background: var(--bg);
+      border: none;
+      border-radius: 8px;
+      width: 30px;
+      height: 30px;
+      font-size: .95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted)
+    }
+
+    .mcl:hover {
+      background: var(--danger-bg);
+      color: var(--danger)
+    }
+
+    /* Donation / Message rows */
+    .row-unread td {
+      background: #fffbeb !important;
+      font-weight: 600;
+    }
+
+    .row-unread td:first-child {
+      border-left: 3px solid var(--warning, #f59e0b);
+    }
+
+    .msg-preview {
+      max-width: 220px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--muted);
+      font-size: .8rem;
+    }
+
+    .btn-view {
+      background: var(--teal-pale);
+      color: var(--teal);
+      border: none;
+      border-radius: 7px;
+      padding: .28rem .65rem;
+      font-size: .76rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-view:hover {
+      background: var(--teal-light);
+    }
+
+    .don-amount {
+      font-weight: 800;
+      color: #059669;
+      font-size: .9rem;
+    }
+
+    .don-method {
+      background: #f0f9ff;
+      color: #0369a1;
+      border-radius: 6px;
+      padding: .14rem .5rem;
+      font-size: .72rem;
+      font-weight: 700;
+    }
+
+    .msg-type {
+      background: var(--teal-pale);
+      color: var(--teal);
+      border: 1px solid var(--teal-light);
+      border-radius: 6px;
+      font-size: .7rem;
+      padding: .14rem .5rem;
+      font-weight: 700;
+    }
+
+    .status-paid {
+      background: #dcfce7;
+      color: #166534;
+      border-radius: 99px;
+      padding: .2rem .6rem;
+      font-size: .7rem;
+      font-weight: 700;
+    }
+
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+      border-radius: 99px;
+      padding: .2rem .6rem;
+      font-size: .7rem;
+      font-weight: 700;
+    }
+
+    /* Message detail modal */
+    .msg-detail {
+      line-height: 1.7;
+    }
+
+    .msg-detail .md-label {
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      margin-bottom: .2rem;
+    }
+
+    .msg-detail .md-val {
+      font-size: .9rem;
+      color: #1e293b;
+      margin-bottom: 1rem;
+    }
+
+    .msg-detail .md-body {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 1rem;
+      font-size: .875rem;
+      color: #1e293b;
+      line-height: 1.6;
+      margin-top: .2rem;
+      white-space: pre-wrap;
+    }
+
+    /* Stat red sub */
+    .stat-sub.red {
+      color: var(--danger);
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: #0f172a;
+      color: #fff;
+      padding: .72rem 1.2rem;
+      border-radius: 12px;
+      font-size: .858rem;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity .3s, transform .3s;
+      pointer-events: none;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: .55rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .2);
+      max-width: 310px;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0)
+    }
+
+    #toast.success {
+      background: #059669
+    }
+
+    #toast.error {
+      background: var(--danger)
+    }
+
+    /* Responsive */
+    @media(max-width:1100px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .dash-grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media(max-width:900px) {
+      .sidebar {
+        transform: translateX(-100%)
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+        box-shadow: 4px 0 20px rgba(0, 0, 0, .15)
+      }
+
+      .main {
+        margin-left: 0
+      }
+
+      .tb-brand {
+        width: auto
+      }
+
+      .tb-toggle {
+        display: block
+      }
+
+      .tb-search {
+        display: none
+      }
+
+      .fg2 {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media(max-width:600px) {
+      .stats-grid {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .main {
+        padding: 1.1rem 1rem
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- LOGIN -->
-<div id="login-screen">
-  <div class="login-wrap">
-    <div class="login-left">
-      <span class="ll-icon">🕌</span>
-      <h1>AL Hind Trust<br>Admin Portal</h1>
-      <p>Manage gallery, events &amp; content from one central dashboard.</p>
-      <ul class="feat-list">
-        <li>Manage events &amp; programs</li>
-        <li>Upload &amp; organise gallery images</li>
-        <li>Drag-and-drop reordering</li>
-        <li>Real-time dashboard overview</li>
-      </ul>
-    </div>
-    <div class="login-right">
-      <h2>Welcome back 👋</h2>
-      <p class="lr-sub">Sign in to your admin panel</p>
-      <label class="f-lbl" for="pwd-input">Password</label>
-      <input type="password" id="pwd-input" class="f-inp" placeholder="Enter admin password" autocomplete="current-password">
-      <button class="btn-login" onclick="doLogin()">Sign In →</button>
-      <p class="l-err" id="l-err"></p>
-    </div>
-  </div>
-</div>
-
-<!-- ADMIN -->
-<div id="admin">
-
-  <!-- Topbar -->
-  <div class="topbar">
-    <div class="tb-brand">
-      <span class="bi">🕌</span>
-      <div class="bt">AL Hind Trust<small>Admin Panel</small></div>
-    </div>
-    <button class="tb-toggle" onclick="toggleSidebar()">☰</button>
-    <div class="tb-space"></div>
-    <div class="tb-search">
-      <span>🔍</span>
-      <input type="text" placeholder="Search events…" id="gsearch" oninput="gSearch()">
-    </div>
-    <div class="tb-right">
-      <a href="gallery.html" target="_blank" class="ext-link">🖼️ Gallery ↗</a>
-      <a href="events.html"  target="_blank" class="ext-link">📅 Events ↗</a>
-      <div class="avatar-wrap">
-        <div class="avatar" onclick="toggleAvMenu()" id="av-btn">A
-          <div class="av-menu" id="av-menu">
-            <div class="am-meta">Signed in as</div>
-            <div class="am-name">Admin</div>
-            <hr>
-            <button class="danger" onclick="doLogout()">🚪 Sign Out</button>
-          </div>
-        </div>
+  <!-- LOGIN -->
+  <div id="login-screen">
+    <div class="login-wrap">
+      <div class="login-left">
+        <span class="ll-icon">🕌</span>
+        <h1>AL Hind Trust<br>Admin Portal</h1>
+        <p>Manage gallery, events &amp; content from one central dashboard.</p>
+        <ul class="feat-list">
+          <li>Manage events &amp; programs</li>
+          <li>Upload &amp; organise gallery images</li>
+          <li>Drag-and-drop reordering</li>
+          <li>Real-time dashboard overview</li>
+        </ul>
+      </div>
+      <div class="login-right">
+        <h2>Welcome back 👋</h2>
+        <p class="lr-sub">Sign in to your admin panel</p>
+        <label class="f-lbl" for="pwd-input">Password</label>
+        <input type="password" id="pwd-input" class="f-inp" placeholder="Enter admin password"
+          autocomplete="current-password">
+        <button class="btn-login" onclick="doLogin()">Sign In →</button>
+        <p class="l-err" id="l-err"></p>
       </div>
     </div>
   </div>
 
-  <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sb-section">
-      <div class="sb-sec-lbl">Main</div>
-      <button class="nav-item active" onclick="goTo('dashboard')" data-page="dashboard">
-        <span class="ni-icon">📊</span>Dashboard
-      </button>
-    </div>
-    <div class="sb-section">
-      <div class="sb-sec-lbl">Content</div>
-      <button class="nav-item" onclick="goTo('events')" data-page="events">
-        <span class="ni-icon">📅</span>Events
-        <span class="ni-badge" id="sb-ec">0</span>
-      </button>
-      <button class="nav-item" onclick="goTo('gallery')" data-page="gallery">
-        <span class="ni-icon">🖼️</span>Gallery
-        <span class="ni-badge" id="sb-gc">0</span>
-      </button>
-    </div>
-    <div class="sb-section">
-      <div class="sb-sec-lbl">Inbox</div>
-      <button class="nav-item" onclick="goTo('donations')" data-page="donations">
-        <span class="ni-icon">💰</span>Donations
-        <span class="ni-badge red" id="sb-don-count">0</span>
-      </button>
-      <button class="nav-item" onclick="goTo('messages')" data-page="messages">
-        <span class="ni-icon">📬</span>Messages
-        <span class="ni-badge red" id="sb-msg-count">0</span>
-      </button>
-    </div>
-    <div class="sb-section">
-      <div class="sb-sec-lbl">Actions</div>
-      <button class="nav-item" onclick="goTo('add-event')" data-page="add-event">
-        <span class="ni-icon">➕</span>Add Event
-      </button>
-      <button class="nav-item" onclick="goTo('upload')" data-page="upload">
-        <span class="ni-icon">📤</span>Upload Images
-      </button>
-    </div>
-    <div class="sb-foot">
-      <div class="sb-user">
-        <div class="su-av">A</div>
-        <div><div class="su-name">Admin</div><div class="su-role">Super Admin</div></div>
-      </div>
-    </div>
-  </aside>
+  <!-- ADMIN -->
+  <div id="admin">
 
-  <!-- Main -->
-  <main class="main" id="main-area">
-
-    <!-- DASHBOARD -->
-    <div class="tab-panel active" id="page-dashboard">
-      <div class="pg-header"><h1>Dashboard</h1><p>Welcome back! Here's an overview.</p></div>
-      <div class="stats-grid">
-        <div class="stat-card sc-green">
-          <div class="stat-icon si-green">📅</div>
-          <div class="stat-val" id="sv-total">0</div>
-          <div class="stat-lbl">Total Events</div>
-          <div class="stat-sub" id="sv-up">↑ 0 upcoming</div>
-        </div>
-        <div class="stat-card sc-blue">
-          <div class="stat-icon si-blue">🖼️</div>
-          <div class="stat-val" id="sv-gal">0</div>
-          <div class="stat-lbl">Gallery Images</div>
-          <div class="stat-sub mu">Across all categories</div>
-        </div>
-        <div class="stat-card sc-amber">
-          <div class="stat-icon si-amber">✅</div>
-          <div class="stat-val" id="sv-past">0</div>
-          <div class="stat-lbl">Past Events</div>
-          <div class="stat-sub mu">Completed programs</div>
-        </div>
-        <div class="stat-card sc-purple">
-          <div class="stat-icon si-purple">📍</div>
-          <div class="stat-val" id="sv-locs">0</div>
-          <div class="stat-lbl">Locations Covered</div>
-          <div class="stat-sub mu">Unique locations</div>
-        </div>
-        <div class="stat-card sc-amber">
-          <div class="stat-icon si-amber">💰</div>
-          <div class="stat-val" id="sv-don">0</div>
-          <div class="stat-lbl">Total Donations</div>
-          <div class="stat-sub" id="sv-don-amt">₹0 raised</div>
-        </div>
-        <div class="stat-card sc-blue">
-          <div class="stat-icon si-blue">📬</div>
-          <div class="stat-val" id="sv-msg">0</div>
-          <div class="stat-lbl">Messages</div>
-          <div class="stat-sub mu" id="sv-msg-unread">0 unread</div>
-        </div>
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="tb-brand">
+        <span class="bi">🕌</span>
+        <div class="bt">AL Hind Trust<small>Admin Panel</small></div>
       </div>
-      <div class="dash-grid">
-        <div class="dash-card">
-          <div class="dc-title">📅 Recent Events <span class="dc-ct" id="dc-ec">0</span></div>
-          <div class="recent-list" id="dash-events"></div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:1.1rem">
-          <div class="dash-card">
-            <div class="dc-title">🖼️ Gallery Preview</div>
-            <div class="gal-strip" id="dash-gal-strip"></div>
-          </div>
-          <div class="dash-card">
-            <div class="dc-title">⚡ Quick Actions</div>
-            <div class="qa-list">
-              <button class="qa-btn" onclick="goTo('add-event')"><span>➕</span> Add New Event</button>
-              <button class="qa-btn" onclick="goTo('upload')"><span>📤</span> Upload Gallery Images</button>
-              <button class="qa-btn" onclick="goTo('events')"><span>📋</span> Manage All Events</button>
-              <button class="qa-btn" onclick="goTo('gallery')"><span>🗂️</span> Manage Gallery</button>
+      <button class="tb-toggle" onclick="toggleSidebar()">☰</button>
+      <div class="tb-space"></div>
+      <div class="tb-search">
+        <span>🔍</span>
+        <input type="text" placeholder="Search events…" id="gsearch" oninput="gSearch()">
+      </div>
+      <div class="tb-right">
+        <a href="gallery.html" target="_blank" class="ext-link">🖼️ Gallery ↗</a>
+        <a href="events.html" target="_blank" class="ext-link">📅 Events ↗</a>
+        <div class="avatar-wrap">
+          <div class="avatar" onclick="toggleAvMenu()" id="av-btn">A
+            <div class="av-menu" id="av-menu">
+              <div class="am-meta">Signed in as</div>
+              <div class="am-name">Admin</div>
+              <hr>
+              <button class="danger" onclick="doLogout()">🚪 Sign Out</button>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- EVENTS LIST -->
-    <div class="tab-panel" id="page-events">
-      <div class="pg-header"><h1>📅 Events</h1><p>Manage all events and activities.</p></div>
-      <div class="sec-bar">
-        <h2>All Events</h2>
-        <div style="display:flex;gap:.7rem;align-items:center;flex-wrap:wrap">
-          <span class="cpill" id="evt-cnt">0 events</span>
-          <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;" onclick="goTo('add-event')">➕ Add Event</button>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-section">
+        <div class="sb-sec-lbl">Main</div>
+        <button class="nav-item active" onclick="goTo('dashboard')" data-page="dashboard">
+          <span class="ni-icon">📊</span>Dashboard
+        </button>
+      </div>
+      <div class="sb-section">
+        <div class="sb-sec-lbl">Content</div>
+        <button class="nav-item" onclick="goTo('events')" data-page="events">
+          <span class="ni-icon">📅</span>Events
+          <span class="ni-badge" id="sb-ec">0</span>
+        </button>
+        <button class="nav-item" onclick="goTo('gallery')" data-page="gallery">
+          <span class="ni-icon">🖼️</span>Gallery
+          <span class="ni-badge" id="sb-gc">0</span>
+        </button>
+      </div>
+      <div class="sb-section">
+        <div class="sb-sec-lbl">Inbox</div>
+        <button class="nav-item" onclick="goTo('donations')" data-page="donations">
+          <span class="ni-icon">💰</span>Donations
+          <span class="ni-badge red" id="sb-don-count">0</span>
+        </button>
+        <button class="nav-item" onclick="goTo('messages')" data-page="messages">
+          <span class="ni-icon">📬</span>Messages
+          <span class="ni-badge red" id="sb-msg-count">0</span>
+        </button>
+      </div>
+      <div class="sb-section">
+        <div class="sb-sec-lbl">Actions</div>
+        <button class="nav-item" onclick="goTo('add-event')" data-page="add-event">
+          <span class="ni-icon">➕</span>Add Event
+        </button>
+        <button class="nav-item" onclick="goTo('upload')" data-page="upload">
+          <span class="ni-icon">📤</span>Upload Images
+        </button>
+      </div>
+      <div class="sb-foot">
+        <div class="sb-user">
+          <div class="su-av">A</div>
+          <div>
+            <div class="su-name">Admin</div>
+            <div class="su-role">Super Admin</div>
+          </div>
         </div>
       </div>
-      <div class="tbl-wrap">
-        <table><thead><tr>
-          <th></th><th>Title</th><th>Date</th><th>Status</th><th>Category</th><th>Location</th><th>Actions</th>
-        </tr></thead>
-        <tbody id="evt-tbody"></tbody></table>
-      </div>
-    </div>
+    </aside>
 
-    <!-- ADD EVENT -->
-    <div class="tab-panel" id="page-add-event">
-      <div class="pg-header">
-        <h1 id="ae-title">➕ Add New Event</h1>
-        <p>Fill in the details to publish an event on the public page.</p>
-      </div>
-      <div class="panel-card">
-        <div class="fg2">
-          <div class="fg"><label>Event Title *</label><input type="text" id="ef-title" placeholder="Free Medical Camp"></div>
-          <div class="fg"><label>Date *</label><input type="date" id="ef-date"></div>
-          <div class="fg"><label>Location</label><input type="text" id="ef-location" placeholder="Madhepura, Bihar"></div>
-          <div class="fg"><label>Category</label>
-            <select id="ef-cat">
-              <option value="">-- Select --</option>
-              <option>Health</option><option>Education</option><option>Welfare</option>
-              <option>Community</option><option>Awareness</option><option>Volunteer</option><option>Other</option>
-            </select>
+    <!-- Main -->
+    <main class="main" id="main-area">
+
+      <!-- DASHBOARD -->
+      <div class="tab-panel active" id="page-dashboard">
+        <div class="pg-header">
+          <h1>Dashboard</h1>
+          <p>Welcome back! Here's an overview.</p>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card sc-green">
+            <div class="stat-icon si-green">📅</div>
+            <div class="stat-val" id="sv-total">0</div>
+            <div class="stat-lbl">Total Events</div>
+            <div class="stat-sub" id="sv-up">↑ 0 upcoming</div>
           </div>
-          <div class="fg full"><label>Description</label><textarea id="ef-desc" placeholder="Brief description…"></textarea></div>
-          <div class="fg"><label>Map Search Query</label><input type="text" id="ef-map" placeholder="Madhepura,Bihar"></div>
-          <div class="fg"><label>Join / Register Link</label><input type="text" id="ef-link" placeholder="join.html or https://…"></div>
-          <div class="fg full">
-            <label>Event Image</label>
-            <div class="img-uz" id="ef-uz" onclick="document.getElementById('ef-img-file').click()">
-              📷 Click to upload image
-              <input type="file" id="ef-img-file" accept="image/*" onchange="handleEvtImg(this)">
-              <div class="ip-wrap" id="ef-ip-wrap" style="display:none">
-                <img id="ef-ip" class="ip-img" alt="">
-                <button class="ip-clr" onclick="clearEvtImg(event)">✕</button>
+          <div class="stat-card sc-blue">
+            <div class="stat-icon si-blue">🖼️</div>
+            <div class="stat-val" id="sv-gal">0</div>
+            <div class="stat-lbl">Gallery Images</div>
+            <div class="stat-sub mu">Across all categories</div>
+          </div>
+          <div class="stat-card sc-amber">
+            <div class="stat-icon si-amber">✅</div>
+            <div class="stat-val" id="sv-past">0</div>
+            <div class="stat-lbl">Past Events</div>
+            <div class="stat-sub mu">Completed programs</div>
+          </div>
+          <div class="stat-card sc-purple">
+            <div class="stat-icon si-purple">📍</div>
+            <div class="stat-val" id="sv-locs">0</div>
+            <div class="stat-lbl">Locations Covered</div>
+            <div class="stat-sub mu">Unique locations</div>
+          </div>
+          <div class="stat-card sc-amber">
+            <div class="stat-icon si-amber">💰</div>
+            <div class="stat-val" id="sv-don">0</div>
+            <div class="stat-lbl">Total Donations</div>
+            <div class="stat-sub" id="sv-don-amt">₹0 raised</div>
+          </div>
+          <div class="stat-card sc-blue">
+            <div class="stat-icon si-blue">📬</div>
+            <div class="stat-val" id="sv-msg">0</div>
+            <div class="stat-lbl">Messages</div>
+            <div class="stat-sub mu" id="sv-msg-unread">0 unread</div>
+          </div>
+        </div>
+        <div class="dash-grid">
+          <div class="dash-card">
+            <div class="dc-title">📅 Recent Events <span class="dc-ct" id="dc-ec">0</span></div>
+            <div class="recent-list" id="dash-events"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:1.1rem">
+            <div class="dash-card">
+              <div class="dc-title">🖼️ Gallery Preview</div>
+              <div class="gal-strip" id="dash-gal-strip"></div>
+            </div>
+            <div class="dash-card">
+              <div class="dc-title">⚡ Quick Actions</div>
+              <div class="qa-list">
+                <button class="qa-btn" onclick="goTo('add-event')"><span>➕</span> Add New Event</button>
+                <button class="qa-btn" onclick="goTo('upload')"><span>📤</span> Upload Gallery Images</button>
+                <button class="qa-btn" onclick="goTo('events')"><span>📋</span> Manage All Events</button>
+                <button class="qa-btn" onclick="goTo('gallery')"><span>🗂️</span> Manage Gallery</button>
               </div>
             </div>
-            <input type="text" id="ef-img-url" style="margin-top:.5rem;padding:.6rem .9rem;border:1.5px solid var(--border);border-radius:10px;font-size:.875rem;font-family:inherit;width:100%"
-              placeholder="Or paste image URL: images/event1.jpg" oninput="syncImgUrl()">
           </div>
         </div>
-        <div class="f-actions">
-          <button class="btn-sub" id="ef-sub" onclick="submitEvent()">➕ Add Event</button>
-          <button class="btn-canc" id="ef-canc" style="display:none" onclick="cancelEdit()">Cancel</button>
+      </div>
+
+      <!-- EVENTS LIST -->
+      <div class="tab-panel" id="page-events">
+        <div class="pg-header">
+          <h1>📅 Events</h1>
+          <p>Manage all events and activities.</p>
+        </div>
+        <div class="sec-bar">
+          <h2>All Events</h2>
+          <div style="display:flex;gap:.7rem;align-items:center;flex-wrap:wrap">
+            <span class="cpill" id="evt-cnt">0 events</span>
+            <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;" onclick="goTo('add-event')">➕ Add
+              Event</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Category</th>
+                <th>Location</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="evt-tbody"></tbody>
+          </table>
         </div>
       </div>
-    </div>
 
-    <!-- GALLERY -->
-    <div class="tab-panel" id="page-gallery">
-      <div class="pg-header"><h1>🖼️ Gallery</h1><p>Drag cards to reorder. Changes save automatically.</p></div>
-      <div class="sec-bar">
-        <h2>All Images</h2>
-        <div style="display:flex;gap:.65rem;align-items:center;flex-wrap:wrap">
-          <span class="cpill" id="gal-cpill">0 images</span>
-          <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;" onclick="goTo('upload')">📤 Upload</button>
-          <button style="background:var(--danger-bg);color:var(--danger);border:none;border-radius:8px;padding:.42rem .95rem;font-size:.8rem;cursor:pointer;font-weight:700;" onclick="clearAllGal()">Clear All</button>
+      <!-- ADD EVENT -->
+      <div class="tab-panel" id="page-add-event">
+        <div class="pg-header">
+          <h1 id="ae-title">➕ Add New Event</h1>
+          <p>Fill in the details to publish an event on the public page.</p>
+        </div>
+        <div class="panel-card">
+          <div class="fg2">
+            <div class="fg"><label>Event Title *</label><input type="text" id="ef-title"
+                placeholder="Free Medical Camp"></div>
+            <div class="fg"><label>Date *</label><input type="date" id="ef-date"></div>
+            <div class="fg"><label>Location</label><input type="text" id="ef-location" placeholder="Madhepura, Bihar">
+            </div>
+            <div class="fg"><label>Category</label>
+              <select id="ef-cat">
+                <option value="">-- Select --</option>
+                <option>Health</option>
+                <option>Education</option>
+                <option>Welfare</option>
+                <option>Community</option>
+                <option>Awareness</option>
+                <option>Volunteer</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="fg full"><label>Description</label><textarea id="ef-desc"
+                placeholder="Brief description…"></textarea></div>
+            <div class="fg"><label>Map Search Query</label><input type="text" id="ef-map" placeholder="Madhepura,Bihar">
+            </div>
+            <div class="fg"><label>Join / Register Link</label><input type="text" id="ef-link"
+                placeholder="join.html or https://…"></div>
+            <div class="fg full">
+              <label>Event Image</label>
+              <div class="img-uz" id="ef-uz" onclick="document.getElementById('ef-img-file').click()">
+                📷 Click to upload image
+                <input type="file" id="ef-img-file" accept="image/*" onchange="handleEvtImg(this)">
+                <div class="ip-wrap" id="ef-ip-wrap" style="display:none">
+                  <img id="ef-ip" class="ip-img" alt="">
+                  <button class="ip-clr" onclick="clearEvtImg(event)">✕</button>
+                </div>
+              </div>
+              <input type="text" id="ef-img-url"
+                style="margin-top:.5rem;padding:.6rem .9rem;border:1.5px solid var(--border);border-radius:10px;font-size:.875rem;font-family:inherit;width:100%"
+                placeholder="Or paste image URL: images/event1.jpg" oninput="syncImgUrl()">
+            </div>
+          </div>
+          <div class="f-actions">
+            <button class="btn-sub" id="ef-sub" onclick="submitEvent()">➕ Add Event</button>
+            <button class="btn-canc" id="ef-canc" style="display:none" onclick="cancelEdit()">Cancel</button>
+          </div>
         </div>
       </div>
-      <div class="adm-grid" id="gal-grid"></div>
-    </div>
 
-    <!-- UPLOAD -->
-    <div class="tab-panel" id="page-upload">
-      <div class="pg-header"><h1>📤 Upload Images</h1><p>Add new images to the public gallery.</p></div>
-      <div class="panel-card">
-        <div class="drop-zone" id="gal-dz" onclick="document.getElementById('gal-fi').click()">
-          <span class="dzi">📁</span>
-          <p><span class="dz-strong">Click to browse</span> or drag &amp; drop images here</p>
-          <small style="display:block;margin-top:.4rem;">JPG, PNG, WebP — multiple files supported</small>
-          <input type="file" id="gal-fi" accept="image/*" multiple onchange="handleGalFiles(this.files)">
+      <!-- GALLERY -->
+      <div class="tab-panel" id="page-gallery">
+        <div class="pg-header">
+          <h1>🖼️ Gallery</h1>
+          <p>Drag cards to reorder. Changes save automatically.</p>
         </div>
-        <div class="prev-strip" id="gal-prev"></div>
-        <div class="upl-row" id="gal-upl-row" style="display:none">
-          <input type="text" id="gal-cap" placeholder="Caption for all (or leave blank to use filenames)">
-          <button class="btn-add" onclick="addGalImages()">＋ Add to Gallery</button>
+        <div class="sec-bar">
+          <h2>All Images</h2>
+          <div style="display:flex;gap:.65rem;align-items:center;flex-wrap:wrap">
+            <span class="cpill" id="gal-cpill">0 images</span>
+            <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;" onclick="goTo('upload')">📤
+              Upload</button>
+            <button
+              style="background:var(--danger-bg);color:var(--danger);border:none;border-radius:8px;padding:.42rem .95rem;font-size:.8rem;cursor:pointer;font-weight:700;"
+              onclick="clearAllGal()">Clear All</button>
+          </div>
         </div>
+        <div class="adm-grid" id="gal-grid"></div>
       </div>
-    </div>
 
-    <!-- DONATIONS -->
-    <div class="tab-panel" id="page-donations">
-      <div class="pg-header"><h1>💰 Donations</h1><p>All donation submissions from your website.</p></div>
-      <div class="sec-bar">
-        <h2>Donation Records</h2>
-        <div style="display:flex;gap:.65rem;align-items:center;flex-wrap:wrap">
-          <span class="cpill" id="don-cpill">0 donations</span>
-          <span style="background:#dcfce7;color:#166534;border-radius:99px;padding:.22rem .75rem;font-size:.75rem;font-weight:700;" id="don-total-pill">₹0 total</span>
-          <button style="background:var(--danger-bg);color:var(--danger);border:none;border-radius:8px;padding:.42rem .95rem;font-size:.8rem;cursor:pointer;font-weight:700;" onclick="clearDonations()">Clear All</button>
-          <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;" onclick="exportCSV('donations')">⬇ Export CSV</button>
+      <!-- UPLOAD -->
+      <div class="tab-panel" id="page-upload">
+        <div class="pg-header">
+          <h1>📤 Upload Images</h1>
+          <p>Add new images to the public gallery.</p>
         </div>
-      </div>
-      <div class="tbl-wrap">
-        <table><thead><tr>
-          <th>#</th><th>Name</th><th>Email</th><th>Amount</th><th>Method</th><th>Status</th><th>Date & Time</th><th>Actions</th>
-        </tr></thead>
-        <tbody id="don-tbody"></tbody></table>
-      </div>
-    </div>
-
-    <!-- MESSAGES -->
-    <div class="tab-panel" id="page-messages">
-      <div class="pg-header"><h1>📬 Contact Messages</h1><p>Messages and inquiries submitted via your contact form.</p></div>
-      <div class="sec-bar">
-        <h2>All Messages</h2>
-        <div style="display:flex;gap:.65rem;align-items:center;flex-wrap:wrap">
-          <span class="cpill" id="msg-cpill">0 messages</span>
-          <span style="background:#fee2e2;color:#dc2626;border-radius:99px;padding:.22rem .75rem;font-size:.75rem;font-weight:700;" id="msg-unread-pill">0 unread</span>
-          <button style="background:var(--danger-bg);color:var(--danger);border:none;border-radius:8px;padding:.42rem .95rem;font-size:.8rem;cursor:pointer;font-weight:700;" onclick="clearMessages()">Clear All</button>
-          <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;" onclick="markAllRead()">✓ Mark All Read</button>
-          <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;background:#475569;" onclick="exportCSV('messages')">⬇ Export CSV</button>
+        <div class="panel-card">
+          <div class="drop-zone" id="gal-dz" onclick="document.getElementById('gal-fi').click()">
+            <span class="dzi">📁</span>
+            <p><span class="dz-strong">Click to browse</span> or drag &amp; drop images here</p>
+            <small style="display:block;margin-top:.4rem;">JPG, PNG, WebP — multiple files supported</small>
+            <input type="file" id="gal-fi" accept="image/*" multiple onchange="handleGalFiles(this.files)">
+          </div>
+          <div class="prev-strip" id="gal-prev"></div>
+          <div class="upl-row" id="gal-upl-row" style="display:none">
+            <input type="text" id="gal-cap" placeholder="Caption for all (or leave blank to use filenames)">
+            <button class="btn-add" onclick="addGalImages()">＋ Add to Gallery</button>
+          </div>
         </div>
       </div>
-      <div class="tbl-wrap">
-        <table><thead><tr>
-          <th>#</th><th>Name</th><th>Email</th><th>Phone</th><th>Type</th><th>Message</th><th>Date & Time</th><th>Actions</th>
-        </tr></thead>
-        <tbody id="msg-tbody"></tbody></table>
+
+      <!-- DONATIONS -->
+      <div class="tab-panel" id="page-donations">
+        <div class="pg-header">
+          <h1>💰 Donations</h1>
+          <p>All donation submissions from your website.</p>
+        </div>
+        <div class="sec-bar">
+          <h2>Donation Records</h2>
+          <div style="display:flex;gap:.65rem;align-items:center;flex-wrap:wrap">
+            <span class="cpill" id="don-cpill">0 donations</span>
+            <span
+              style="background:#dcfce7;color:#166534;border-radius:99px;padding:.22rem .75rem;font-size:.75rem;font-weight:700;"
+              id="don-total-pill">₹0 total</span>
+            <button
+              style="background:var(--danger-bg);color:var(--danger);border:none;border-radius:8px;padding:.42rem .95rem;font-size:.8rem;cursor:pointer;font-weight:700;"
+              onclick="clearDonations()">Clear All</button>
+            <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;" onclick="exportCSV('donations')">⬇
+              Export CSV</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Status</th>
+                <th>Date & Time</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="don-tbody"></tbody>
+          </table>
+        </div>
       </div>
-    </div>
 
-  </main>
-</div>
+      <!-- MESSAGES -->
+      <div class="tab-panel" id="page-messages">
+        <div class="pg-header">
+          <h1>📬 Contact Messages</h1>
+          <p>Messages and inquiries submitted via your contact form.</p>
+        </div>
+        <div class="sec-bar">
+          <h2>All Messages</h2>
+          <div style="display:flex;gap:.65rem;align-items:center;flex-wrap:wrap">
+            <span class="cpill" id="msg-cpill">0 messages</span>
+            <span
+              style="background:#fee2e2;color:#dc2626;border-radius:99px;padding:.22rem .75rem;font-size:.75rem;font-weight:700;"
+              id="msg-unread-pill">0 unread</span>
+            <button
+              style="background:var(--danger-bg);color:var(--danger);border:none;border-radius:8px;padding:.42rem .95rem;font-size:.8rem;cursor:pointer;font-weight:700;"
+              onclick="clearMessages()">Clear All</button>
+            <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;" onclick="markAllRead()">✓ Mark All
+              Read</button>
+            <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;background:#475569;"
+              onclick="exportCSV('messages')">⬇ Export CSV</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Type</th>
+                <th>Message</th>
+                <th>Date & Time</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="msg-tbody"></tbody>
+          </table>
+        </div>
+      </div>
 
-<!-- MESSAGE DETAIL MODAL -->
-<div class="modal-ov" id="msg-modal">
-  <div class="modal" style="max-width:520px">
-    <div class="mh"><h2>📬 Message Detail</h2><button class="mcl" onclick="closeMsgModal()">✕</button></div>
-    <div class="msg-detail" id="msg-detail-body"></div>
-    <div class="f-actions" style="margin-top:1.5rem">
-      <a id="msg-reply-link" href="" class="btn-sub" style="text-decoration:none">✉️ Reply via Email</a>
-      <button class="btn-canc" onclick="closeMsgModal()">Close</button>
+    </main>
+  </div>
+
+  <!-- MESSAGE DETAIL MODAL -->
+  <div class="modal-ov" id="msg-modal">
+    <div class="modal" style="max-width:520px">
+      <div class="mh">
+        <h2>📬 Message Detail</h2><button class="mcl" onclick="closeMsgModal()">✕</button>
+      </div>
+      <div class="msg-detail" id="msg-detail-body"></div>
+      <div class="f-actions" style="margin-top:1.5rem">
+        <a id="msg-reply-link" href="" class="btn-sub" style="text-decoration:none">✉️ Reply via Email</a>
+        <button class="btn-canc" onclick="closeMsgModal()">Close</button>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- EDIT MODAL -->
-<div class="modal-ov" id="edit-modal">
-  <div class="modal">
-    <div class="mh"><h2>✏️ Edit Event</h2><button class="mcl" onclick="closeModal()">✕</button></div>
-    <div class="fg2">
-      <div class="fg"><label>Title *</label><input type="text" id="em-title"></div>
-      <div class="fg"><label>Date *</label><input type="date" id="em-date"></div>
-      <div class="fg"><label>Location</label><input type="text" id="em-loc"></div>
-      <div class="fg"><label>Category</label>
-        <select id="em-cat">
-          <option value="">-- Select --</option>
-          <option>Health</option><option>Education</option><option>Welfare</option>
-          <option>Community</option><option>Awareness</option><option>Volunteer</option><option>Other</option>
-        </select>
+  <!-- EDIT MODAL -->
+  <div class="modal-ov" id="edit-modal">
+    <div class="modal">
+      <div class="mh">
+        <h2>✏️ Edit Event</h2><button class="mcl" onclick="closeModal()">✕</button>
       </div>
-      <div class="fg full"><label>Description</label><textarea id="em-desc"></textarea></div>
-      <div class="fg"><label>Map Query</label><input type="text" id="em-map"></div>
-      <div class="fg"><label>Join Link</label><input type="text" id="em-link"></div>
-      <div class="fg full"><label>Image URL / Path</label><input type="text" id="em-img" placeholder="images/event1.jpg"></div>
-    </div>
-    <div class="f-actions">
-      <button class="btn-sub" onclick="saveEdit()">💾 Save Changes</button>
-      <button class="btn-canc" onclick="closeModal()">Cancel</button>
+      <div class="fg2">
+        <div class="fg"><label>Title *</label><input type="text" id="em-title"></div>
+        <div class="fg"><label>Date *</label><input type="date" id="em-date"></div>
+        <div class="fg"><label>Location</label><input type="text" id="em-loc"></div>
+        <div class="fg"><label>Category</label>
+          <select id="em-cat">
+            <option value="">-- Select --</option>
+            <option>Health</option>
+            <option>Education</option>
+            <option>Welfare</option>
+            <option>Community</option>
+            <option>Awareness</option>
+            <option>Volunteer</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="fg full"><label>Description</label><textarea id="em-desc"></textarea></div>
+        <div class="fg"><label>Map Query</label><input type="text" id="em-map"></div>
+        <div class="fg"><label>Join Link</label><input type="text" id="em-link"></div>
+        <div class="fg full"><label>Image URL / Path</label><input type="text" id="em-img"
+            placeholder="images/event1.jpg"></div>
+      </div>
+      <div class="f-actions">
+        <button class="btn-sub" onclick="saveEdit()">💾 Save Changes</button>
+        <button class="btn-canc" onclick="closeModal()">Cancel</button>
+      </div>
     </div>
   </div>
-</div>
 
-<div id="toast"></div>
+  <div id="toast"></div>
 
-<script>
-const APWD="alhind2024"; // ← Change before deploying!
-const EK="alhind_events",GK="alhind_gallery_items";
-const TODAY=new Date().toISOString().split("T")[0];
-const DE=[
-  {id:1,title:"Free Medical Camp",date:"2026-03-10",location:"Madhepura, Bihar",description:"Health checkup camp organised for rural families.",image:"images/event1.jpg",mapQuery:"Madhepura,Bihar",joinLink:"join.html",category:"Health"},
-  {id:2,title:"Winter Blanket Distribution",date:"2025-12-20",location:"Saharsa, Bihar",description:"Helping needy families during winter.",image:"images/event2.jpg",mapQuery:"Saharsa,Bihar",joinLink:"join.html",category:"Welfare"},
-];
-const DG=[
-  {id:1,src:"/assets/gallery/1.jpeg",caption:"Education Support Program"},
-  {id:2,src:"/assets/gallery/7.jpeg",caption:"Classroom Activity"},
-  {id:3,src:"/assets/gallery/3.jpeg",caption:"Community Outreach"},
-  {id:4,src:"/assets/gallery/4.jpeg",caption:"Health Camp"},
-  {id:5,src:"/assets/gallery/5.jpeg",caption:"Volunteer Activity"},
-  {id:6,src:"/assets/gallery/6.jpeg",caption:"Distribution Drive"},
-  {id:7,src:"/assets/gallery/8.jpeg",caption:"Skill Development"},
-  {id:8,src:"/assets/gallery/9.jpeg",caption:"Awareness Campaign"},
-  {id:9,src:"/assets/gallery/10.jpeg",caption:"Free Medical Camp"},
-];
-let events=[],gallery=[],editId=null,galPend=[],galDragI=null,efB64="";
+  <script>
+    const API = 'https://api.alhindtrust.com';
+    const TODAY = new Date().toISOString().split('T')[0];
+    let events = [], gallery = [], donations = [], messages = [];
+    let editId = null, galPend = [], galDragI = null, efB64 = '', jwtToken = '';
 
-/* Auth */
-function doLogin(){
-  if(document.getElementById("pwd-input").value===APWD){sessionStorage.setItem("alhind_admin","1");showAdmin();}
-  else{document.getElementById("l-err").textContent="Incorrect password.";document.getElementById("pwd-input").value="";}
-}
-document.getElementById("pwd-input").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();document.getElementById("l-err").textContent="";});
-function doLogout(){sessionStorage.removeItem("alhind_admin");location.reload();}
-function showAdmin(){
-  document.getElementById("login-screen").style.display="none";
-  document.getElementById("admin").style.display="block";
-  loadAll();refreshAll();goTo("dashboard");
-}
-if(sessionStorage.getItem("alhind_admin"))showAdmin();
+    /* ══════════════════════════════════════
+       API HELPERS
+    ══════════════════════════════════════ */
+    async function apiFetch(method, endpoint, body = null, isForm = false) {
+      const headers = {};
+      if (!isForm) headers['Content-Type'] = 'application/json';
+      if (jwtToken) headers['Authorization'] = `Bearer ${jwtToken}`;
+      const opts = { method, headers };
+      if (body) opts.body = isForm ? body : JSON.stringify(body);
+      try {
+        const res = await fetch(`${API}/${endpoint}`, opts);
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text); }
+        catch (e) { console.error('Non-JSON response:', text); throw new Error('Server returned non-JSON'); }
+        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+        return data;
+      } catch (err) {
+        console.error(`API [${method} /${endpoint}]:`, err.message);
+        throw err;
+      }
+    }
 
-/* Storage */
-function loadAll(){
-  try{const r=localStorage.getItem(EK);events=r?JSON.parse(r):[...DE];}catch{events=[...DE];}
-  try{const r=localStorage.getItem(GK);gallery=r?JSON.parse(r):[...DG];}catch{gallery=[...DG];}
-}
-function saveEvents(s){localStorage.setItem(EK,JSON.stringify(events));refreshAll();if(!s)toast("Saved ✓","success");}
-function saveGallery(s){
-  try{localStorage.setItem(GK,JSON.stringify(gallery));}catch{toast("Storage full","error");return;}
-  refreshAll();if(!s)toast("Saved ✓","success");
-}
-function refreshAll(){updateCounts();renderDash();renderEvtTable();renderGalGrid();}
-function updateCounts(){
-  const e=events.length,g=gallery.length;
-  const up=events.filter(x=>x.date>=TODAY).length;
-  const past=events.filter(x=>x.date<TODAY).length;
-  const locs=[...new Set(events.map(x=>x.location).filter(Boolean))].length;
-  document.getElementById("sb-ec").textContent=e;
-  document.getElementById("sb-gc").textContent=g;
-  document.getElementById("sv-total").textContent=e;
-  document.getElementById("sv-gal").textContent=g;
-  document.getElementById("sv-past").textContent=past;
-  document.getElementById("sv-locs").textContent=locs;
-  document.getElementById("sv-up").textContent="↑ "+up+" upcoming";
-  document.getElementById("evt-cnt").textContent=e+" event"+(e!==1?"s":"");
-  document.getElementById("gal-cpill").textContent=g+" image"+(g!==1?"s":"");
-  document.getElementById("dc-ec").textContent=e;
-}
+    /* ══════════════════════════════════════
+       AUTH
+    ══════════════════════════════════════ */
+    async function doLogin() {
+      const pwd = document.getElementById('pwd-input').value.trim();
+      const err = document.getElementById('l-err');
+      if (!pwd) { err.textContent = 'Enter your password'; return; }
+      const btn = document.querySelector('.btn-login');
+      btn.textContent = 'Signing in…'; btn.disabled = true;
+      try {
+        // Try API login first
+        const res = await apiFetch('POST', 'auth', { username: 'admin', password: pwd });
+        jwtToken = res.data.token;
+        sessionStorage.setItem('alhind_token', jwtToken);
+        sessionStorage.setItem('alhind_admin', '1');
+        showAdmin();
+      } catch (e) {
+        err.textContent = 'Incorrect password — please try again.';
+        document.getElementById('pwd-input').value = '';
+      } finally {
+        btn.textContent = 'Sign In →'; btn.disabled = false;
+      }
+    }
+    document.getElementById('pwd-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+      document.getElementById('l-err').textContent = '';
+    });
+    function doLogout() {
+      sessionStorage.removeItem('alhind_admin');
+      sessionStorage.removeItem('alhind_token');
+      jwtToken = '';
+      location.reload();
+    }
+    function showAdmin() {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('admin').style.display = 'block';
+      loadAll();
+    }
+    // Auto-login if token exists
+    const savedToken = sessionStorage.getItem('alhind_token');
+    if (savedToken && sessionStorage.getItem('alhind_admin')) {
+      jwtToken = savedToken; showAdmin();
+    }
 
-/* Nav */
-function goTo(p){
-  document.querySelectorAll(".tab-panel").forEach(x=>x.classList.remove("active"));
-  document.querySelectorAll(".nav-item").forEach(b=>b.classList.remove("active"));
-  const panel=document.getElementById("page-"+p);if(panel)panel.classList.add("active");
-  const btn=document.querySelector(`[data-page="${p}"]`);if(btn)btn.classList.add("active");
-  if(window.innerWidth<900)document.getElementById("sidebar").classList.remove("open");
-  window.scrollTo(0,0);
-}
-function toggleSidebar(){document.getElementById("sidebar").classList.toggle("open");}
-function toggleAvMenu(){document.getElementById("av-menu").classList.toggle("open");}
-document.addEventListener("click",e=>{
-  if(!document.getElementById("av-btn").contains(e.target))
-    document.getElementById("av-menu").classList.remove("open");
-});
-function gSearch(){
-  const q=document.getElementById("gsearch").value.trim().toLowerCase();if(!q)return;
-  if(events.some(e=>e.title.toLowerCase().includes(q)))goTo("events");else goTo("gallery");
-}
+    /* ══════════════════════════════════════
+       LOAD ALL DATA
+    ══════════════════════════════════════ */
+    async function loadAll() {
+      showPageLoader(true);
+      try {
+        await Promise.all([loadDashboard(), loadEvents(), loadGallery(), loadInbox()]);
+      } catch (e) {
+        toast('Some data failed to load', 'error');
+      } finally {
+        showPageLoader(false);
+        goTo('dashboard');
+      }
+    }
 
-/* Dashboard */
-function renderDash(){
-  const el=document.getElementById("dash-events");
-  const sorted=[...events].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
-  el.innerHTML=sorted.length?sorted.map(e=>`
-    <div class="ri">
-      ${e.image?`<img src="${e.image}" alt="">`:`<div class="ri-ph">📅</div>`}
-      <div class="ri-info"><div class="ri-t">${esc(e.title)}</div><div class="ri-s">${fmtDate(e.date)} · ${esc(e.location||"—")}</div></div>
-      <div class="sdot ${e.date<TODAY?"sd-gray":"sd-green"}"></div>
-    </div>`).join(""):`<p style="color:var(--muted);font-size:.875rem;">No events yet.</p>`;
+    function showPageLoader(show) {
+      // Simple loading state on sidebar badges
+      if (show) {
+        ['sb-ec', 'sb-gc', 'sb-don-count', 'sb-msg-count'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = '…';
+        });
+      }
+    }
 
-  const strip=document.getElementById("dash-gal-strip");
-  const rem=gallery.length-5;
-  strip.innerHTML=gallery.slice(0,5).map(g=>`<img src="${g.src}" alt="${esc(g.caption||"")}" loading="lazy">`).join("")+
-    (rem>0?`<div class="gal-more" onclick="goTo('gallery')">+${rem}<br>more</div>`:"");
-}
+    /* ══════════════════════════════════════
+       DASHBOARD
+    ══════════════════════════════════════ */
+    async function loadDashboard() {
+      try {
+        const res = await apiFetch('GET', 'dashboard');
+        const s = res.data.stats;
+        document.getElementById('sv-total').textContent = s.total_events || 0;
+        document.getElementById('sv-gal').textContent = s.total_images || 0;
+        document.getElementById('sv-past').textContent = s.past_events || 0;
+        document.getElementById('sv-locs').textContent = s.locations || 0;
+        document.getElementById('sv-don').textContent = s.total_donations || 0;
+        document.getElementById('sv-msg').textContent = s.total_messages || 0;
+        document.getElementById('sv-up').textContent = `↑ ${s.upcoming_events || 0} upcoming`;
+        document.getElementById('sv-don-amt').textContent = `₹${(s.total_raised || 0).toLocaleString('en-IN')} raised`;
+        document.getElementById('sv-msg-unread').textContent = `${s.unread_messages || 0} unread`;
+        document.getElementById('sb-ec').textContent = s.total_events || 0;
+        document.getElementById('sb-gc').textContent = s.total_images || 0;
+        document.getElementById('sb-don-count').textContent = s.total_donations || 0;
+        document.getElementById('sb-msg-count').textContent = s.unread_messages || 0;
+        document.getElementById('dc-ec').textContent = s.total_events || 0;
+        document.getElementById('evt-cnt').textContent = `${s.total_events || 0} events`;
+        document.getElementById('gal-cpill').textContent = `${s.total_images || 0} images`;
+        // Recent events
+        const evtList = document.getElementById('dash-events');
+        const re = res.data.recent_events || [];
+        evtList.innerHTML = re.length ? re.map(e => `
+      <div class="ri">
+        ${e.image_path ? `<img src="${e.image_path}" alt="">` : `<div class="ri-ph">📅</div>`}
+        <div class="ri-info">
+          <div class="ri-t">${esc(e.title)}</div>
+          <div class="ri-s">${fmtDate(e.event_date?.substring(0, 10))} · ${esc(e.location || '—')}</div>
+        </div>
+        <div class="sdot ${e.event_date?.substring(0, 10) < TODAY ? 'sd-gray' : 'sd-green'}"></div>
+      </div>`).join('')
+          : `<p style="color:var(--muted);font-size:.875rem;">No events yet.</p>`;
+        // Gallery strip
+        const strip = document.getElementById('dash-gal-strip');
+        const gp = res.data.gallery_preview || [];
+        const rem = Math.max(0, (s.total_images || 0) - 5);
+        strip.innerHTML = gp.slice(0, 5).map(g => `<img src="${g.filepath}" alt="${esc(g.title || '')}" loading="lazy">`).join('') +
+          (rem > 0 ? `<div class="gal-more" onclick="goTo('gallery')">+${rem}<br>more</div>` : '');
+      } catch (e) {
+        console.error('Dashboard load failed:', e);
+      }
+    }
 
-/* Events table */
-function renderEvtTable(){
-  const tb=document.getElementById("evt-tbody");
-  if(!events.length){tb.innerHTML=`<tr class="empty-r"><td colspan="7">No events yet — <a href="#" onclick="goTo('add-event');return false;" style="color:var(--teal)">add one</a></td></tr>`;return;}
-  const s=[...events].sort((a,b)=>{const au=a.date>=TODAY,bu=b.date>=TODAY;if(au!==bu)return au?-1:1;return au?a.date.localeCompare(b.date):b.date.localeCompare(a.date);});
-  tb.innerHTML=s.map(e=>`<tr>
-    <td>${e.image?`<img src="${e.image}" class="tbl-img" alt="">`:`<div class="tbl-ph">📅</div>`}</td>
+    /* ══════════════════════════════════════
+       EVENTS
+    ══════════════════════════════════════ */
+    async function loadEvents() {
+      try {
+        const res = await apiFetch('GET', 'events');
+        events = res.data || [];
+        renderEvtTable();
+      } catch (e) { toast('Failed to load events', 'error'); }
+    }
+
+    function renderEvtTable() {
+      const tb = document.getElementById('evt-tbody');
+      if (!events.length) {
+        tb.innerHTML = `<tr class="empty-r"><td colspan="7">No events yet — <a href="#" onclick="goTo('add-event');return false;" style="color:var(--teal)">add one</a></td></tr>`;
+        return;
+      }
+      const s = [...events].sort((a, b) => {
+        const au = a.date >= TODAY, bu = b.date >= TODAY;
+        if (au !== bu) return au ? -1 : 1;
+        return au ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date);
+      });
+      tb.innerHTML = s.map(e => `<tr>
+    <td>${e.image ? `<img src="${e.image}" class="tbl-img" alt="">` : `<div class="tbl-ph">📅</div>`}</td>
     <td><strong>${esc(e.title)}</strong></td>
     <td style="white-space:nowrap;color:var(--muted);font-size:.8rem">${fmtDate(e.date)}</td>
-    <td><span class="spill ${e.date<TODAY?"sp-past":"sp-up"}">${e.date<TODAY?"Past":"Upcoming"}</span></td>
-    <td>${e.category?`<span class="cat-tag">${esc(e.category)}</span>`:"-"}</td>
-    <td style="color:var(--muted);font-size:.8rem">${esc(e.location||"-")}</td>
-    <td><div class="tbl-acts"><button class="btn-ed" onclick="openEdit(${e.id})">✏️ Edit</button><button class="btn-rm" onclick="delEvt(${e.id})">🗑</button></div></td>
-  </tr>`).join("");
-}
+    <td><span class="spill ${e.date < TODAY ? 'sp-past' : 'sp-up'}">${e.date < TODAY ? 'Past' : 'Upcoming'}</span></td>
+    <td>${e.category ? `<span class="cat-tag">${esc(e.category)}</span>` : '-'}</td>
+    <td style="color:var(--muted);font-size:.8rem">${esc(e.location || '-')}</td>
+    <td><div class="tbl-acts">
+      <button class="btn-ed" onclick="openEdit(${e.id})">✏️ Edit</button>
+      <button class="btn-rm" onclick="delEvt(${e.id})">🗑</button>
+    </div></td>
+  </tr>`).join('');
+    }
 
-/* Add event */
-function handleEvtImg(inp){
-  const f=inp.files[0];if(!f)return;
-  const r=new FileReader();r.onload=e=>{efB64=e.target.result;document.getElementById("ef-img-url").value="";document.getElementById("ef-ip").src=efB64;document.getElementById("ef-ip-wrap").style.display="inline-block";};r.readAsDataURL(f);
-}
-function syncImgUrl(){const u=document.getElementById("ef-img-url").value.trim();if(u){efB64="";document.getElementById("ef-ip").src=u;document.getElementById("ef-ip-wrap").style.display="inline-block";}}
-function clearEvtImg(e){e.stopPropagation();efB64="";document.getElementById("ef-img-url").value="";document.getElementById("ef-ip-wrap").style.display="none";document.getElementById("ef-img-file").value="";}
-function submitEvent(){
-  const title=document.getElementById("ef-title").value.trim(),date=document.getElementById("ef-date").value;
-  if(!title||!date){toast("Title and date required","error");return;}
-  const img=efB64||document.getElementById("ef-img-url").value.trim();
-  if(editId){const i=events.findIndex(x=>x.id===editId);if(i!==-1)events[i]=buildEvt(editId,title,date,img);editId=null;}
-  else events.push(buildEvt(Date.now(),title,date,img));
-  saveEvents();resetForm();goTo("events");
-}
-function buildEvt(id,title,date,img){return{id,title,date,location:document.getElementById("ef-location").value.trim(),description:document.getElementById("ef-desc").value.trim(),image:img,mapQuery:document.getElementById("ef-map").value.trim(),joinLink:document.getElementById("ef-link").value.trim(),category:document.getElementById("ef-cat").value};}
-function resetForm(){
-  ["ef-title","ef-date","ef-location","ef-desc","ef-map","ef-link","ef-img-url"].forEach(i=>document.getElementById(i).value="");
-  document.getElementById("ef-cat").value="";document.getElementById("ef-img-file").value="";
-  document.getElementById("ef-ip-wrap").style.display="none";efB64="";editId=null;
-  document.getElementById("ef-sub").textContent="➕ Add Event";
-  document.getElementById("ef-canc").style.display="none";
-  document.getElementById("ae-title").textContent="➕ Add New Event";
-}
-function cancelEdit(){resetForm();goTo("events");}
+    /* Add / Edit event */
+    function handleEvtImg(inp) {
+      const f = inp.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = e => { efB64 = e.target.result; document.getElementById('ef-img-url').value = ''; document.getElementById('ef-ip').src = efB64; document.getElementById('ef-ip-wrap').style.display = 'inline-block'; };
+      r.readAsDataURL(f);
+    }
+    function syncImgUrl() {
+      const u = document.getElementById('ef-img-url').value.trim();
+      if (u) { efB64 = ''; document.getElementById('ef-ip').src = u; document.getElementById('ef-ip-wrap').style.display = 'inline-block'; }
+    }
+    function clearEvtImg(e) {
+      e.stopPropagation(); efB64 = '';
+      document.getElementById('ef-img-url').value = '';
+      document.getElementById('ef-ip-wrap').style.display = 'none';
+      document.getElementById('ef-img-file').value = '';
+    }
 
-/* Edit modal */
-function openEdit(id){
-  const e=events.find(x=>x.id===id);if(!e)return;editId=id;
-  document.getElementById("em-title").value=e.title||"";
-  document.getElementById("em-date").value=e.date||"";
-  document.getElementById("em-loc").value=e.location||"";
-  document.getElementById("em-cat").value=e.category||"";
-  document.getElementById("em-desc").value=e.description||"";
-  document.getElementById("em-map").value=e.mapQuery||"";
-  document.getElementById("em-link").value=e.joinLink||"";
-  document.getElementById("em-img").value=e.image||"";
-  document.getElementById("edit-modal").classList.add("open");
-}
-function closeModal(){document.getElementById("edit-modal").classList.remove("open");editId=null;}
-function saveEdit(){
-  const i=events.findIndex(x=>x.id===editId);if(i===-1)return;
-  const t=document.getElementById("em-title").value.trim(),d=document.getElementById("em-date").value;
-  if(!t||!d){toast("Title and date required","error");return;}
-  events[i]={...events[i],title:t,date:d,location:document.getElementById("em-loc").value.trim(),category:document.getElementById("em-cat").value,description:document.getElementById("em-desc").value.trim(),mapQuery:document.getElementById("em-map").value.trim(),joinLink:document.getElementById("em-link").value.trim(),image:document.getElementById("em-img").value.trim()};
-  saveEvents();closeModal();
-}
-document.getElementById("edit-modal").addEventListener("click",e=>{if(e.target===document.getElementById("edit-modal"))closeModal();});
-function delEvt(id){const e=events.find(x=>x.id===id);if(!confirm(`Delete "${e?.title}"?`))return;events=events.filter(x=>x.id!==id);saveEvents(true);toast("Deleted","success");}
+    async function submitEvent() {
+      const title = document.getElementById('ef-title').value.trim();
+      const date = document.getElementById('ef-date').value;
+      if (!title || !date) { toast('Title and date required', 'error'); return; }
+      const img = efB64 || document.getElementById('ef-img-url').value.trim();
+      const payload = {
+        title, event_date: date,
+        location: document.getElementById('ef-location').value.trim(),
+        description: document.getElementById('ef-desc').value.trim(),
+        image_path: img,
+        map_query: document.getElementById('ef-map').value.trim(),
+        join_link: document.getElementById('ef-link').value.trim(),
+        category: document.getElementById('ef-cat').value,
+      };
+      const btn = document.getElementById('ef-sub');
+      btn.disabled = true; btn.textContent = 'Saving…';
+      try {
+        if (editId) {
+          await apiFetch('PUT', `events/${editId}`, payload);
+          toast('Event updated ✓', 'success');
+        } else {
+          await apiFetch('POST', 'events', payload);
+          toast('Event added ✓', 'success');
+        }
+        await loadEvents();
+        await loadDashboard();
+        resetForm();
+        goTo('events');
+      } catch (e) {
+        toast('Failed: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = editId ? '💾 Save Changes' : '➕ Add Event';
+      }
+    }
 
-/* Gallery */
-function handleGalFiles(files){
-  galPend=Array.from(files);const s=document.getElementById("gal-prev");s.innerHTML="";
-  galPend.forEach(f=>{const img=document.createElement("img");img.src=URL.createObjectURL(f);img.className="prev-thumb";s.appendChild(img);});
-  document.getElementById("gal-upl-row").style.display=galPend.length?"flex":"none";
-}
-function addGalImages(){
-  if(!galPend.length)return;
-  const cap=document.getElementById("gal-cap").value.trim();let done=0;
-  galPend.forEach((f,i)=>{
-    const r=new FileReader();r.onload=e=>{
-      gallery.push({id:Date.now()+i,src:e.target.result,caption:cap||f.name.replace(/\.[^.]+$/,"").replace(/[-_]/g," ")});
-      if(++done===galPend.length){saveGallery();renderGalGrid();document.getElementById("gal-prev").innerHTML="";document.getElementById("gal-cap").value="";document.getElementById("gal-upl-row").style.display="none";document.getElementById("gal-fi").value="";galPend=[];goTo("gallery");}
-    };r.readAsDataURL(f);
-  });
-}
-function renderGalGrid(){
-  const g=document.getElementById("gal-grid");g.innerHTML="";
-  if(!gallery.length){g.innerHTML=`<div class="gal-empty">📭 No images yet — <a href="#" onclick="goTo('upload');return false;" style="color:var(--teal)">upload some</a></div>`;return;}
-  gallery.forEach((item,idx)=>{
-    const card=document.createElement("div");card.className="adm-card";card.draggable=true;card.dataset.idx=idx;
-    card.innerHTML=`<div class="drag-h">⠿⠿</div><div class="ord-b">#${idx+1}</div>
-      <img src="${item.src}" alt="${esc(item.caption||"")}" loading="lazy">
-      <div class="acb">
-        <input class="cap-inp" type="text" value="${esc(item.caption||"")}" placeholder="Caption…" data-idx="${idx}">
-        <div class="card-acts"><button class="btn-sv" onclick="saveCap(${idx})">💾</button><button class="btn-dl" onclick="delGal(${idx})">🗑</button></div>
-      </div>`;
-    card.addEventListener("dragstart",()=>{galDragI=idx;card.classList.add("dragging");});
-    card.addEventListener("dragend",  ()=>{card.classList.remove("dragging");galDragI=null;});
-    card.addEventListener("dragover", e=>{e.preventDefault();card.classList.add("drop-target");});
-    card.addEventListener("dragleave",()=>card.classList.remove("drop-target"));
-    card.addEventListener("drop",     e=>{e.preventDefault();card.classList.remove("drop-target");
-      if(galDragI===null||galDragI===idx)return;
-      const m=gallery.splice(galDragI,1)[0];gallery.splice(idx,0,m);saveGallery(true);renderGalGrid();toast("Reordered","success");
+    function buildEvt(id, title, date, img) {
+      return {
+        id, title, date,
+        location: document.getElementById('ef-location').value.trim(),
+        description: document.getElementById('ef-desc').value.trim(),
+        image: img,
+        mapQuery: document.getElementById('ef-map').value.trim(),
+        joinLink: document.getElementById('ef-link').value.trim(),
+        category: document.getElementById('ef-cat').value
+      };
+    }
+    function resetForm() {
+      ['ef-title', 'ef-date', 'ef-location', 'ef-desc', 'ef-map', 'ef-link', 'ef-img-url'].forEach(i => document.getElementById(i).value = '');
+      document.getElementById('ef-cat').value = '';
+      document.getElementById('ef-img-file').value = '';
+      document.getElementById('ef-ip-wrap').style.display = 'none';
+      efB64 = ''; editId = null;
+      document.getElementById('ef-sub').textContent = '➕ Add Event';
+      document.getElementById('ef-canc').style.display = 'none';
+      document.getElementById('ae-title').textContent = '➕ Add New Event';
+    }
+    function cancelEdit() { resetForm(); goTo('events'); }
+
+    /* Edit modal */
+    function openEdit(id) {
+      const e = events.find(x => x.id === id); if (!e) return;
+      editId = id;
+      document.getElementById('em-title').value = e.title || '';
+      document.getElementById('em-date').value = e.date || '';
+      document.getElementById('em-loc').value = e.location || '';
+      document.getElementById('em-cat').value = e.category || '';
+      document.getElementById('em-desc').value = e.description || '';
+      document.getElementById('em-map').value = e.mapQuery || '';
+      document.getElementById('em-link').value = e.joinLink || '';
+      document.getElementById('em-img').value = e.image || '';
+      document.getElementById('edit-modal').classList.add('open');
+    }
+    function closeModal() { document.getElementById('edit-modal').classList.remove('open'); editId = null; }
+    async function saveEdit() {
+      const t = document.getElementById('em-title').value.trim();
+      const d = document.getElementById('em-date').value;
+      if (!t || !d) { toast('Title and date required', 'error'); return; }
+      const payload = {
+        title: t, event_date: d,
+        location: document.getElementById('em-loc').value.trim(),
+        category: document.getElementById('em-cat').value,
+        description: document.getElementById('em-desc').value.trim(),
+        map_query: document.getElementById('em-map').value.trim(),
+        join_link: document.getElementById('em-link').value.trim(),
+        image_path: document.getElementById('em-img').value.trim(),
+      };
+      try {
+        await apiFetch('PUT', `events/${editId}`, payload);
+        toast('Event updated ✓', 'success');
+        await loadEvents();
+        await loadDashboard();
+        closeModal();
+      } catch (e) { toast('Failed: ' + e.message, 'error'); }
+    }
+    document.getElementById('edit-modal').addEventListener('click', e => {
+      if (e.target === document.getElementById('edit-modal')) closeModal();
     });
-    card.querySelector(".cap-inp").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();saveCap(idx);}});
-    g.appendChild(card);
-  });
-}
-function saveCap(idx){const i=document.querySelector(`.cap-inp[data-idx="${idx}"]`);if(!i)return;gallery[idx].caption=i.value.trim();saveGallery();}
-function delGal(idx){if(!confirm(`Delete "${gallery[idx]?.caption||"this image"}"?`))return;gallery.splice(idx,1);saveGallery(true);renderGalGrid();toast("Deleted","success");}
-function clearAllGal(){if(!confirm("Delete ALL gallery images?"))return;gallery=[];saveGallery(true);renderGalGrid();toast("Cleared","success");}
-const gdz=document.getElementById("gal-dz");
-gdz.addEventListener("dragover",e=>{e.preventDefault();gdz.classList.add("drag-over");});
-gdz.addEventListener("dragleave",()=>gdz.classList.remove("drag-over"));
-gdz.addEventListener("drop",e=>{e.preventDefault();gdz.classList.remove("drag-over");handleGalFiles(e.dataTransfer.files);});
+    async function delEvt(id) {
+      const e = events.find(x => x.id === id);
+      if (!confirm(`Delete "${e?.title}"?`)) return;
+      try {
+        await apiFetch('DELETE', `events/${id}`);
+        toast('Event deleted', 'success');
+        await loadEvents();
+        await loadDashboard();
+      } catch (e) { toast('Failed: ' + e.message, 'error'); }
+    }
 
-/* ══════════════════════════════════════
-   DONATIONS & MESSAGES
-══════════════════════════════════════ */
-const DON_KEY = "alhind_donations";
-const MSG_KEY = "alhind_messages";
+    /* ══════════════════════════════════════
+       GALLERY
+    ══════════════════════════════════════ */
+    async function loadGallery() {
+      try {
+        const res = await apiFetch('GET', 'gallery');
+        gallery = res.data || [];
+        renderGalGrid();
+      } catch (e) { toast('Failed to load gallery', 'error'); }
+    }
 
-let donations = [], messages = [];
+    function handleGalFiles(files) {
+      galPend = Array.from(files);
+      const s = document.getElementById('gal-prev'); s.innerHTML = '';
+      galPend.forEach(f => {
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(f); img.className = 'prev-thumb'; s.appendChild(img);
+      });
+      document.getElementById('gal-upl-row').style.display = galPend.length ? 'flex' : 'none';
+    }
 
-function loadInbox() {
-  try { const r = localStorage.getItem(DON_KEY); donations = r ? JSON.parse(r) : []; } catch { donations = []; }
-  try { const r = localStorage.getItem(MSG_KEY); messages  = r ? JSON.parse(r) : []; } catch { messages  = []; }
-}
+    async function addGalImages() {
+      if (!galPend.length) return;
+      const cap = document.getElementById('gal-cap').value.trim();
+      const btn = document.querySelector('#gal-upl-row .btn-add');
+      btn.disabled = true; btn.textContent = 'Uploading…';
+      let done = 0;
+      for (let i = 0; i < galPend.length; i++) {
+        const f = galPend[i];
+        try {
+          await new Promise((resolve, reject) => {
+            const r = new FileReader();
+            r.onload = async e => {
+              try {
+                await apiFetch('POST', 'gallery', {
+                  src: e.target.result,
+                  caption: cap || f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '),
+                });
+                done++;
+                resolve();
+              } catch (err) { reject(err); }
+            };
+            r.readAsDataURL(f);
+          });
+        } catch (e) { toast(`Failed to upload ${f.name}`, 'error'); }
+      }
+      toast(`${done} image${done !== 1 ? 's' : ''} uploaded ✓`, 'success');
+      await loadGallery();
+      await loadDashboard();
+      document.getElementById('gal-prev').innerHTML = '';
+      document.getElementById('gal-cap').value = '';
+      document.getElementById('gal-upl-row').style.display = 'none';
+      document.getElementById('gal-fi').value = '';
+      galPend = [];
+      goTo('gallery');
+      btn.disabled = false; btn.textContent = '＋ Add to Gallery';
+    }
 
-function saveInbox() {
-  localStorage.setItem(DON_KEY, JSON.stringify(donations));
-  localStorage.setItem(MSG_KEY, JSON.stringify(messages));
-}
+    function renderGalGrid() {
+      const g = document.getElementById('gal-grid'); g.innerHTML = '';
+      if (!gallery.length) {
+        g.innerHTML = `<div class="gal-empty">📭 No images yet — <a href="#" onclick="goTo('upload');return false;" style="color:var(--teal)">upload some</a></div>`;
+        return;
+      }
+      gallery.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = 'adm-card'; card.draggable = true; card.dataset.idx = idx;
+        const src = item.filepath || item.src || '';
+        const cap = item.title || item.caption || '';
+        card.innerHTML = `
+      <div class="drag-h">⠿⠿</div>
+      <div class="ord-b">#${idx + 1}</div>
+      <img src="${src}" alt="${esc(cap)}" loading="lazy">
+      <div class="acb">
+        <input class="cap-inp" type="text" value="${esc(cap)}" placeholder="Caption…" data-id="${item.id}" data-idx="${idx}">
+        <div class="card-acts">
+          <button class="btn-sv" onclick="saveCap(${idx})">💾</button>
+          <button class="btn-dl" onclick="delGal(${item.id})">🗑</button>
+        </div>
+      </div>`;
+        card.addEventListener('dragstart', () => { galDragI = idx; card.classList.add('dragging'); });
+        card.addEventListener('dragend', () => { card.classList.remove('dragging'); galDragI = null; });
+        card.addEventListener('dragover', e => { e.preventDefault(); card.classList.add('drop-target'); });
+        card.addEventListener('dragleave', () => card.classList.remove('drop-target'));
+        card.addEventListener('drop', async e => {
+          e.preventDefault(); card.classList.remove('drop-target');
+          if (galDragI === null || galDragI === idx) return;
+          const moved = gallery.splice(galDragI, 1)[0];
+          gallery.splice(idx, 0, moved);
+          renderGalGrid();
+          try {
+            await apiFetch('POST', 'gallery/reorder', { order: gallery.map(g => g.id) });
+            toast('Order saved ✓', 'success');
+          } catch (e) { toast('Reorder failed', 'error'); await loadGallery(); }
+        });
+        card.querySelector('.cap-inp').addEventListener('keydown', e => {
+          if (e.key === 'Enter') { e.preventDefault(); saveCap(idx); }
+        });
+        g.appendChild(card);
+      });
+    }
 
-/* ── Counts ─────────────────────────── */
-function updateInboxCounts() {
-  const dc = donations.length;
-  const mc = messages.length;
-  const unread = messages.filter(m => !m.read).length;
-  const totalAmt = donations.reduce((s, d) => s + (parseFloat(d.amount) || 0), 0);
+    async function saveCap(idx) {
+      const inp = document.querySelector(`.cap-inp[data-idx="${idx}"]`);
+      if (!inp) return;
+      const id = inp.dataset.id;
+      const caption = inp.value.trim();
+      try {
+        await apiFetch('PUT', `gallery/${id}`, { title: caption, alt_text: caption });
+        gallery[idx].title = caption;
+        toast('Caption saved ✓', 'success');
+      } catch (e) { toast('Failed to save', 'error'); }
+    }
+    async function delGal(id) {
+      if (!confirm('Delete this image?')) return;
+      try {
+        await apiFetch('DELETE', `gallery/${id}`);
+        toast('Image deleted', 'success');
+        await loadGallery();
+        await loadDashboard();
+      } catch (e) { toast('Failed: ' + e.message, 'error'); }
+    }
+    async function clearAllGal() {
+      if (!confirm('Delete ALL gallery images? This cannot be undone.')) return;
+      try {
+        for (const img of gallery) await apiFetch('DELETE', `gallery/${img.id}`);
+        toast('Gallery cleared', 'success');
+        await loadGallery();
+        await loadDashboard();
+      } catch (e) { toast('Failed', 'error'); }
+    }
+    const gdz = document.getElementById('gal-dz');
+    gdz.addEventListener('dragover', e => { e.preventDefault(); gdz.classList.add('drag-over'); });
+    gdz.addEventListener('dragleave', () => gdz.classList.remove('drag-over'));
+    gdz.addEventListener('drop', e => { e.preventDefault(); gdz.classList.remove('drag-over'); handleGalFiles(e.dataTransfer.files); });
 
-  document.getElementById("sb-don-count").textContent = dc;
-  document.getElementById("sb-msg-count").textContent = unread || mc;
-  document.getElementById("sv-don").textContent = dc;
-  document.getElementById("sv-don-amt").textContent = "₹" + totalAmt.toLocaleString("en-IN") + " raised";
-  document.getElementById("sv-msg").textContent = mc;
-  document.getElementById("sv-msg-unread").textContent = unread + " unread";
-  document.getElementById("don-cpill").textContent = dc + " donation" + (dc !== 1 ? "s" : "");
-  document.getElementById("don-total-pill").textContent = "₹" + totalAmt.toLocaleString("en-IN") + " total";
-  document.getElementById("msg-cpill").textContent = mc + " message" + (mc !== 1 ? "s" : "");
-  document.getElementById("msg-unread-pill").textContent = unread + " unread";
-}
+    /* ══════════════════════════════════════
+       DONATIONS & MESSAGES
+    ══════════════════════════════════════ */
+    async function loadInbox() {
+      try {
+        const [donRes, msgRes] = await Promise.all([
+          apiFetch('GET', 'donations'),
+          apiFetch('GET', 'messages'),
+        ]);
+        donations = donRes.data?.donations || [];
+        messages = msgRes.data?.messages || [];
+        updateInboxCounts();
+        renderDonations();
+        renderMessages();
+      } catch (e) { console.error('Inbox load failed:', e); }
+    }
 
-/* ── Render Donations Table ─────────── */
-function renderDonations() {
-  const tb = document.getElementById("don-tbody");
-  if (!donations.length) {
-    tb.innerHTML = `<tr class="empty-r"><td colspan="8">No donations yet. They will appear here when submitted via your donate page.</td></tr>`;
-    return;
-  }
-  const sorted = [...donations].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  tb.innerHTML = sorted.map((d, i) => `
+    function updateInboxCounts() {
+      const dc = donations.length;
+      const mc = messages.length;
+      const unread = messages.filter(m => !m.is_read).length;
+      const total = donations.filter(d => d.payment_status === 'paid').reduce((s, d) => s + (parseFloat(d.amount) || 0), 0);
+      document.getElementById('sb-don-count').textContent = dc;
+      document.getElementById('sb-msg-count').textContent = unread || mc;
+      document.getElementById('sv-don').textContent = dc;
+      document.getElementById('sv-don-amt').textContent = `₹${total.toLocaleString('en-IN')} raised`;
+      document.getElementById('sv-msg').textContent = mc;
+      document.getElementById('sv-msg-unread').textContent = `${unread} unread`;
+      document.getElementById('don-cpill').textContent = `${dc} donation${dc !== 1 ? 's' : ''}`;
+      document.getElementById('don-total-pill').textContent = `₹${total.toLocaleString('en-IN')} total`;
+      document.getElementById('msg-cpill').textContent = `${mc} message${mc !== 1 ? 's' : ''}`;
+      document.getElementById('msg-unread-pill').textContent = `${unread} unread`;
+    }
+
+    function renderDonations() {
+      const tb = document.getElementById('don-tbody');
+      if (!donations.length) {
+        tb.innerHTML = `<tr class="empty-r"><td colspan="8">No donations yet. They will appear here when submitted.</td></tr>`;
+        return;
+      }
+      const sorted = [...donations].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      tb.innerHTML = sorted.map((d, i) => `
     <tr>
       <td style="color:var(--muted);font-size:.78rem">#${sorted.length - i}</td>
-      <td><strong>${esc(d.name || "—")}</strong></td>
-      <td style="color:var(--muted);font-size:.8rem">${esc(d.email || "—")}</td>
-      <td><span class="don-amount">₹${parseFloat(d.amount || 0).toLocaleString("en-IN")}</span></td>
-      <td><span class="don-method">${esc(d.method || "Online")}</span></td>
-      <td><span class="${d.status === "paid" ? "status-paid" : "status-pending"}">${d.status === "paid" ? "✓ Paid" : "⏳ Pending"}</span></td>
-      <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">${fmtDateTime(d.createdAt)}</td>
+      <td><strong>${esc(d.donor_name || '—')}</strong></td>
+      <td style="color:var(--muted);font-size:.8rem">${esc(d.donor_email || '—')}</td>
+      <td><span class="don-amount">₹${parseFloat(d.amount || 0).toLocaleString('en-IN')}</span></td>
+      <td><span class="don-method">${esc(d.payment_method || 'Online')}</span></td>
+      <td><span class="${d.payment_status === 'paid' ? 'status-paid' : 'status-pending'}">${d.payment_status === 'paid' ? '✓ Paid' : '⏳ Pending'}</span></td>
+      <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">${fmtDateTime(d.created_at)}</td>
       <td><div class="tbl-acts">
-        ${d.email ? `<a href="mailto:${esc(d.email)}?subject=Thank%20you%20for%20your%20donation" class="btn-view">✉️</a>` : ""}
-        <button class="btn-rm" onclick="deleteDonation('${d.id}')">🗑</button>
+        ${d.donor_email ? `<a href="mailto:${esc(d.donor_email)}?subject=Thank%20you%20for%20your%20donation" class="btn-view">✉️</a>` : ''}
+        <button class="btn-rm" onclick="deleteDonation(${d.id})">🗑</button>
       </div></td>
-    </tr>`).join("");
-}
+    </tr>`).join('');
+    }
 
-function deleteDonation(id) {
-  if (!confirm("Remove this donation record?")) return;
-  donations = donations.filter(d => d.id !== id);
-  localStorage.setItem(DON_KEY, JSON.stringify(donations));
-  updateInboxCounts();
-  renderDonations();
-  renderDashRecentDonations();
-  toast("Record removed", "success");
-}
+    async function deleteDonation(id) {
+      if (!confirm('Remove this donation record?')) return;
+      try {
+        await apiFetch('DELETE', `donations/${id}`);
+        toast('Deleted', 'success');
+        await loadInbox();
+        await loadDashboard();
+      } catch (e) { toast('Failed', 'error'); }
+    }
+    async function clearDonations() {
+      if (!confirm('Clear ALL donation records?')) return;
+      try {
+        await apiFetch('DELETE', 'donations');
+        toast('Cleared', 'success');
+        await loadInbox();
+        await loadDashboard();
+      } catch (e) { toast('Failed', 'error'); }
+    }
 
-function clearDonations() {
-  if (!confirm("Clear ALL donation records?")) return;
-  donations = [];
-  localStorage.setItem(DON_KEY, JSON.stringify(donations));
-  updateInboxCounts(); renderDonations(); renderDashRecentDonations();
-  toast("Cleared", "success");
-}
-
-/* ── Render Messages Table ──────────── */
-function renderMessages() {
-  const tb = document.getElementById("msg-tbody");
-  if (!messages.length) {
-    tb.innerHTML = `<tr class="empty-r"><td colspan="8">No messages yet. They will appear here when submitted via your contact form.</td></tr>`;
-    return;
-  }
-  const sorted = [...messages].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  tb.innerHTML = sorted.map((m, i) => `
-    <tr class="${!m.read ? "row-unread" : ""}">
+    function renderMessages() {
+      const tb = document.getElementById('msg-tbody');
+      if (!messages.length) {
+        tb.innerHTML = `<tr class="empty-r"><td colspan="8">No messages yet. They will appear here when submitted.</td></tr>`;
+        return;
+      }
+      const sorted = [...messages].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      tb.innerHTML = sorted.map((m, i) => `
+    <tr class="${!m.is_read ? 'row-unread' : ''}">
       <td style="color:var(--muted);font-size:.78rem">#${sorted.length - i}</td>
-      <td><strong>${esc(m.name || "—")}</strong></td>
-      <td style="color:var(--muted);font-size:.8rem">${esc(m.email || "—")}</td>
-      <td style="color:var(--muted);font-size:.8rem">${esc(m.phone || "—")}</td>
-      <td><span class="msg-type">${esc(labelInterest(m.interest))}</span></td>
-      <td><span class="msg-preview">${esc(m.message || "—")}</span></td>
-      <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">${fmtDateTime(m.createdAt)}</td>
+      <td><strong>${esc(m.sender_name || '—')}</strong></td>
+      <td style="color:var(--muted);font-size:.8rem">${esc(m.sender_email || '—')}</td>
+      <td style="color:var(--muted);font-size:.8rem">${esc(m.sender_phone || '—')}</td>
+      <td><span class="msg-type">${esc(labelInterest(m.interest_type))}</span></td>
+      <td><span class="msg-preview">${esc(m.message || '—')}</span></td>
+      <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">${fmtDateTime(m.created_at)}</td>
       <td><div class="tbl-acts">
-        <button class="btn-view" onclick="viewMessage('${m.id}')">👁 View</button>
-        <button class="btn-rm"   onclick="deleteMessage('${m.id}')">🗑</button>
+        <button class="btn-view" onclick="viewMessage(${m.id})">👁 View</button>
+        <button class="btn-rm"   onclick="deleteMessage(${m.id})">🗑</button>
       </div></td>
-    </tr>`).join("");
-}
+    </tr>`).join('');
+    }
 
-function labelInterest(v) {
-  const map = { volunteer: "Volunteer", team: "Member", partner: "Partner", general: "General" };
-  return map[v] || v || "General";
-}
+    function labelInterest(v) {
+      const map = { volunteer: 'Volunteer', team: 'Member', partner: 'Partner', general: 'General' };
+      return map[v] || v || 'General';
+    }
 
-function viewMessage(id) {
-  const m = messages.find(x => x.id === id); if (!m) return;
-  // Mark as read
-  m.read = true;
-  localStorage.setItem(MSG_KEY, JSON.stringify(messages));
-  updateInboxCounts(); renderMessages();
+    async function viewMessage(id) {
+      const m = messages.find(x => x.id === id); if (!m) return;
+      if (!m.is_read) {
+        try {
+          await apiFetch('PATCH', `messages/${id}`, { read: true });
+          m.is_read = true;
+          updateInboxCounts();
+          renderMessages();
+        } catch (e) { }
+      }
+      document.getElementById('msg-detail-body').innerHTML = `
+    <div class="md-label">From</div><div class="md-val"><strong>${esc(m.sender_name)}</strong></div>
+    <div class="md-label">Email</div><div class="md-val">${esc(m.sender_email || '—')}</div>
+    <div class="md-label">Phone</div><div class="md-val">${esc(m.sender_phone || '—')}</div>
+    <div class="md-label">Type</div><div class="md-val"><span class="msg-type">${esc(labelInterest(m.interest_type))}</span></div>
+    <div class="md-label">Received</div><div class="md-val">${fmtDateTime(m.created_at)}</div>
+    <div class="md-label">Message</div><div class="md-body">${esc(m.message || '—')}</div>`;
+      const replyLink = document.getElementById('msg-reply-link');
+      if (m.sender_email) {
+        replyLink.href = `mailto:${m.sender_email}?subject=Re: Your message to AL Hind Trust`;
+        replyLink.style.display = 'inline-flex';
+      } else { replyLink.style.display = 'none'; }
+      document.getElementById('msg-modal').classList.add('open');
+    }
+    function closeMsgModal() { document.getElementById('msg-modal').classList.remove('open'); }
+    document.getElementById('msg-modal').addEventListener('click', e => {
+      if (e.target === document.getElementById('msg-modal')) closeMsgModal();
+    });
+    async function deleteMessage(id) {
+      if (!confirm('Delete this message?')) return;
+      try {
+        await apiFetch('DELETE', `messages/${id}`);
+        toast('Deleted', 'success');
+        await loadInbox();
+      } catch (e) { toast('Failed', 'error'); }
+    }
+    async function clearMessages() {
+      if (!confirm('Clear ALL messages?')) return;
+      try {
+        await apiFetch('DELETE', 'messages');
+        toast('Cleared', 'success');
+        await loadInbox();
+      } catch (e) { toast('Failed', 'error'); }
+    }
+    async function markAllRead() {
+      try {
+        await apiFetch('PATCH', 'messages', {});
+        toast('All marked read', 'success');
+        await loadInbox();
+      } catch (e) { toast('Failed', 'error'); }
+    }
 
-  document.getElementById("msg-detail-body").innerHTML = `
-    <div class="md-label">From</div><div class="md-val"><strong>${esc(m.name)}</strong></div>
-    <div class="md-label">Email</div><div class="md-val">${esc(m.email || "—")}</div>
-    <div class="md-label">Phone</div><div class="md-val">${esc(m.phone || "—")}</div>
-    <div class="md-label">Type</div><div class="md-val"><span class="msg-type">${esc(labelInterest(m.interest))}</span></div>
-    <div class="md-label">Received</div><div class="md-val">${fmtDateTime(m.createdAt)}</div>
-    <div class="md-label">Message</div><div class="md-body">${esc(m.message || "—")}</div>`;
+    function exportCSV(type) {
+      let rows, filename;
+      if (type === 'donations') {
+        rows = [['#', 'Name', 'Email', 'Amount (₹)', 'Method', 'Status', 'Date']];
+        [...donations].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+          .forEach((d, i) => rows.push([i + 1, d.donor_name || '', d.donor_email || '', d.amount || '', d.payment_method || 'Online', d.payment_status || '', fmtDateTime(d.created_at)]));
+        filename = 'alhind_donations.csv';
+      } else {
+        rows = [['#', 'Name', 'Email', 'Phone', 'Type', 'Message', 'Date']];
+        [...messages].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+          .forEach((m, i) => rows.push([i + 1, m.sender_name || '', m.sender_email || '', m.sender_phone || '', labelInterest(m.interest_type), (m.message || '').replace(/\n/g, ' '), fmtDateTime(m.created_at)]));
+        filename = 'alhind_messages.csv';
+      }
+      const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
+      URL.revokeObjectURL(url);
+      toast('Exported ✓', 'success');
+    }
 
-  const replyLink = document.getElementById("msg-reply-link");
-  if (m.email) {
-    replyLink.href = `mailto:${m.email}?subject=Re: Your message to AL Hind Trust`;
-    replyLink.style.display = "inline-flex";
-  } else {
-    replyLink.style.display = "none";
-  }
-  document.getElementById("msg-modal").classList.add("open");
-}
+    /* ══════════════════════════════════════
+       NAV & UI
+    ══════════════════════════════════════ */
+    function goTo(p) {
+      document.querySelectorAll('.tab-panel').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      const panel = document.getElementById('page-' + p); if (panel) panel.classList.add('active');
+      const btn = document.querySelector(`[data-page="${p}"]`); if (btn) btn.classList.add('active');
+      if (window.innerWidth < 900) document.getElementById('sidebar').classList.remove('open');
+      window.scrollTo(0, 0);
+    }
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+    function toggleAvMenu() { document.getElementById('av-menu').classList.toggle('open'); }
+    document.addEventListener('click', e => {
+      if (!document.getElementById('av-btn').contains(e.target))
+        document.getElementById('av-menu').classList.remove('open');
+    });
+    function gSearch() {
+      const q = document.getElementById('gsearch').value.trim().toLowerCase(); if (!q) return;
+      if (events.some(e => e.title.toLowerCase().includes(q))) goTo('events'); else goTo('gallery');
+    }
 
-function closeMsgModal() {
-  document.getElementById("msg-modal").classList.remove("open");
-}
-document.getElementById("msg-modal").addEventListener("click", e => {
-  if (e.target === document.getElementById("msg-modal")) closeMsgModal();
-});
+    /* ══════════════════════════════════════
+       UTILS
+    ══════════════════════════════════════ */
+    function fmtDate(iso) {
+      if (!iso) return '';
+      return new Date(iso + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    function fmtDateTime(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) + ' ' +
+        d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    }
+    function esc(s) {
+      return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    let ttmr;
+    function toast(msg, type = 'success') {
+      const el = document.getElementById('toast');
+      el.textContent = (type === 'success' ? '✓ ' : '✕ ') + msg;
+      el.className = `show ${type}`;
+      clearTimeout(ttmr);
+      ttmr = setTimeout(() => el.className = '', 3000);
+    }
 
-function deleteMessage(id) {
-  if (!confirm("Delete this message?")) return;
-  messages = messages.filter(m => m.id !== id);
-  localStorage.setItem(MSG_KEY, JSON.stringify(messages));
-  updateInboxCounts(); renderMessages();
-  toast("Message deleted", "success");
-}
-
-function clearMessages() {
-  if (!confirm("Clear ALL messages?")) return;
-  messages = [];
-  localStorage.setItem(MSG_KEY, JSON.stringify(messages));
-  updateInboxCounts(); renderMessages();
-  toast("Cleared", "success");
-}
-
-function markAllRead() {
-  messages.forEach(m => m.read = true);
-  localStorage.setItem(MSG_KEY, JSON.stringify(messages));
-  updateInboxCounts(); renderMessages();
-  toast("Marked all read", "success");
-}
-
-/* ── Dashboard: recent donations ────── */
-function renderDashRecentDonations() {
-  // Append to recent events list or just update counts — handled via updateInboxCounts
-}
-
-/* ── CSV Export ─────────────────────── */
-function exportCSV(type) {
-  let rows, filename;
-  if (type === "donations") {
-    rows = [["#", "Name", "Email", "Amount (₹)", "Method", "Status", "Date"]];
-    [...donations].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))
-      .forEach((d, i) => rows.push([i+1, d.name||"", d.email||"", d.amount||"", d.method||"Online", d.status||"", fmtDateTime(d.createdAt)]));
-    filename = "alhind_donations.csv";
-  } else {
-    rows = [["#", "Name", "Email", "Phone", "Type", "Message", "Date"]];
-    [...messages].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))
-      .forEach((m, i) => rows.push([i+1, m.name||"", m.email||"", m.phone||"", labelInterest(m.interest), (m.message||"").replace(/\n/g," "), fmtDateTime(m.createdAt)]));
-    filename = "alhind_messages.csv";
-  }
-  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a"); a.href = url; a.download = filename; a.click();
-  URL.revokeObjectURL(url);
-  toast("Exported ✓", "success");
-}
-
-/* ── Helpers ────────────────────────── */
-function fmtDateTime(iso) {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
-    + " " + d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
-}
-
-/* Hook into existing showAdmin + refreshAll */
-const _origShowAdmin = showAdmin;
-showAdmin = function() {
-  loadInbox();
-  _origShowAdmin();
-};
-
-const _origRefreshAll = refreshAll;
-refreshAll = function() {
-  _origRefreshAll();
-  updateInboxCounts();
-  renderDonations();
-  renderMessages();
-};
-
-/* Poll for new submissions every 30s while panel is open */
-setInterval(() => {
-  if (sessionStorage.getItem("alhind_admin")) {
-    loadInbox(); updateInboxCounts(); renderDonations(); renderMessages();
-  }
-}, 30000);
-
-
-/* Utils */
-function fmtDate(iso){if(!iso)return"";return new Date(iso+"T00:00:00").toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"});}
-function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
-let ttmr;
-function toast(msg,type="success"){
-  const el=document.getElementById("toast");el.textContent=(type==="success"?"✓ ":"✕ ")+msg;
-  el.className=`show ${type}`;clearTimeout(ttmr);ttmr=setTimeout(()=>el.className="",3000);
-}
-</script>
+    /* Auto-refresh every 60s */
+    setInterval(() => {
+      if (sessionStorage.getItem('alhind_admin')) loadInbox();
+    }, 60000);
+  </script>
 </body>
+
 </html>
