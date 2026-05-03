@@ -1,4 +1,31 @@
 <?php
+// ── Save base64 or URL image, return public URL ───────────────
+function resolveEventImage(?string $src): string {
+    if (empty($src)) return '';
+
+    // Plain URL or relative path — use as-is
+    if (!preg_match('/^data:image\/(\w+);base64,/', $src, $type)) {
+        return $src;
+    }
+
+    // Decode base64 and save to disk
+    $ext       = strtolower($type[1]);
+    if ($ext === 'jpeg') $ext = 'jpg';
+    if (!in_array($ext, ['jpg','png','webp','gif'])) return '';
+
+    $imageData = base64_decode(substr($src, strpos($src, ',') + 1));
+    if (!$imageData) return '';
+
+    $uploadDir = __DIR__ . '/../../uploads/events/';
+    $uploadUrl = 'https://alhindtrust.com/uploads/events/';
+    if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+
+    $filename = uniqid('evt_') . '.' . $ext;
+    file_put_contents($uploadDir . $filename, $imageData);
+
+    return $uploadUrl . $filename;
+}
+
 function getPublicEvents(): void {
     $db  = getDB();
     $cat = $_GET['category'] ?? null;
@@ -41,7 +68,7 @@ function createEvent(): void {
     $check->execute([$slug]);
     if ((int)$check->fetchColumn() > 0) $slug .= '-' . time();
     $maxOrder = (int)$db->query("SELECT COALESCE(MAX(sort_order),0) FROM events")->fetchColumn();
-    $imgPath  = sanitize($b['image_path'] ?? $b['image'] ?? '');
+    $imgPath  = resolveEventImage($b['image_path'] ?? $b['image'] ?? '');
     $desc     = sanitize($b['description'] ?? '');
     $link     = sanitize($b['join_link'] ?? '');
     $status   = ($b['event_date'] >= date('Y-m-d')) ? 'upcoming' : 'completed';
@@ -83,8 +110,14 @@ function updateEvent(string $id): void {
         if (!array_key_exists($input, $b)) continue;
         foreach ($cols as $col) {
             $set[]  = "`$col` = ?";
-            $vals[] = in_array($col, ['sort_order','is_active','event_date'])
-                ? $b[$input] : sanitize((string)$b[$input]);
+            if ($input === 'image_path') {
+                // Decode base64 if needed, otherwise use as plain URL
+                $vals[] = resolveEventImage((string)$b[$input]);
+            } elseif (in_array($col, ['sort_order','is_active','event_date'])) {
+                $vals[] = $b[$input];
+            } else {
+                $vals[] = sanitize((string)$b[$input]);
+            }
         }
     }
     if (isset($b['event_date'])) {
@@ -133,6 +166,7 @@ function formatEvent(array $r): array {
         'location'    => $r['location']    ?? '',
         'description' => $r['description'] ?? $r['short_desc'] ?? '',
         'image'       => $r['image_path']  ?? $r['image'] ?? '',
+        'image_path'  => $r['image_path']  ?? $r['image'] ?? '',
         'mapQuery'    => $r['map_query']   ?? '',
         'joinLink'    => $r['join_link']   ?? $r['register_link'] ?? '',
         'category'    => $r['category']    ?? '',
