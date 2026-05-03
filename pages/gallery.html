@@ -5,7 +5,10 @@
     <meta charset="UTF-8">
     <title>Gallery | AL Hind Educational and Charitable Trust</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Explore photos from our education, welfare, and community development programs.">
+    <meta name="description" content="Explore photos from our education, welfare, and community development programs across Bihar.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Lora:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/gallery.css">
 </head>
@@ -18,43 +21,56 @@
     <!-- HERO -->
     <section class="gallery-hero">
         <div class="gallery-hero-inner">
-            <div class="gallery-hero-badge">📸 Our Work</div>
+            <div class="gallery-hero-badge">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1.5" y="3.5" width="10" height="7.5" rx="1.5" stroke="white" stroke-width="1.3"/>
+                    <path d="M4.5 3.5V2.5A2 2 0 0 1 8.5 2.5V3.5" stroke="white" stroke-width="1.3"/>
+                    <circle cx="6.5" cy="7.25" r="1.2" fill="white"/>
+                </svg>
+                Our Work in Photos
+            </div>
             <h1>Moments That Matter</h1>
-            <p>Snapshots from our educational programs, health camps, community outreach, and volunteer activities
-                across Bihar.</p>
+            <p>Snapshots from our educational programs, health camps, community outreach, and volunteer activities across Bihar.</p>
             <div class="gallery-hero-stats" id="gallery-stats">
-                <div class="ghs-item"><span class="ghs-num" id="stat-photos">—</span><span class="ghs-lbl">Photos</span>
+                <div class="ghs-item">
+                    <span class="ghs-num" id="stat-photos">—</span>
+                    <span class="ghs-lbl">Photos</span>
                 </div>
                 <div class="ghs-divider"></div>
-                <div class="ghs-item"><span class="ghs-num" id="stat-cats">—</span><span
-                        class="ghs-lbl">Categories</span></div>
+                <div class="ghs-item">
+                    <span class="ghs-num" id="stat-cats">—</span>
+                    <span class="ghs-lbl">Categories</span>
+                </div>
                 <div class="ghs-divider"></div>
-                <div class="ghs-item"><span class="ghs-num">12+</span><span class="ghs-lbl">Years of Work</span></div>
+                <div class="ghs-item">
+                    <span class="ghs-num">12+</span>
+                    <span class="ghs-lbl">Years of Work</span>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- CAROUSEL -->
     <section class="gallery-carousel-wrap">
-        <div class="gallery-carousel">
-            <button class="carousel-btn prev" aria-label="Previous">&#8249;</button>
-            <div class="carousel-track">
+        <div class="gallery-carousel" id="gallery-carousel">
+            <button class="carousel-btn prev" id="carousel-prev" aria-label="Previous slide">&#8249;</button>
+            <div class="carousel-track" id="carousel-track">
                 <!-- populated by gallery.js -->
             </div>
-            <button class="carousel-btn next" aria-label="Next">&#8250;</button>
+            <button class="carousel-btn next" id="carousel-next" aria-label="Next slide">&#8250;</button>
             <div class="carousel-dots" id="carousel-dots"></div>
         </div>
     </section>
 
     <!-- FILTER BAR -->
-    <section class="gallery-filter-section">
+    <section class="gallery-filter-section" role="navigation" aria-label="Filter gallery by category">
         <div class="container">
             <div class="gallery-filter-bar" id="gallery-filter-bar">
-                <button class="gfb-btn active" data-cat="all">
+                <button class="gfb-btn active" data-cat="all" onclick="filterGallery('all', this)">
                     <span class="gfb-icon">🌐</span> All
                     <span class="gfb-count" id="fcount-all">0</span>
                 </button>
-                <!-- category buttons populated by gallery.js -->
+                <!-- category buttons appended by gallery.js -->
             </div>
         </div>
     </section>
@@ -63,35 +79,42 @@
     <section class="gallery-section">
         <div class="container">
             <div class="masonry-grid" id="masonry-grid">
-                <!-- skeleton placeholders -->
+                <!-- skeleton placeholders shown while JS loads -->
                 <div class="masonry-skeleton"></div>
                 <div class="masonry-skeleton tall"></div>
                 <div class="masonry-skeleton"></div>
                 <div class="masonry-skeleton wide"></div>
-                <div class="masonry-skeleton"></div>
                 <div class="masonry-skeleton tall"></div>
+                <div class="masonry-skeleton"></div>
+                <div class="masonry-skeleton wide"></div>
+                <div class="masonry-skeleton"></div>
             </div>
-            <div class="gallery-load-more" id="load-more-wrap" style="display:none">
-                <button class="btn-load-more" id="load-more-btn" onclick="loadMore()">Load More Photos</button>
+            <div class="gallery-load-more" id="load-more-wrap" style="display:none;">
+                <button class="btn-load-more" id="load-more-btn" onclick="loadMore()">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M8 3v10M3 8l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Load More Photos
+                </button>
             </div>
         </div>
     </section>
 
     <!-- LIGHTBOX -->
-    <div id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
-        <button class="lightbox-nav lightbox-prev" aria-label="Previous">&#8249;</button>
+    <div id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+        <button class="lightbox-nav lightbox-prev" id="lb-prev" aria-label="Previous photo">&#8249;</button>
         <div class="lightbox-content">
             <div class="lightbox-topbar">
-                <span class="lightbox-counter"></span>
-                <button class="lightbox-close" aria-label="Close">&times;</button>
+                <span class="lightbox-counter" id="lb-counter"></span>
+                <button class="lightbox-close" id="lb-close" aria-label="Close viewer">&times;</button>
             </div>
-            <img class="lightbox-img" alt="">
+            <img class="lightbox-img" id="lb-img" alt="" loading="lazy">
             <div class="lightbox-meta">
-                <p class="lightbox-caption"></p>
-                <span class="lightbox-cat-badge"></span>
+                <p class="lightbox-caption" id="lb-caption"></p>
+                <span class="lightbox-cat-badge" id="lb-badge"></span>
             </div>
         </div>
-        <button class="lightbox-nav lightbox-next" aria-label="Next">&#8250;</button>
+        <button class="lightbox-nav lightbox-next" id="lb-next" aria-label="Next photo">&#8250;</button>
     </div>
 
     <!-- FOOTER -->
@@ -100,8 +123,338 @@
     <script src="/js/include.js" defer></script>
     <script src="/js/main.js" defer></script>
     <script src="/js/header-animate.js" defer></script>
-    <script src="/js/gallery.js" defer></script>
+
+    <script>
+    /* ══════════════════════════════════════════════════
+       gallery.js — Inline for AL Hind Gallery Page
+       Concept B: Clean Light
+    ══════════════════════════════════════════════════ */
+
+    /* ── DATA ─────────────────────────────────────────── */
+    const GALLERY_DATA = [
+        /* Replace src values with your actual image paths */
+        { src: "/images/gallery/edu-01.jpg", caption: "Annual prize distribution ceremony at Patna school", cat: "education" },
+        { src: "/images/gallery/health-01.jpg", caption: "Free health camp — Vaishali district", cat: "health" },
+        { src: "/images/gallery/community-01.jpg", caption: "Community clean-up drive, Gaya", cat: "community" },
+        { src: "/images/gallery/health-02.jpg", caption: "Medical volunteers at rural outreach camp", cat: "health" },
+        { src: "/images/gallery/volunteer-01.jpg", caption: "Youth volunteers — flood relief 2024", cat: "volunteer" },
+        { src: "/images/gallery/welfare-01.jpg", caption: "Ration distribution for elderly families", cat: "welfare" },
+        { src: "/images/gallery/edu-02.jpg", caption: "Computer literacy class, Muzaffarpur", cat: "education" },
+        { src: "/images/gallery/edu-03.jpg", caption: "Scholarship award function 2024", cat: "education" },
+        { src: "/images/gallery/community-02.jpg", caption: "Eid gathering and community meal, Patna", cat: "community" },
+        { src: "/images/gallery/volunteer-02.jpg", caption: "Tree plantation drive — 500 saplings", cat: "volunteer" },
+        { src: "/images/gallery/health-03.jpg", caption: "Eye checkup camp — Sitamarhi", cat: "health" },
+        { src: "/images/gallery/edu-04.jpg", caption: "Girls empowerment workshop series", cat: "education" },
+        { src: "/images/gallery/skill-01.jpg", caption: "Tailoring skill training for women", cat: "skill" },
+        { src: "/images/gallery/awareness-01.jpg", caption: "Road safety awareness rally, Patna", cat: "awareness" },
+        { src: "/images/gallery/welfare-02.jpg", caption: "Winter blanket distribution drive", cat: "welfare" },
+        { src: "/images/gallery/community-03.jpg", caption: "Iftar gathering — 2024", cat: "community" },
+        { src: "/images/gallery/edu-05.jpg", caption: "Free coaching centre inauguration", cat: "education" },
+        { src: "/images/gallery/health-04.jpg", caption: "Blood donation camp — 80+ donors", cat: "health" },
+    ];
+
+    /* Featured slides for carousel — pick your best 5 photos */
+    const CAROUSEL_DATA = [
+        { src: "/images/gallery/edu-01.jpg",      caption: "Annual prize distribution ceremony at Patna school", cat: "Education" },
+        { src: "/images/gallery/health-02.jpg",   caption: "Medical volunteers at rural outreach camp",          cat: "Health" },
+        { src: "/images/gallery/volunteer-01.jpg", caption: "Youth volunteers — flood relief 2024",              cat: "Volunteer" },
+        { src: "/images/gallery/community-01.jpg", caption: "Community clean-up drive, Gaya",                   cat: "Community" },
+        { src: "/images/gallery/edu-03.jpg",       caption: "Scholarship award function 2024",                   cat: "Education" },
+    ];
+
+    /* Category display config */
+    const CAT_CONFIG = {
+        education:  { label: "Education",  icon: "🎓", cls: "cat-education" },
+        health:     { label: "Health",     icon: "🏥", cls: "cat-health" },
+        community:  { label: "Community",  icon: "🤝", cls: "cat-community" },
+        volunteer:  { label: "Volunteer",  icon: "🌱", cls: "cat-volunteer" },
+        skill:      { label: "Skill Dev",  icon: "🛠️", cls: "cat-skill" },
+        awareness:  { label: "Awareness",  icon: "📢", cls: "cat-awareness" },
+        welfare:    { label: "Welfare",    icon: "🎁", cls: "cat-welfare" },
+    };
+
+    /* ── STATE ────────────────────────────────────────── */
+    const PAGE_SIZE    = 12;
+    let currentCat     = "all";
+    let visibleCount   = PAGE_SIZE;
+    let carouselIndex  = 0;
+    let carouselTimer  = null;
+    let lightboxItems  = [];
+    let lightboxIndex  = 0;
+    let filteredItems  = [...GALLERY_DATA];
+
+    /* ── INIT ─────────────────────────────────────────── */
+    document.addEventListener("DOMContentLoaded", () => {
+        buildCarousel();
+        buildFilterBar();
+        buildGallery();
+        updateStats();
+    });
+
+    /* ── STATS ────────────────────────────────────────── */
+    function updateStats() {
+        const cats = new Set(GALLERY_DATA.map(i => i.cat)).size;
+        animateNumber("stat-photos", GALLERY_DATA.length);
+        animateNumber("stat-cats", cats);
+    }
+
+    function animateNumber(id, target) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        let current = 0;
+        const step = Math.ceil(target / 30);
+        const timer = setInterval(() => {
+            current = Math.min(current + step, target);
+            el.textContent = current;
+            if (current >= target) clearInterval(timer);
+        }, 40);
+    }
+
+    /* ── CAROUSEL ─────────────────────────────────────── */
+    function buildCarousel() {
+        const track = document.getElementById("carousel-track");
+        const dotsEl = document.getElementById("carousel-dots");
+        if (!track || !dotsEl) return;
+
+        track.innerHTML = "";
+        dotsEl.innerHTML = "";
+
+        CAROUSEL_DATA.forEach((item, i) => {
+            const slide = document.createElement("div");
+            slide.className = "carousel-slide";
+            slide.innerHTML = `
+                <img src="${item.src}" alt="${item.caption}" loading="${i === 0 ? 'eager' : 'lazy'}" onerror="this.parentElement.style.display='none'">
+                <div class="carousel-slide-overlay">
+                    <div class="carousel-slide-badge">${item.cat}</div>
+                    <div class="carousel-slide-caption">${item.caption}</div>
+                </div>`;
+            track.appendChild(slide);
+
+            const dot = document.createElement("button");
+            dot.className = "carousel-dot" + (i === 0 ? " active" : "");
+            dot.setAttribute("aria-label", `Slide ${i + 1}`);
+            dot.addEventListener("click", () => goToSlide(i));
+            dotsEl.appendChild(dot);
+        });
+
+        document.getElementById("carousel-prev")?.addEventListener("click", () => {
+            goToSlide((carouselIndex - 1 + CAROUSEL_DATA.length) % CAROUSEL_DATA.length);
+        });
+        document.getElementById("carousel-next")?.addEventListener("click", () => {
+            goToSlide((carouselIndex + 1) % CAROUSEL_DATA.length);
+        });
+
+        startCarouselAuto();
+
+        const wrap = document.querySelector(".gallery-carousel-wrap");
+        wrap?.addEventListener("mouseenter", stopCarouselAuto);
+        wrap?.addEventListener("mouseleave", startCarouselAuto);
+    }
+
+    function goToSlide(index) {
+        carouselIndex = index;
+        const track = document.getElementById("carousel-track");
+        if (track) track.style.transform = `translateX(-${index * 100}%)`;
+        document.querySelectorAll(".carousel-dot").forEach((d, i) => {
+            d.classList.toggle("active", i === index);
+        });
+    }
+
+    function startCarouselAuto() {
+        stopCarouselAuto();
+        carouselTimer = setInterval(() => {
+            goToSlide((carouselIndex + 1) % CAROUSEL_DATA.length);
+        }, 4500);
+    }
+
+    function stopCarouselAuto() {
+        if (carouselTimer) { clearInterval(carouselTimer); carouselTimer = null; }
+    }
+
+    /* ── FILTER BAR ───────────────────────────────────── */
+    function buildFilterBar() {
+        const bar = document.getElementById("gallery-filter-bar");
+        if (!bar) return;
+
+        const cats = [...new Set(GALLERY_DATA.map(i => i.cat))];
+        const allCount = document.getElementById("fcount-all");
+        if (allCount) allCount.textContent = GALLERY_DATA.length;
+
+        cats.forEach(cat => {
+            const cfg = CAT_CONFIG[cat] || { label: cat, icon: "📷", cls: "cat-default" };
+            const count = GALLERY_DATA.filter(i => i.cat === cat).length;
+            const btn = document.createElement("button");
+            btn.className = "gfb-btn";
+            btn.dataset.cat = cat;
+            btn.innerHTML = `<span class="gfb-icon">${cfg.icon}</span> ${cfg.label} <span class="gfb-count">${count}</span>`;
+            btn.addEventListener("click", () => filterGallery(cat, btn));
+            bar.appendChild(btn);
+        });
+    }
+
+    /* ── FILTER ───────────────────────────────────────── */
+    function filterGallery(cat, btnEl) {
+        currentCat = cat;
+        visibleCount = PAGE_SIZE;
+
+        document.querySelectorAll(".gfb-btn").forEach(b => b.classList.remove("active"));
+        if (btnEl) btnEl.classList.add("active");
+
+        filteredItems = cat === "all" ? [...GALLERY_DATA] : GALLERY_DATA.filter(i => i.cat === cat);
+        buildGallery();
+    }
+
+    /* ── GALLERY BUILD ────────────────────────────────── */
+    function buildGallery() {
+        const grid = document.getElementById("masonry-grid");
+        if (!grid) return;
+
+        grid.innerHTML = "";
+        const slice = filteredItems.slice(0, visibleCount);
+
+        if (slice.length === 0) {
+            grid.innerHTML = `<div class="gallery-empty"><span class="gallery-empty-icon">📷</span>No photos found in this category.</div>`;
+            document.getElementById("load-more-wrap").style.display = "none";
+            return;
+        }
+
+        lightboxItems = slice;
+
+        slice.forEach((item, i) => {
+            const cfg = CAT_CONFIG[item.cat] || { label: item.cat, icon: "📷", cls: "cat-default" };
+            const el = document.createElement("div");
+            el.className = "masonry-item";
+            el.style.animationDelay = `${(i % PAGE_SIZE) * 0.04}s`;
+            el.setAttribute("role", "button");
+            el.setAttribute("tabindex", "0");
+            el.setAttribute("aria-label", item.caption);
+            el.innerHTML = `
+                <img src="${item.src}" alt="${item.caption}" loading="lazy" onerror="this.src='/images/gallery/placeholder.jpg'">
+                <div class="masonry-overlay">
+                    <div class="masonry-overlay-title">${item.caption}</div>
+                    <div class="masonry-cat-badge ${cfg.cls}">${cfg.icon} ${cfg.label}</div>
+                </div>
+                <div class="masonry-zoom" aria-hidden="true">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M9.5 9.5L12.5 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </div>`;
+
+            /* lazy load with loaded class */
+            const img = el.querySelector("img");
+            if (img.complete) {
+                img.classList.add("loaded");
+            } else {
+                img.addEventListener("load", () => img.classList.add("loaded"));
+            }
+
+            el.addEventListener("click", () => openLightbox(i));
+            el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") openLightbox(i); });
+            grid.appendChild(el);
+        });
+
+        const lmWrap = document.getElementById("load-more-wrap");
+        if (lmWrap) {
+            lmWrap.style.display = filteredItems.length > visibleCount ? "block" : "none";
+        }
+    }
+
+    /* ── LOAD MORE ────────────────────────────────────── */
+    function loadMore() {
+        visibleCount += PAGE_SIZE;
+        lightboxItems = filteredItems.slice(0, visibleCount);
+        buildGallery();
+    }
+
+    /* ── LIGHTBOX ─────────────────────────────────────── */
+    function openLightbox(index) {
+        lightboxIndex = index;
+        renderLightbox();
+        const lb = document.getElementById("lightbox");
+        lb.classList.add("active");
+        lb.style.display = "flex";
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeLightbox() {
+        const lb = document.getElementById("lightbox");
+        lb.style.display = "none";
+        lb.classList.remove("active");
+        document.body.style.overflow = "";
+    }
+
+    function renderLightbox() {
+        const item = lightboxItems[lightboxIndex];
+        if (!item) return;
+        const cfg = CAT_CONFIG[item.cat] || { label: item.cat, icon: "📷", cls: "cat-default" };
+        document.getElementById("lb-img").src = item.src;
+        document.getElementById("lb-img").alt = item.caption;
+        document.getElementById("lb-caption").textContent = item.caption;
+        document.getElementById("lb-counter").textContent = `${lightboxIndex + 1} / ${lightboxItems.length}`;
+        const badge = document.getElementById("lb-badge");
+        badge.textContent = `${cfg.icon} ${cfg.label}`;
+        badge.className = "lightbox-cat-badge " + cfg.cls;
+    }
+
+    function prevLightbox() {
+        lightboxIndex = (lightboxIndex - 1 + lightboxItems.length) % lightboxItems.length;
+        renderLightbox();
+    }
+
+    function nextLightbox() {
+        lightboxIndex = (lightboxIndex + 1) % lightboxItems.length;
+        renderLightbox();
+    }
+
+    /* ── LIGHTBOX EVENT LISTENERS ─────────────────────── */
+    document.getElementById("lb-close")?.addEventListener("click", closeLightbox);
+    document.getElementById("lb-prev")?.addEventListener("click", prevLightbox);
+    document.getElementById("lb-next")?.addEventListener("click", nextLightbox);
+
+    document.getElementById("lightbox")?.addEventListener("click", function(e) {
+        if (e.target === this) closeLightbox();
+    });
+
+    document.addEventListener("keydown", e => {
+        const lb = document.getElementById("lightbox");
+        if (!lb || lb.style.display === "none") return;
+        if (e.key === "Escape")      closeLightbox();
+        if (e.key === "ArrowLeft")   prevLightbox();
+        if (e.key === "ArrowRight")  nextLightbox();
+    });
+
+    /* ── TOUCH SWIPE ──────────────────────────────────── */
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    document.getElementById("lightbox")?.addEventListener("touchstart", e => {
+        touchStartX = e.changedTouches[0].clientX;
+        touchStartY = e.changedTouches[0].clientY;
+    }, { passive: true });
+
+    document.getElementById("lightbox")?.addEventListener("touchend", e => {
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const dy = e.changedTouches[0].clientY - touchStartY;
+        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+            dx < 0 ? nextLightbox() : prevLightbox();
+        }
+    }, { passive: true });
+
+    /* ── CAROUSEL TOUCH SWIPE ─────────────────────────── */
+    let cTouchStart = 0;
+    document.querySelector(".gallery-carousel-wrap")?.addEventListener("touchstart", e => {
+        cTouchStart = e.changedTouches[0].clientX;
+    }, { passive: true });
+    document.querySelector(".gallery-carousel-wrap")?.addEventListener("touchend", e => {
+        const dx = e.changedTouches[0].clientX - cTouchStart;
+        if (Math.abs(dx) > 45) {
+            dx < 0
+                ? goToSlide((carouselIndex + 1) % CAROUSEL_DATA.length)
+                : goToSlide((carouselIndex - 1 + CAROUSEL_DATA.length) % CAROUSEL_DATA.length);
+        }
+    }, { passive: true });
+    </script>
 
 </body>
-
 </html>
