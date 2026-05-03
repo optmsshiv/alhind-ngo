@@ -1,38 +1,51 @@
 /**
  * gallery.js — AL Hind Trust Premium Gallery
- * Masonry layout · Category filters · Lightbox · API-powered
+ * No carousel · Masonry + Grid view · Category filters · Lightbox
+ * Font Awesome icons · API powered
  */
 
 const GALLERY_API = 'https://api.alhindtrust.com';
-const PAGE_SIZE = 12; // images per page
+const PAGE_SIZE = 12;
 let allItems = [];
 let filteredItems = [];
 let visibleCount = PAGE_SIZE;
 let activeCategory = 'all';
+let viewMode = 'masonry';
 let lbItems = [];
 let lbIndex = 0;
-let carouselCurrent = 0;
-let carouselTimer = null;
 
 /* ── Category config ─────────────────────────────────────── */
 const CAT_CONFIG = {
-  'education-programs': { icon: '📚', label: 'Education', cls: 'cat-education' },
-  'health-camps': { icon: '🏥', label: 'Health', cls: 'cat-health' },
-  'community-outreach': { icon: '🤝', label: 'Community', cls: 'cat-community' },
-  'volunteer-activities': { icon: '🙌', label: 'Volunteer', cls: 'cat-volunteer' },
-  'skill-development': { icon: '⚙️', label: 'Skills', cls: 'cat-skill' },
-  'awareness-campaigns': { icon: '📢', label: 'Awareness', cls: 'cat-awareness' },
-  'welfare': { icon: '💚', label: 'Welfare', cls: 'cat-welfare' },
+  'education-programs': { icon: 'fa-book-open', label: 'Education', cls: 'cat-education' },
+  'health-camps': { icon: 'fa-hospital', label: 'Health', cls: 'cat-health' },
+  'community-outreach': { icon: 'fa-people-group', label: 'Community', cls: 'cat-community' },
+  'volunteer-activities': { icon: 'fa-hands-helping', label: 'Volunteer', cls: 'cat-volunteer' },
+  'skill-development': { icon: 'fa-screwdriver-wrench', label: 'Skills', cls: 'cat-skill' },
+  'awareness-campaigns': { icon: 'fa-bullhorn', label: 'Awareness', cls: 'cat-awareness' },
+  'welfare': { icon: 'fa-heart', label: 'Welfare', cls: 'cat-welfare' },
 };
 
-function getCatInfo(catSlug, catName) {
-  if (!catSlug && !catName) return { icon: '📷', label: 'General', cls: 'cat-default' };
-  const key = catSlug || slugify(catName || '');
-  return CAT_CONFIG[key] || { icon: '📷', label: catName || 'General', cls: 'cat-default' };
-}
+const FILTER_ICONS = {
+  'education-programs': 'fa-book-open',
+  'health-camps': 'fa-hospital',
+  'community-outreach': 'fa-people-group',
+  'volunteer-activities': 'fa-hands-helping',
+  'skill-development': 'fa-screwdriver-wrench',
+  'awareness-campaigns': 'fa-bullhorn',
+  'welfare': 'fa-heart',
+};
 
 function slugify(s) {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function getCatInfo(slug, name) {
+  const key = slug || slugify(name || '');
+  return CAT_CONFIG[key] || { icon: 'fa-image', label: name || 'General', cls: 'cat-default' };
+}
+
+function getFilterIcon(slug) {
+  return FILTER_ICONS[slug] || 'fa-images';
 }
 
 /* ── Fetch ───────────────────────────────────────────────── */
@@ -40,60 +53,50 @@ async function fetchGallery() {
   try {
     const res = await fetch(`${GALLERY_API}/gallery`);
     const data = await res.json();
-    return data.data || [];
+    return (data.data || []).filter(item => item.is_active !== 0);
   } catch (e) {
     console.error('Gallery fetch failed:', e);
     return [];
   }
 }
 
-/* ── Build filter bar ────────────────────────────────────── */
+/* ── Filter bar ──────────────────────────────────────────── */
 function buildFilterBar(items) {
   const bar = document.getElementById('gallery-filter-bar');
   if (!bar) return;
 
   // Count per category
-  const catCounts = {};
+  const catMap = {};
   items.forEach(item => {
-    const key = item.category_slug || slugify(item.category_name || '');
-    if (key) catCounts[key] = (catCounts[key] || 0) + 1;
+    const slug = item.category_slug || slugify(item.category_name || '');
+    const name = item.category_name || '';
+    if (slug) {
+      if (!catMap[slug]) catMap[slug] = { name, count: 0 };
+      catMap[slug].count++;
+    }
   });
 
-  // Update all count
+  // Update All count
   const allCount = document.getElementById('fcount-all');
   if (allCount) allCount.textContent = items.length;
 
-  // Update stats with animated counter
-  function animateCount(id, target) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    let n = 0;
-    const step = Math.max(1, Math.ceil(target / 30));
-    const t = setInterval(() => {
-      n = Math.min(n + step, target);
-      el.textContent = n;
-      if (n >= target) clearInterval(t);
-    }, 40);
-  }
-  animateCount('stat-photos', items.length);
-  animateCount('stat-cats', Object.keys((() => {
-    const c = {};
-    items.forEach(i => { const k = i.category_slug || slugify(i.category_name || ''); if (k) c[k] = 1; });
-    return c;
-  })()).length);
+  // Update hero stats
+  const sp = document.getElementById('stat-photos');
+  const sc = document.getElementById('stat-cats');
+  if (sp) sp.textContent = items.length;
+  if (sc) sc.textContent = Object.keys(catMap).length;
 
-  // Add category buttons
-  Object.entries(catCounts).forEach(([slug, count]) => {
-    const info = getCatInfo(slug, slug.replace(/-/g, ' '));
+  // Build category buttons
+  Object.entries(catMap).forEach(([slug, info]) => {
+    const icon = getFilterIcon(slug);
     const btn = document.createElement('button');
     btn.className = 'gfb-btn';
     btn.dataset.cat = slug;
-    btn.innerHTML = `<span class="gfb-icon">${info.icon}</span> ${info.label} <span class="gfb-count">${count}</span>`;
+    btn.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${info.name || slug.replace(/-/g, ' ')}</span> <span class="gfb-count">${info.count}</span>`;
     btn.addEventListener('click', () => filterGallery(slug));
     bar.appendChild(btn);
   });
 
-  // All button click
   bar.querySelector('[data-cat="all"]')?.addEventListener('click', () => filterGallery('all'));
 }
 
@@ -102,10 +105,7 @@ function filterGallery(cat) {
   activeCategory = cat;
   visibleCount = PAGE_SIZE;
 
-  // Update button states
-  document.querySelectorAll('.gfb-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.cat === cat);
-  });
+  document.querySelectorAll('.gfb-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
 
   filteredItems = cat === 'all'
     ? [...allItems]
@@ -114,23 +114,40 @@ function filterGallery(cat) {
       return slug === cat;
     });
 
-  renderMasonry();
+  renderGallery();
 }
 
-/* ── Masonry render ──────────────────────────────────────── */
-function renderMasonry() {
+/* ── View mode ───────────────────────────────────────────── */
+function setViewMode(mode) {
+  viewMode = mode;
+  document.getElementById('view-masonry')?.classList.toggle('active', mode === 'masonry');
+  document.getElementById('view-grid')?.classList.toggle('active', mode === 'grid');
+  const grid = document.getElementById('masonry-grid');
+  if (grid) grid.classList.toggle('grid-mode', mode === 'grid');
+  renderGallery();
+}
+
+/* ── Render gallery ──────────────────────────────────────── */
+function renderGallery() {
   const grid = document.getElementById('masonry-grid');
   if (!grid) return;
 
   const toShow = filteredItems.slice(0, visibleCount);
 
   if (!toShow.length) {
-    grid.innerHTML = `<p class="gallery-empty">No images in this category yet.</p>`;
-    document.getElementById('load-more-wrap').style.display = 'none';
+    grid.innerHTML = `
+      <div class="gallery-empty">
+        <i class="fa-regular fa-image"></i>
+        <p>No photos in this category yet.</p>
+      </div>`;
+    const wrap = document.getElementById('load-more-wrap');
+    if (wrap) wrap.style.display = 'none';
     return;
   }
 
   grid.innerHTML = '';
+  grid.classList.toggle('grid-mode', viewMode === 'grid');
+
   toShow.forEach((item, i) => {
     const src = item.filepath || item.src || '';
     const cap = item.title || item.alt_text || '';
@@ -139,19 +156,22 @@ function renderMasonry() {
 
     const div = document.createElement('div');
     div.className = 'masonry-item';
+
     div.innerHTML = `
       <img src="" data-src="${esc(src)}" alt="${esc(cap)}" class="skeleton-hidden" loading="lazy">
-      <div class="masonry-zoom" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12.5 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <div class="masonry-zoom-icon">
+        <i class="fa-solid fa-magnifying-glass-plus"></i>
+      </div>
       <div class="masonry-overlay">
-        ${cap ? `<div class="masonry-overlay-title">${esc(cap)}</div>` : ''}
-        ${catInfo.label !== 'General'
-        ? `<span class="masonry-cat-badge ${catInfo.cls}">${catInfo.icon} ${catInfo.label}</span>`
-        : ''}
+        ${catInfo.label !== 'General' ? `
+          <span class="masonry-cat-badge ${catInfo.cls}">
+            <i class="fa-solid ${catInfo.icon}"></i> ${catInfo.label}
+          </span>` : ''}
+        ${cap ? `<div class="masonry-title">${esc(cap)}</div>` : ''}
       </div>`;
 
+    // Lazy load
     const img = div.querySelector('img');
-
-    // Lazy load with IntersectionObserver
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -163,111 +183,37 @@ function renderMasonry() {
           observer.unobserve(img);
         }
       });
-    }, { rootMargin: '200px' });
-
+    }, { rootMargin: '250px' });
     observer.observe(img);
 
-    div.addEventListener('click', () => {
-      const lightboxItems = filteredItems.slice(0, visibleCount);
-      openLightbox(lightboxItems, i);
-    });
-
+    div.addEventListener('click', () => openLightbox(toShow, i));
     grid.appendChild(div);
   });
 
-  // Load more button
+  // Load more
   const wrap = document.getElementById('load-more-wrap');
-  if (wrap) wrap.style.display = visibleCount < filteredItems.length ? 'block' : 'none';
+  if (wrap) {
+    const hasMore = visibleCount < filteredItems.length;
+    wrap.style.display = hasMore ? 'block' : 'none';
+    const btn = document.getElementById('load-more-btn');
+    if (btn) {
+      const remaining = filteredItems.length - visibleCount;
+      btn.innerHTML = `<i class="fa-solid fa-circle-down"></i> Load ${Math.min(remaining, PAGE_SIZE)} More Photos`;
+    }
+  }
 }
 
 /* ── Load more ───────────────────────────────────────────── */
 function loadMore() {
+  const prev = visibleCount;
   visibleCount += PAGE_SIZE;
-  renderMasonry();
-  // Smooth scroll to new items
+  renderGallery();
+  // Smooth scroll to newly loaded content
   const grid = document.getElementById('masonry-grid');
   const items = grid.querySelectorAll('.masonry-item');
-  items[visibleCount - PAGE_SIZE]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-/* ── Carousel ────────────────────────────────────────────── */
-function goToSlide(i, total) {
-  if (!total) return;
-  carouselCurrent = (i + total) % total;
-  const track = document.querySelector('.carousel-track');
-  if (track) track.style.transform = `translateX(-${carouselCurrent * 100}%)`;
-  document.querySelectorAll('.carousel-dot').forEach((d, idx) => {
-    d.classList.toggle('active', idx === carouselCurrent);
-  });
-}
-
-function buildCarousel(items) {
-  const track = document.querySelector('.carousel-track');
-  const dots = document.getElementById('carousel-dots');
-  if (!track) return;
-
-  const featured = items.filter(item => item.is_featured == 1 || item.is_featured === true).slice(0, 8);
-  const slides = featured.length ? featured : items.slice(0, 6);
-
-  if (!slides.length) {
-    document.querySelector('.gallery-carousel-wrap')?.style.setProperty('display', 'none');
-    return;
+  if (items[prev]) {
+    setTimeout(() => items[prev].scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
   }
-
-  track.innerHTML = '';
-  if (dots) dots.innerHTML = '';
-
-  slides.forEach((item, i) => {
-    const src = item.filepath || item.src || '';
-    const cap = item.title || item.alt_text || '';
-    const catSlug = item.category_slug || slugify(item.category_name || '');
-    const catInfo = getCatInfo(catSlug, item.category_name);
-
-    const slide = document.createElement('div');
-    slide.className = 'carousel-slide';
-    slide.innerHTML = `
-      <img src="${esc(src)}" alt="${esc(cap)}" loading="${i === 0 ? 'eager' : 'lazy'}">
-      <div class="carousel-slide-overlay">
-        ${catInfo.label !== 'General'
-        ? `<div class="carousel-slide-badge">${catInfo.icon} ${catInfo.label}</div>`
-        : ''}
-        ${cap ? `<div class="carousel-slide-caption">${esc(cap)}</div>` : ''}
-      </div>`;
-    track.appendChild(slide);
-
-    // Dot
-    if (dots) {
-      const dot = document.createElement('button');
-      dot.className = `carousel-dot${i === 0 ? ' active' : ''}`;
-      dot.addEventListener('click', () => goToSlide(i, slides.length));
-      dots.appendChild(dot);
-    }
-  });
-
-  initCarousel(slides.length);
-}
-
-function initCarousel(total) {
-  const carousel = document.querySelector('.gallery-carousel');
-  const track = document.querySelector('.carousel-track');
-  if (!carousel || !track || total === 0) return;
-
-  carousel.querySelector('.carousel-btn.prev')?.addEventListener('click', () => goToSlide(carouselCurrent - 1, total));
-  carousel.querySelector('.carousel-btn.next')?.addEventListener('click', () => goToSlide(carouselCurrent + 1, total));
-
-  function startAuto() {
-    carouselTimer = setInterval(() => goToSlide(carouselCurrent + 1, total), 5000);
-  }
-  startAuto();
-  carousel.addEventListener('mouseenter', () => clearInterval(carouselTimer));
-  carousel.addEventListener('mouseleave', startAuto);
-
-  let startX = 0;
-  track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
-  track.addEventListener('touchend', e => {
-    const diff = startX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) goToSlide(carouselCurrent + (diff > 0 ? 1 : -1), total);
-  });
 }
 
 /* ── Lightbox ────────────────────────────────────────────── */
@@ -275,29 +221,54 @@ function openLightbox(items, index) {
   lbItems = items; lbIndex = index;
   const box = document.getElementById('lightbox');
   if (!box) return;
-  updateLightbox();
   box.style.display = 'flex';
   document.body.style.overflow = 'hidden';
+  updateLightbox();
 }
 
 function updateLightbox() {
   const item = lbItems[lbIndex];
   if (!item) return;
+
   const src = item.filepath || item.src || '';
   const cap = item.title || item.alt_text || '';
   const catSlug = item.category_slug || slugify(item.category_name || '');
   const catInfo = getCatInfo(catSlug, item.category_name);
 
-  document.querySelector('.lightbox-img').src = src;
-  document.querySelector('.lightbox-img').alt = cap;
-  document.querySelector('.lightbox-caption').textContent = cap;
-  document.querySelector('.lightbox-counter').textContent = `${lbIndex + 1} / ${lbItems.length}`;
+  // Show spinner while loading
+  const spinner = document.getElementById('lb-spinner');
+  const imgEl = document.getElementById('lb-img');
+  if (spinner) spinner.style.display = 'block';
+  if (imgEl) { imgEl.style.opacity = '0'; }
 
-  const catBadge = document.querySelector('.lightbox-cat-badge');
-  if (catBadge) {
-    catBadge.textContent = `${catInfo.icon} ${catInfo.label}`;
-    catBadge.className = `lightbox-cat-badge ${catInfo.cls}`;
+  const tmpImg = new Image();
+  tmpImg.onload = () => {
+    if (imgEl) { imgEl.src = src; imgEl.style.opacity = '1'; imgEl.alt = cap; }
+    if (spinner) spinner.style.display = 'none';
+  };
+  tmpImg.src = src;
+
+  // Counter
+  const counter = document.getElementById('lb-counter');
+  if (counter) counter.innerHTML = `<i class="fa-solid fa-layer-group"></i> ${lbIndex + 1} / ${lbItems.length}`;
+
+  // Category badge
+  const catBadge = document.getElementById('lb-cat-badge');
+  if (catBadge && catInfo.label !== 'General') {
+    catBadge.innerHTML = `<i class="fa-solid ${catInfo.icon}"></i> ${catInfo.label}`;
+    catBadge.className = `lb-cat-badge ${catInfo.cls}`;
+    catBadge.style.display = 'inline-flex';
+  } else if (catBadge) {
+    catBadge.style.display = 'none';
   }
+
+  // Caption
+  const capEl = document.getElementById('lb-caption');
+  if (capEl) capEl.textContent = cap;
+
+  // Download link
+  const dlLink = document.getElementById('lb-download');
+  if (dlLink) { dlLink.href = src; dlLink.setAttribute('download', cap || 'image'); }
 }
 
 function lightboxNav(dir) {
@@ -316,11 +287,7 @@ function initLightbox() {
   const box = document.getElementById('lightbox');
   if (!box) return;
 
-  box.querySelector('.lightbox-close')?.addEventListener('click', closeLightbox);
-  box.querySelector('.lightbox-prev')?.addEventListener('click', () => lightboxNav(-1));
-  box.querySelector('.lightbox-next')?.addEventListener('click', () => lightboxNav(1));
-  box.addEventListener('click', e => { if (e.target === box) closeLightbox(); });
-
+  // Keyboard
   document.addEventListener('keydown', e => {
     if (box.style.display !== 'flex') return;
     if (e.key === 'Escape') closeLightbox();
@@ -328,15 +295,15 @@ function initLightbox() {
     if (e.key === 'ArrowRight') lightboxNav(1);
   });
 
-  let lbTx = 0;
-  box.addEventListener('touchstart', e => { lbTx = e.touches[0].clientX; }, { passive: true });
+  // Touch swipe
+  let startX = 0;
+  box.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
   box.addEventListener('touchend', e => {
-    const d = lbTx - e.changedTouches[0].clientX;
-    if (Math.abs(d) > 40) lightboxNav(d > 0 ? 1 : -1);
+    const diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) lightboxNav(diff > 0 ? 1 : -1);
   });
 }
 
-/* ── Escape helper ───────────────────────────────────────── */
 function esc(s) {
   return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
@@ -349,10 +316,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   allItems = items;
   filteredItems = [...items];
 
-  // Remove skeleton
-  document.getElementById('masonry-grid').innerHTML = '';
+  // Clear skeletons
+  const grid = document.getElementById('masonry-grid');
+  if (grid) grid.innerHTML = '';
 
   buildFilterBar(items);
-  buildCarousel(items);
-  renderMasonry();
+  renderGallery();
 });
