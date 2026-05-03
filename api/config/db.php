@@ -1,33 +1,13 @@
-// ============================================================
-// $host = "localhost";
-// $user = "u699609112_alhind";
-// $pass = "123@Alhindtrust";
-// $db   = "u699609112_alhind";
-// 
-// $conn = new mysqli($host,$user,$pass,$db);
-// 
-// if($conn->connect_error){
-//     die("DB FAILED");
-// }
-// 
-
 <?php
-// ============================================================
-//  config/db.php — Database connection
-//  AL Hind Educational and Charitable Trust
-// ============================================================
-
-define('DB_HOST', '127.0.0.1');        // Usually 'localhost' on shared hosting
-define('DB_NAME', 'u699609112_alhind');        // Your cPanel database name (e.g. user_alhind_db)
-define('DB_USER', 'u699609112_alhind');      // Your cPanel database username
-define('DB_PASS', '123@Alhindtrust'); // ← Change this
+define('DB_HOST', '127.0.0.1');
+define('DB_NAME', 'u699609112_alhind');
+define('DB_USER', 'u699609112_alhind');
+define('DB_PASS', '123@Alhindtrust');
 
 define('ADMIN_USERNAME', 'admin');
-define('ADMIN_PASSWORD', 'alhind2024'); // ← Change this (plain text compared to hashed)
-define('JWT_SECRET',     'alhind_jwt_secret_change_this_32chars'); // ← Change this
- 
-// ── CORS Origins ────────────────────────────────────────────
-// Add your domains here
+define('ADMIN_PASSWORD', 'alhind2024');
+define('JWT_SECRET',     'alhind_jwt_secret_change_this_32chars');
+
 define('ALLOWED_ORIGINS', [
     'https://alhindtrust.com',
     'https://www.alhindtrust.com',
@@ -35,8 +15,7 @@ define('ALLOWED_ORIGINS', [
     'https://api.alhindtrust.com',
     'http://localhost',
 ]);
- 
-// ── Create PDO connection ────────────────────────────────────
+
 function getDB(): PDO {
     static $pdo = null;
     if ($pdo === null) {
