@@ -1,100 +1,97 @@
 /**
- * contact.js — Contact / Join form handler
- * Saves messages to localStorage so they appear in the admin panel.
+ * contact.js — AL Hind Trust
+ * Handles contact / join form submission to the real API.
  */
 
-const MSG_STORAGE_KEY = "alhind_messages";
+const CONTACT_API = 'https://api.alhindtrust.com';
 
-/* ── Join fee display ───────────────────────────────────────── */
+/* ── Join fee display ──────────────────────────────────────── */
 const JOIN_FEES = {
-  volunteer: { label: "₹200 (one-time)" },
-  team:      { label: "₹500 (one-time)" },
-  partner:   { label: "Contact us for CSR / collaboration rates" },
-  general:   { label: null },
+  volunteer: '₹200 (one-time)',
+  team: '₹500 (one-time)',
+  partner: 'Contact us for CSR / collaboration rates',
+  general: null,
 };
 
-const joinType = document.getElementById("joinType");
-const feeBox   = document.getElementById("joinFeeBox");
-const feeAmt   = document.getElementById("feeAmount");
+const joinType = document.getElementById('joinType');
+const feeBox = document.getElementById('joinFeeBox');
+const feeAmt = document.getElementById('feeAmount');
 
 if (joinType) {
-  joinType.addEventListener("change", () => {
-    const val  = joinType.value;
-    const info = JOIN_FEES[val];
-    if (info?.label) {
-      feeAmt.textContent = info.label;
-      feeBox.style.display = "block";
-    } else {
-      feeBox.style.display = "none";
+  joinType.addEventListener('change', () => {
+    const fee = JOIN_FEES[joinType.value];
+    if (fee && feeBox && feeAmt) {
+      feeAmt.textContent = fee;
+      feeBox.style.display = 'block';
+    } else if (feeBox) {
+      feeBox.style.display = 'none';
     }
   });
 }
 
-/* ── Save message record to localStorage ───────────────────── */
-function saveMsgRecord(name, email, phone, interest, message) {
-  try {
-    const existing = JSON.parse(localStorage.getItem(MSG_STORAGE_KEY) || "[]");
-    existing.unshift({
-      id:        "msg_" + Date.now(),
-      name:      name     || "",
-      email:     email    || "",
-      phone:     phone    || "",
-      interest:  interest || "general",
-      message:   message  || "",
-      read:      false,
-      createdAt: new Date().toISOString(),
-    });
-    localStorage.setItem(MSG_STORAGE_KEY, JSON.stringify(existing));
-  } catch (e) {
-    console.warn("Could not save message:", e);
-  }
-}
+/* ── Form submit ───────────────────────────────────────────── */
+const contactForm = document.querySelector('.ngo-form');
+const joinBtn = document.getElementById('joinBtn');
 
-/* ── Form submission ────────────────────────────────────────── */
-const form   = document.querySelector(".ngo-form");
-const joinBtn = document.getElementById("joinBtn");
-
-if (form) {
-  form.addEventListener("submit", async function (e) {
+if (contactForm) {
+  contactForm.addEventListener('submit', async function (e) {
     e.preventDefault();
-    if (joinBtn) { joinBtn.disabled = true; joinBtn.textContent = "Sending…"; }
 
-    const name     = form.querySelector("[name='name']")?.value.trim()    || "";
-    const email    = form.querySelector("[name='email']")?.value.trim()   || "";
-    const phone    = form.querySelector("[name='phone']")?.value.trim()   || "";
-    const interest = form.querySelector("[name='interest']")?.value       || "general";
-    const message  = form.querySelector("[name='message']")?.value.trim() || "";
+    const name = contactForm.querySelector("[name='name']")?.value.trim() || '';
+    const email = contactForm.querySelector("[name='email']")?.value.trim() || '';
+    const phone = contactForm.querySelector("[name='phone']")?.value.trim() || '';
+    const interest = contactForm.querySelector("[name='interest']")?.value || 'general';
+    const message = contactForm.querySelector("[name='message']")?.value.trim() || '';
 
-    // Save to localStorage for admin panel
-    saveMsgRecord(name, email, phone, interest, message);
-
-    // Optional: send via FormSubmit / backend
-    // Uncomment and set your endpoint if you have one:
-    /*
-    try {
-      await fetch("https://formsubmit.co/YOUR_EMAIL", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify({ name, email, phone, interest, message }),
-      });
-    } catch {}
-    */
-
-    // Show success with SweetAlert2 if available, else native alert
-    if (typeof Swal !== "undefined") {
-      await Swal.fire({
-        icon:             "success",
-        title:            "Message Sent!",
-        text:             "Thank you for reaching out. We'll respond within 24–48 hours.",
-        confirmButtonColor: "#0f766e",
-        confirmButtonText:  "Close",
-      });
-    } else {
-      alert("Thank you! We'll get back to you within 24–48 hours.");
+    if (!name || !message) {
+      alert('Please fill in your name and message.');
+      return;
     }
 
-    form.reset();
-    if (feeBox) feeBox.style.display = "none";
-    if (joinBtn) { joinBtn.disabled = false; joinBtn.textContent = "Send Message"; }
+    if (joinBtn) { joinBtn.disabled = true; joinBtn.textContent = 'Sending…'; }
+
+    try {
+      const res = await fetch(`${CONTACT_API}/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, interest, message }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        // Show success — use SweetAlert2 if available
+        if (typeof Swal !== 'undefined') {
+          await Swal.fire({
+            icon: 'success',
+            title: 'Message Sent! 🙏',
+            html: `Thank you <strong>${name}</strong>! We'll respond within 24–48 hours.<br><small>Ticket: ${data.data?.ticket_id || ''}</small>`,
+            confirmButtonColor: '#0f766e',
+            confirmButtonText: 'Close',
+          });
+        } else {
+          alert(`Thank you ${name}! Your message has been received. We'll get back to you within 24–48 hours.`);
+        }
+
+        contactForm.reset();
+        if (feeBox) feeBox.style.display = 'none';
+      } else {
+        throw new Error(data.error || 'Submission failed');
+      }
+    } catch (err) {
+      console.error('Contact form error:', err);
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Something went wrong',
+          text: 'Please try again or contact us directly at alhindtrust@gmail.com',
+          confirmButtonColor: '#0f766e',
+        });
+      } else {
+        alert('Something went wrong. Please email us at alhindtrust@gmail.com');
+      }
+    } finally {
+      if (joinBtn) { joinBtn.disabled = false; joinBtn.textContent = 'Send Message'; }
+    }
   });
 }
