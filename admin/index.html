@@ -1560,6 +1560,37 @@
       white-space: pre-wrap;
     }
 
+    /* Gallery action icon buttons */
+    .gal-act-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      transition: background .15s, border-color .15s;
+    }
+
+    .gal-act-btn:hover {
+      background: var(--bg);
+      border-color: #cbd5e1;
+      color: #1e293b;
+    }
+
+    .gal-act-del:hover {
+      background: var(--danger-bg) !important;
+      border-color: #fca5a5 !important;
+      color: var(--danger) !important;
+    }
+
+    .gal-tbl {
+      table-layout: fixed;
+    }
+
     /* Stat red sub */
     .stat-sub.red {
       color: var(--danger);
@@ -1950,16 +1981,26 @@
         <!-- TABLE VIEW -->
         <div id="gal-table-view" style="display:none">
           <div class="tbl-wrap" style="margin-top:.5rem">
-            <table>
+            <table class="gal-tbl">
+              <colgroup>
+                <col style="width:42px">
+                <col style="width:72px">
+                <col style="width:180px">
+                <col style="width:140px">
+                <col style="width:100px">
+                <col style="width:96px">
+                <col style="width:100px">
+                <col style="width:96px">
+              </colgroup>
               <thead>
                 <tr>
                   <th>#</th>
                   <th>Image</th>
+                  <th>Title</th>
                   <th>Caption</th>
                   <th>Category</th>
-                  <th>Featured</th>
-                  <th>Visible</th>
-                  <th>Uploaded</th>
+                  <th>Status</th>
+                  <th>Date</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -1976,16 +2017,69 @@
           <p>Add new images to the public gallery.</p>
         </div>
         <div class="panel-card">
+          <p
+            style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:.6rem;">
+            Image File</p>
           <div class="drop-zone" id="gal-dz" onclick="document.getElementById('gal-fi').click()">
-            <span class="dzi">📁</span>
-            <p><span class="dz-strong">Click to browse</span> or drag &amp; drop images here</p>
-            <small style="display:block;margin-top:.4rem;">JPG, PNG, WebP — multiple files supported</small>
+            <span class="dzi">☁️</span>
+            <p><span class="dz-strong">Drag &amp; drop an image here, or</span> <span
+                style="color:var(--teal);font-weight:700;cursor:pointer;">click to browse</span></p>
+            <small style="display:block;margin-top:.4rem;">JPG, PNG, WEBP, GIF — Max 5 MB</small>
             <input type="file" id="gal-fi" accept="image/*" multiple onchange="handleGalFiles(this.files)">
           </div>
           <div class="prev-strip" id="gal-prev"></div>
-          <div class="upl-row" id="gal-upl-row" style="display:none">
-            <input type="text" id="gal-cap" placeholder="Caption for all (or leave blank to use filenames)">
-            <button class="btn-add" onclick="addGalImages()">＋ Add to Gallery</button>
+
+          <div id="gal-upl-row" style="display:none">
+            <div style="border-top:1px solid var(--border);margin:1.25rem 0"></div>
+            <p
+              style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:1rem;">
+              Photo Details</p>
+            <div class="fg2" style="margin-bottom:1rem;">
+              <div class="fg">
+                <label class="f-lbl">Title (English) <span style="color:#dc2626">*</span></label>
+                <input type="text" id="gal-title-en" class="f-inp" style="margin-bottom:0"
+                  placeholder="e.g. Annual Mahasabha 2024">
+              </div>
+              <div class="fg">
+                <label class="f-lbl">Title (Hindi)</label>
+                <input type="text" id="gal-title-hi" class="f-inp" style="margin-bottom:0"
+                  placeholder="e.g. वार्षिक महासभा 2024">
+              </div>
+            </div>
+            <div class="fg2" style="margin-bottom:1rem;grid-template-columns:1fr 1fr 140px;">
+              <div class="fg">
+                <label class="f-lbl">Category <span style="color:#dc2626">*</span></label>
+                <select id="gal-cat" class="f-inp" style="margin-bottom:0">
+                  <option value="">— Select Category —</option>
+                  <option>Events</option>
+                  <option>Health</option>
+                  <option>Education</option>
+                  <option>Welfare</option>
+                  <option>Community</option>
+                  <option>Awareness</option>
+                  <option>Volunteer</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label class="f-lbl">Caption / Description</label>
+                <input type="text" id="gal-cap" class="f-inp" style="margin-bottom:0"
+                  placeholder="Brief description of the photo…">
+              </div>
+              <div class="fg">
+                <label class="f-lbl">Sort Order <small
+                    style="text-transform:none;font-size:.68rem;font-weight:400;">(lower = first)</small></label>
+                <input type="number" id="gal-sort" class="f-inp" style="margin-bottom:0" value="0" min="0">
+              </div>
+            </div>
+            <label style="display:flex;align-items:center;gap:.55rem;cursor:pointer;margin-bottom:1.25rem;">
+              <input type="checkbox" id="gal-pub" checked style="width:15px;height:15px;accent-color:var(--teal);">
+              <span style="font-size:.875rem;color:#1e293b;">Show this photo on the public gallery</span>
+            </label>
+            <div class="f-actions">
+              <button class="btn-sub btn-add" onclick="addGalImages()">📤 Upload Photo</button>
+              <button class="btn-canc" onclick="cancelUpload()">Cancel</button>
+            </div>
           </div>
         </div>
       </div>
@@ -2292,7 +2386,7 @@
         return au ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date);
       });
       tb.innerHTML = s.map(e => `<tr>
-    <td>${e.image ? `<img src="${e.image}" class="tbl-img" alt="">` : `<div class="tbl-ph">📅</div>`}</td>
+    <td>${(e.image_path || e.image) ? `<img src="${e.image_path || e.image}" class="tbl-img" alt="">` : `<div class="tbl-ph">📅</div>`}</td>
     <td><strong>${esc(e.title)}</strong></td>
     <td style="white-space:nowrap;color:var(--muted);font-size:.8rem">${fmtDate(e.date)}</td>
     <td><span class="spill ${e.date < TODAY ? 'sp-past' : 'sp-up'}">${e.date < TODAY ? 'Past' : 'Upcoming'}</span></td>
@@ -2449,12 +2543,17 @@
         const img = document.createElement('img');
         img.src = URL.createObjectURL(f); img.className = 'prev-thumb'; s.appendChild(img);
       });
-      document.getElementById('gal-upl-row').style.display = galPend.length ? 'flex' : 'none';
+      document.getElementById('gal-upl-row').style.display = galPend.length ? 'block' : 'none';
     }
 
     async function addGalImages() {
       if (!galPend.length) return;
+      const titleEn = document.getElementById('gal-title-en').value.trim();
+      const titleHi = document.getElementById('gal-title-hi').value.trim();
       const cap = document.getElementById('gal-cap').value.trim();
+      const cat = document.getElementById('gal-cat').value;
+      const sort = parseInt(document.getElementById('gal-sort').value) || 0;
+      const isPublic = document.getElementById('gal-pub').checked ? 1 : 0;
       const btn = document.querySelector('#gal-upl-row .btn-add');
       btn.disabled = true; btn.textContent = 'Uploading…';
       let done = 0;
@@ -2465,9 +2564,16 @@
             const r = new FileReader();
             r.onload = async e => {
               try {
+                const autoTitle = titleEn || f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
                 await apiFetch('POST', 'gallery', {
                   src: e.target.result,
-                  caption: cap || f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '),
+                  title: autoTitle,
+                  title_hi: titleHi,
+                  caption: cap || autoTitle,
+                  alt_text: cap || autoTitle,
+                  category: cat,
+                  sort_order: sort,
+                  is_active: isPublic,
                 });
                 done++;
                 resolve();
@@ -2480,13 +2586,27 @@
       toast(`${done} image${done !== 1 ? 's' : ''} uploaded ✓`, 'success');
       await loadGallery();
       await loadDashboard();
+      resetUploadForm();
+      goTo('gallery');
+      btn.disabled = false; btn.textContent = '📤 Upload Photo';
+    }
+
+    function cancelUpload() {
+      resetUploadForm();
+      goTo('gallery');
+    }
+
+    function resetUploadForm() {
       document.getElementById('gal-prev').innerHTML = '';
       document.getElementById('gal-cap').value = '';
+      document.getElementById('gal-title-en').value = '';
+      document.getElementById('gal-title-hi').value = '';
+      document.getElementById('gal-cat').value = '';
+      document.getElementById('gal-sort').value = '0';
+      document.getElementById('gal-pub').checked = true;
       document.getElementById('gal-upl-row').style.display = 'none';
       document.getElementById('gal-fi').value = '';
       galPend = [];
-      goTo('gallery');
-      btn.disabled = false; btn.textContent = '＋ Add to Gallery';
     }
 
     /* ══════════════════════════════════════
@@ -2513,49 +2633,66 @@
       }
       tb.innerHTML = gallery.map((item, idx) => {
         const src = item.filepath || item.src || '';
-        const cap = item.title || item.alt_text || item.caption || '';
-        const catName = item.category_name || '—';
-        const isFeat = item.is_featured == 1 || item.is_featured === true;
+        const titleEn = item.title || item.alt_text || item.caption || '';
+        const titleHi = item.title_hi || '';
+        const cap = item.caption || item.alt_text || '';
+        const catName = item.category_name || item.category || '—';
         const isVis = item.is_active == 1 || item.is_active === true || item.is_active === undefined;
         const date = item.created_at ? new Date(item.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
         return `<tr id="gal-row-${item.id}" class="${!isVis ? 'row-hidden' : ''}">
-      <td style="color:var(--muted);font-size:.78rem">#${idx + 1}</td>
-      <td><img src="${esc(src)}" style="width:60px;height:44px;object-fit:cover;border-radius:7px;display:block" alt=""></td>
+      <td style="color:var(--muted);font-size:.78rem;font-variant-numeric:tabular-nums">#${idx + 1}</td>
+      <td>${src ? `<img src="${esc(src)}" style="width:54px;height:40px;object-fit:cover;border-radius:7px;display:block;border:0.5px solid var(--border)" alt="">` : `<div style="width:54px;height:40px;border-radius:7px;background:var(--bg);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.9rem;">🖼️</div>`}</td>
       <td>
-        <input type="text" value="${esc(cap)}" class="caption-input" style="width:160px"
-          id="tbl-cap-${item.id}" onkeydown="if(event.key==='Enter'){event.preventDefault();saveCapById(${item.id})}">
+        <div style="font-size:.83rem;font-weight:600;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:175px">${esc(titleEn) || '—'}</div>
+        ${titleHi ? `<div style="font-size:.75rem;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:175px">${esc(titleHi)}</div>` : ''}
       </td>
-      <td><span class="cat-tag">${esc(catName)}</span></td>
-      <td>
-        <button onclick="toggleFeatured(${item.id},${isFeat ? 0 : 1})"
-          class="feat-star ${isFeat ? 'on' : ''}" title="${isFeat ? 'Remove from featured' : 'Mark as featured'}">
-          ${isFeat ? '⭐ Featured' : '☆ Feature'}
-        </button>
+      <td style="max-width:135px">
+        <span style="font-size:.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:135px">${esc(cap) || '—'}</span>
       </td>
+      <td>${catName !== '—' ? `<span class="cat-tag">${esc(catName)}</span>` : '<span style="color:var(--muted);font-size:.8rem">—</span>'}</td>
       <td>
         <button onclick="toggleVisibility(${item.id},${isVis ? 0 : 1})"
-          class="vis-toggle ${isVis ? 'visible' : 'hidden'}">
-          ${isVis ? '👁 Visible' : '🙈 Hidden'}
+          style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;border:none;cursor:pointer;font-size:.72rem;font-weight:600;background:${isVis ? '#dcfce7' : 'var(--bg)'};color:${isVis ? '#166534' : 'var(--muted)'}"
+          title="${isVis ? 'Click to hide' : 'Click to show'}">
+          <span style="width:7px;height:7px;border-radius:50%;background:${isVis ? '#22c55e' : '#94a3b8'};display:inline-block;flex-shrink:0"></span>
+          ${isVis ? 'Visible' : 'Hidden'}
         </button>
       </td>
       <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">${date}</td>
-      <td><div class="tbl-acts">
-        <button class="btn-sv" onclick="saveCapById(${item.id})">💾</button>
-        <button class="btn-rm" onclick="delGal(${item.id})">🗑</button>
-      </div></td>
+      <td>
+        <div class="tbl-acts" style="gap:.3rem">
+          <button class="gal-act-btn" onclick="openGalEdit(${item.id})" title="Edit">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="gal-act-btn" onclick="toggleVisibility(${item.id},${isVis ? 0 : 1})" title="${isVis ? 'Hide' : 'Show'}" style="color:${isVis ? 'var(--teal)' : 'var(--muted)'}">
+            ${isVis
+            ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`
+            : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`}
+          </button>
+          <button class="gal-act-btn gal-act-del" onclick="delGal(${item.id})" title="Delete">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+      </td>
     </tr>`;
       }).join('');
     }
 
-    async function saveCapById(id) {
-      const inp = document.getElementById(`tbl-cap-${id}`);
-      if (!inp) return;
-      const caption = inp.value.trim();
+    function openGalEdit(id) {
+      const item = gallery.find(g => g.id === id); if (!item) return;
+      const newTitle = prompt('Edit title (English):', item.title || item.alt_text || '');
+      if (newTitle === null) return;
+      saveGalTitleById(id, newTitle.trim());
+    }
+
+    async function saveGalTitleById(id, title) {
       try {
-        await apiFetch('PUT', `gallery/${id}`, { title: caption, alt_text: caption });
+        await apiFetch('PUT', `gallery/${id}`, { title, alt_text: title });
         const item = gallery.find(g => g.id === id);
-        if (item) { item.title = caption; item.alt_text = caption; }
-        toast('Caption saved ✓', 'success');
+        if (item) { item.title = title; item.alt_text = title; }
+        toast('Saved ✓', 'success');
+        renderGalTable();
+        if (galView === 'grid') renderGalGrid();
       } catch (e) { toast('Failed to save', 'error'); }
     }
 
