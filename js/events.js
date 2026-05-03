@@ -60,7 +60,7 @@ function renderEvents(filter = 'all') {
                </span>
              </div>`
         : `<div class="event-img-placeholder">
-               <span>📅</span>
+               <i class="fa-solid fa-calendar-days"></i>
                <span class="event-status-badge ${isPast ? 'badge-past' : 'badge-upcoming'}">
                  ${isPast ? 'Past' : 'Upcoming'}
                </span>
@@ -69,8 +69,8 @@ function renderEvents(filter = 'all') {
         <div class="event-body">
           ${e.category ? `<span class="event-category">${esc(e.category)}</span>` : ''}
           <h3 class="event-title">${esc(e.title)}</h3>
-          <p class="event-meta"><span class="event-badge">📅 ${dateStr}</span></p>
-          <p class="event-meta">📍 ${esc(e.location || '')}</p>
+          <p class="event-meta"><span class="event-badge"><i class="fa-solid fa-calendar-days"></i> ${dateStr}</span></p>
+          <p class="event-meta"><i class="fa-solid fa-location-dot"></i> ${esc(e.location || '')}</p>
           <p class="event-desc">${esc(e.description || '')}</p>
           ${mapSrc ? `<iframe class="event-map" src="${mapSrc}" loading="lazy" allowfullscreen></iframe>` : ''}
           ${!isPast && e.joinLink

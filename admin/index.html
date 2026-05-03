@@ -2426,7 +2426,7 @@
         const re = res.data.recent_events || [];
         evtList.innerHTML = re.length ? re.map(e => `
       <div class="ri">
-        ${e.image_path ? `<img src="${e.image_path}" alt="">` : `<div class="ri-ph"><i class="fa-solid fa-calendar-days"></i></div>`}
+        ${(e.image || e.image_path) ? `<img src="${e.image || e.image_path}" alt="">` : `<div class="ri-ph"><i class="fa-solid fa-calendar-days"></i></div>`}
         <div class="ri-info">
           <div class="ri-t">${esc(e.title)}</div>
           <div class="ri-s">${fmtDate(e.event_date?.substring(0, 10))} · ${esc(e.location || '—')}</div>
@@ -2468,7 +2468,7 @@
         return au ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date);
       });
       tb.innerHTML = s.map(e => `<tr>
-    <td>${(e.image_path || e.image) ? `<img src="${e.image_path || e.image}" class="tbl-img" alt="">` : `<div class="tbl-ph"><i class="fa-solid fa-calendar-days"></i></div>`}</td>
+    <td>${(e.image || e.image_path) ? `<img src="${e.image || e.image_path}" class="tbl-img" alt="">` : `<div class="tbl-ph"><i class="fa-solid fa-calendar-days"></i></div>`}</td>
     <td><strong>${esc(e.title)}</strong></td>
     <td style="white-space:nowrap;color:var(--muted);font-size:.8rem">${fmtDate(e.date)}</td>
     <td><span class="spill ${e.date < TODAY ? 'sp-past' : 'sp-up'}">${e.date < TODAY ? 'Past' : 'Upcoming'}</span></td>
