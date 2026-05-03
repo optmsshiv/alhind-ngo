@@ -63,11 +63,24 @@ function buildFilterBar(items) {
   const allCount = document.getElementById('fcount-all');
   if (allCount) allCount.textContent = items.length;
 
-  // Update stats
-  const statPhotos = document.getElementById('stat-photos');
-  const statCats = document.getElementById('stat-cats');
-  if (statPhotos) statPhotos.textContent = items.length;
-  if (statCats) statCats.textContent = Object.keys(catCounts).length;
+  // Update stats with animated counter
+  function animateCount(id, target) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    let n = 0;
+    const step = Math.max(1, Math.ceil(target / 30));
+    const t = setInterval(() => {
+      n = Math.min(n + step, target);
+      el.textContent = n;
+      if (n >= target) clearInterval(t);
+    }, 40);
+  }
+  animateCount('stat-photos', items.length);
+  animateCount('stat-cats', Object.keys((() => {
+    const c = {};
+    items.forEach(i => { const k = i.category_slug || slugify(i.category_name || ''); if (k) c[k] = 1; });
+    return c;
+  })()).length);
 
   // Add category buttons
   Object.entries(catCounts).forEach(([slug, count]) => {
@@ -128,12 +141,12 @@ function renderMasonry() {
     div.className = 'masonry-item';
     div.innerHTML = `
       <img src="" data-src="${esc(src)}" alt="${esc(cap)}" class="skeleton-hidden" loading="lazy">
-      <div class="masonry-zoom">🔍</div>
+      <div class="masonry-zoom" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12.5 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
       <div class="masonry-overlay">
+        ${cap ? `<div class="masonry-overlay-title">${esc(cap)}</div>` : ''}
         ${catInfo.label !== 'General'
         ? `<span class="masonry-cat-badge ${catInfo.cls}">${catInfo.icon} ${catInfo.label}</span>`
         : ''}
-        ${cap ? `<div class="masonry-overlay-title">${esc(cap)}</div>` : ''}
       </div>`;
 
     const img = div.querySelector('img');
@@ -178,6 +191,16 @@ function loadMore() {
 }
 
 /* ── Carousel ────────────────────────────────────────────── */
+function goToSlide(i, total) {
+  if (!total) return;
+  carouselCurrent = (i + total) % total;
+  const track = document.querySelector('.carousel-track');
+  if (track) track.style.transform = `translateX(-${carouselCurrent * 100}%)`;
+  document.querySelectorAll('.carousel-dot').forEach((d, idx) => {
+    d.classList.toggle('active', idx === carouselCurrent);
+  });
+}
+
 function buildCarousel(items) {
   const track = document.querySelector('.carousel-track');
   const dots = document.getElementById('carousel-dots');
@@ -216,7 +239,7 @@ function buildCarousel(items) {
     if (dots) {
       const dot = document.createElement('button');
       dot.className = `carousel-dot${i === 0 ? ' active' : ''}`;
-      dot.addEventListener('click', () => goToSlide(i));
+      dot.addEventListener('click', () => goToSlide(i, slides.length));
       dots.appendChild(dot);
     }
   });
@@ -229,31 +252,21 @@ function initCarousel(total) {
   const track = document.querySelector('.carousel-track');
   if (!carousel || !track || total === 0) return;
 
-  function goToSlide(i) {
-    carouselCurrent = (i + total) % total;
-    track.style.transform = `translateX(-${carouselCurrent * 100}%)`;
-    document.querySelectorAll('.carousel-dot').forEach((d, idx) => {
-      d.classList.toggle('active', idx === carouselCurrent);
-    });
-  }
+  carousel.querySelector('.carousel-btn.prev')?.addEventListener('click', () => goToSlide(carouselCurrent - 1, total));
+  carousel.querySelector('.carousel-btn.next')?.addEventListener('click', () => goToSlide(carouselCurrent + 1, total));
 
-  carousel.querySelector('.carousel-btn.prev')?.addEventListener('click', () => goToSlide(carouselCurrent - 1));
-  carousel.querySelector('.carousel-btn.next')?.addEventListener('click', () => goToSlide(carouselCurrent + 1));
-
-  // Auto-play
   function startAuto() {
-    carouselTimer = setInterval(() => goToSlide(carouselCurrent + 1), 5000);
+    carouselTimer = setInterval(() => goToSlide(carouselCurrent + 1, total), 5000);
   }
   startAuto();
   carousel.addEventListener('mouseenter', () => clearInterval(carouselTimer));
   carousel.addEventListener('mouseleave', startAuto);
 
-  // Touch swipe
   let startX = 0;
   track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
   track.addEventListener('touchend', e => {
     const diff = startX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) goToSlide(carouselCurrent + (diff > 0 ? 1 : -1));
+    if (Math.abs(diff) > 40) goToSlide(carouselCurrent + (diff > 0 ? 1 : -1), total);
   });
 }
 
