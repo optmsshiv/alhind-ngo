@@ -163,50 +163,49 @@ async function createOrder(name, email, amount) {
 ════════════════════════════════════════════════════ */
 function openRazorpay(orderData, name, email, amount, submitBtn) {
   return new Promise((resolve, reject) => {
+    let paymentDone = false; // guard — stops ondismiss rejecting after successful payment
+
     const options = {
       key: orderData.key_id,
-      amount: orderData.amount,       // paise — from backend
+      amount: orderData.amount,
       currency: orderData.currency,
-      order_id: orderData.order_id,     // backend-created order ID
+      order_id: orderData.order_id,
       name: 'AL Hind Educational and Charitable Trust',
       description: 'Donation — Empowering Communities',
       image: '/assets/logo.png',
       prefill: { name, email },
       theme: { color: '#0f766e' },
+      notes: { donor_name: name, donor_email: email },
 
-      notes: {
-        donor_name: name,
-        donor_email: email,
-      },
-
-      // ✅ Payment succeeded — resolve with payment response
       handler: function (response) {
+        console.log('[AL Hind] Payment handler fired:', response);
+        paymentDone = true;
         resolve(response);
       },
 
       modal: {
-        // User closed the modal without paying
         ondismiss: function () {
+          if (paymentDone) return; // payment succeeded — ignore dismiss
+          console.log('[AL Hind] Modal dismissed without payment');
           setSubmitState(submitBtn, 'reset');
           reject(new Error('dismissed'));
         },
-        escape: false,
+        escape: true,
         backdropclose: false,
         animation: true,
-        confirm_close: true,
+        // confirm_close removed — it triggers ondismiss after successful payment
       },
     };
 
     try {
       const rzp = new Razorpay(options);
-
       rzp.on('payment.failed', function (resp) {
         console.error('[AL Hind] Payment failed:', resp.error);
+        paymentDone = false;
         setSubmitState(submitBtn, 'reset');
         showFormError('Payment failed: ' + (resp.error?.description || 'Please try again.'));
         reject(new Error('payment_failed'));
       });
-
       rzp.open();
     } catch (err) {
       reject(err);
