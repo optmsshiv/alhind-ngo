@@ -91,9 +91,13 @@ function razorpayCreateOrder($keyId, $keySecret, $amountPaise, $name, $email) {
     return $result;
 }
 
+// ── Razorpay Keys ─────────────────────────────────────────────
+define('RZP_KEY_ID',     'rzp_test_SlDNLCDQLwY9Ck');
+define('RZP_KEY_SECRET', 'TRBmnePDq3zxJ5JQB60HU2lL');
+
 // ── Call Razorpay ─────────────────────────────────────────────
 try {
-    $order   = razorpayCreateOrder(rzp_test_SlDNLCDQLwY9Ck, TRBmnePDq3zxJ5JQB60HU2lL, $amountPaise, $name, $email);
+    $order   = razorpayCreateOrder(RZP_KEY_ID, RZP_KEY_SECRET, $amountPaise, $name, $email);
     $orderId = $order['id'];
 } catch (Exception $e) {
     error_log('[AL Hind] Razorpay order creation failed: ' . $e->getMessage());
