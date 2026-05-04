@@ -11,7 +11,7 @@
 'use strict';
 
 // ── API base (update if your PHP files are in a different folder) ──
-const DONATE_PHP_BASE = '/backend'; // e.g. /php/create-order.php
+const DONATE_PHP_BASE = '/php'; // e.g. /php/create-order.php
 
 /* ════════════════════════════════════════════════════
    PRESET AMOUNT BUTTONS
@@ -277,31 +277,28 @@ if (donationForm) {
         if (err.message !== 'dismissed' && err.message !== 'payment_failed') {
           showFormError('Payment gateway unavailable. Please donate via UPI QR or bank transfer below.');
         }
-        // If dismissed or failed, setSubmitState already called in ondismiss/on payment.failed
         return;
       }
 
+      // ✅ Payment done — reset button IMMEDIATELY before verify call
+      // so user never sees "Processing..." after popup closes
+      setSubmitState(submitBtn, 'reset');
+      donationForm.reset();
+      document.querySelectorAll('.donation-presets button')
+        .forEach(b => b.classList.remove('active-preset'));
+
       // ── Step 3: Verify payment signature on backend ──
-      setSubmitState(submitBtn, 'loading'); // keep loading while verifying
       try {
         const verified = await verifyPayment(
           paymentResponse.razorpay_order_id,
           paymentResponse.razorpay_payment_id,
           paymentResponse.razorpay_signature
         );
-
-        // ✅ All done — show success
-        donationForm.reset();
-        document.querySelectorAll('.donation-presets button')
-          .forEach(b => b.classList.remove('active-preset'));
-        setSubmitState(submitBtn, 'reset');
         showSuccess(verified.name || name, verified.amount || amount, paymentResponse.razorpay_payment_id);
 
       } catch (err) {
         console.error('[AL Hind] Verification failed:', err);
-        // Payment went through but verification call failed — still show success
-        // (Razorpay webhook handles this as a fallback)
-        setSubmitState(submitBtn, 'reset');
+        // Payment went through — show success anyway (webhook is fallback)
         showSuccess(name, amount, paymentResponse.razorpay_payment_id);
       }
 
