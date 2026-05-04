@@ -1,20 +1,130 @@
 <?php
-require('razorpay-php/Razorpay.php');
+// ============================================================
+//  verify-payment.php — Razorpay Payment Verification
+//  AL Hind Educational and Charitable Trust
+//  Called by donate.js after Razorpay handler fires
+// ============================================================
+
+header('Content-Type: application/json');
+
+// ── CORS ─────────────────────────────────────────────────────
+$allowed = ['https://alhindtrust.com', 'https://www.alhindtrust.com'];
+$origin  = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($origin, $allowed, true)) {
+    header("Access-Control-Allow-Origin: $origin");
+}
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['status' => 'error', 'message' => 'Method not allowed']);
+    exit;
+}
+
+// ── Dependencies ──────────────────────────────────────────────
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+
 use Razorpay\Api\Api;
 
-$api = new Api("RAZORPAY_KEY_ID", "RAZORPAY_KEY_SECRET");
+// ── Razorpay credentials (must match create-order.php) ───────
+define('RZP_KEY_ID',     'rzp_test_REPLACE_YOUR_KEY_ID');
+define('RZP_KEY_SECRET', 'REPLACE_YOUR_KEY_SECRET');
 
-$data = json_decode(file_get_contents("php://input"), true);
+// ── Read input ────────────────────────────────────────────────
+$raw  = file_get_contents('php://input');
+$data = json_decode($raw, true);
 
-$attributes = [
-  'razorpay_order_id' => $data['razorpay_order_id'],
-  'razorpay_payment_id' => $data['razorpay_payment_id'],
-  'razorpay_signature' => $data['razorpay_signature']
-];
+$razorpayOrderId   = trim($data['razorpay_order_id']   ?? '');
+$razorpayPaymentId = trim($data['razorpay_payment_id'] ?? '');
+$razorpaySignature = trim($data['razorpay_signature']  ?? '');
 
-$api->utility->verifyPaymentSignature($attributes);
+if (!$razorpayOrderId || !$razorpayPaymentId || !$razorpaySignature) {
+    http_response_code(400);
+    echo json_encode(['status' => 'error', 'message' => 'Missing payment details']);
+    exit;
+}
 
-// payment verified — here you can:
-// ✔ save to DB
-// ✔ send email receipt
-// ✔ generate 80G receipt
+// ── Verify Razorpay signature (HMAC SHA256) ───────────────────
+// This is the critical security step — prevents fake payment callbacks
+$expectedSignature = hash_hmac(
+    'sha256',
+    $razorpayOrderId . '|' . $razorpayPaymentId,
+    RZP_KEY_SECRET
+);
+
+if (!hash_equals($expectedSignature, $razorpaySignature)) {
+    error_log('[AL Hind] Signature mismatch for order: ' . $razorpayOrderId);
+    http_response_code(400);
+    echo json_encode(['status' => 'error', 'message' => 'Payment verification failed']);
+    exit;
+}
+
+// ── Fetch payment details from Razorpay ───────────────────────
+try {
+    $api     = new Api(RZP_KEY_ID, RZP_KEY_SECRET);
+    $payment = $api->payment->fetch($razorpayPaymentId);
+    $method  = $payment['method'] ?? 'online'; // card, upi, netbanking, wallet, etc.
+} catch (Exception $e) {
+    error_log('[AL Hind] Razorpay payment fetch failed: ' . $e->getMessage());
+    $method = 'online';
+}
+
+// ── Update donation record in DB ──────────────────────────────
+try {
+    $pdo = getDB();
+
+    // Update the pending record to paid
+    $stmt = $pdo->prepare("
+        UPDATE donations
+        SET
+            payment_status      = 'paid',
+            payment_method      = :method,
+            razorpay_payment_id = :payment_id,
+            razorpay_signature  = :signature,
+            updated_at          = NOW()
+        WHERE
+            razorpay_order_id   = :order_id
+            AND payment_status  = 'pending'
+        LIMIT 1
+    ");
+    $stmt->execute([
+        ':method'     => ucfirst($method),
+        ':payment_id' => $razorpayPaymentId,
+        ':signature'  => $razorpaySignature,
+        ':order_id'   => $razorpayOrderId,
+    ]);
+
+    // Fetch the updated record to return donor info
+    $sel = $pdo->prepare("
+        SELECT donor_name, donor_email, amount
+        FROM donations
+        WHERE razorpay_order_id = :order_id
+        LIMIT 1
+    ");
+    $sel->execute([':order_id' => $razorpayOrderId]);
+    $donation = $sel->fetch();
+
+} catch (PDOException $e) {
+    error_log('[AL Hind] DB update failed: ' . $e->getMessage());
+    // Payment is verified — still return success even if DB update glitched
+    echo json_encode([
+        'status'  => 'success',
+        'message' => 'Payment verified',
+        'name'    => '',
+        'amount'  => '',
+    ]);
+    exit;
+}
+
+// ── Return success ────────────────────────────────────────────
+echo json_encode([
+    'status'     => 'success',
+    'message'    => 'Payment verified and recorded',
+    'name'       => $donation['donor_name']  ?? '',
+    'email'      => $donation['donor_email'] ?? '',
+    'amount'     => $donation['amount']      ?? '',
+    'payment_id' => $razorpayPaymentId,
+]);

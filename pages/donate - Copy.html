@@ -6,102 +6,13 @@
     <title>Donate | AL Education and Trust Charitable</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/style.css">
-    <style>
-        .donation-presets button.active-preset {
-            background: #0f766e;
-            color: #fff;
-            outline: 3px solid #0f766e;
-        }
-
-        #stickyDonate {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #0f766e;
-            color: #fff;
-            padding: .75rem 1.5rem;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 999;
-        }
-
-        .success-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, .55);
-            z-index: 9999;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .success-overlay.active {
-            display: flex;
-        }
-
-        .success-box {
-            background: #fff;
-            border-radius: 20px;
-            padding: 2.5rem 2rem;
-            max-width: 420px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, .25);
-        }
-
-        .success-icon {
-            font-size: 3rem;
-            margin-bottom: .75rem;
-            display: block;
-        }
-
-        .success-box h3 {
-            font-size: 1.35rem;
-            font-weight: 800;
-            color: #0f172a;
-            margin-bottom: .5rem;
-        }
-
-        .success-box p {
-            color: #475569;
-            font-size: .95rem;
-            margin-bottom: .5rem;
-            line-height: 1.5;
-        }
-
-        .success-pid-wrap {
-            font-size: .8rem !important;
-            color: #94a3b8 !important;
-        }
-
-        .success-pid-wrap code {
-            background: #f1f5f9;
-            padding: 2px 8px;
-            border-radius: 5px;
-            font-size: .78rem;
-            color: #0f766e;
-        }
-
-        .success-box button {
-            margin-top: 1.25rem;
-            background: #0f766e;
-            color: #fff;
-            border: none;
-            border-radius: 99px;
-            padding: .65rem 2rem;
-            font-size: .9rem;
-            font-weight: 700;
-            cursor: pointer;
-            font-family: inherit;
-            transition: background .2s;
-        }
-
-        .success-box button:hover {
-            background: #0a5e57;
-        }
-    </style>
+<style>
+.donation-presets button.active-preset { background: #0f766e; color: #fff; outline: 3px solid #0f766e; }
+#stickyDonate { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #0f766e; color: #fff; padding: .75rem 1.5rem; display: flex; justify-content: space-between; align-items: center; z-index: 999; }
+#stickyDonate { display: none; }
+.success-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 9999; align-items: center; justify-content: center; }
+.success-overlay.active, .success-overlay[style*="flex"] { display: flex; }
+</style>
 </head>
 
 <body>
@@ -182,7 +93,7 @@
                         <button type="submit" class="btn-donate-main">
                             Donate Securely
                         </button>
-
+                        
                     </form>
 
                     <div class="trust-badge">
@@ -253,19 +164,19 @@
 
     <section class="authority-section about-card reveal-right">
         <h3>Legal Status & Transparency</h3>
-
+    
         <ul class="authority-list">
             <li>
                 <strong>NITI Aayog (Government of India)</strong><br>
                 Registered under NGO DARPAN Platform<br>
                 <span>DARPAN ID: BR/2025/0937487</span>
             </li>
-
+    
             <li>
                 Operates as a non-profit charitable organization committed to
                 transparency, accountability, and lawful governance.
             </li>
-
+    
             <li>
                 All programs and funds are utilized strictly for charitable and
                 educational purposes in accordance with applicable regulations.
@@ -273,7 +184,7 @@
         </ul>
     </section>
 
-    <!-- NGO PROOF 
+<!-- NGO PROOF 
     <div class="ngo-proof">
         <img src="assets/cert.jpeg" alt="Registered NGO">
         <img src="assets/80g.png" alt="80G Certified">
@@ -286,8 +197,8 @@
         <img src="images/impact3.jpg">
     </div>
 -->
-
-
+    
+    
     <div class="sticky-donate" id="stickyDonate">
         <span>Support our mission</span>
         <button onclick="scrollToDonate()">Donate Now</button>
@@ -297,12 +208,8 @@
     <!-- SUCCESS POPUP -->
     <div class="success-overlay" id="successPopup">
         <div class="success-box">
-            <div class="success-icon">🙏</div>
-            <h3>Thank You, <span id="success-name"></span>!</h3>
-            <p>Your donation of <strong id="success-amount"></strong> was successful and will make a real difference.
-            </p>
-            <p class="success-pid-wrap">Payment ID: <code id="success-pid"></code></p>
-            <p style="font-size:.85rem;color:#64748b;margin-top:.5rem;">A confirmation will be sent to your email.</p>
+            <h3>Thank You for Your Support 🙏</h3>
+            <p>Your donation was successful and will make a real difference.</p>
             <button onclick="closeSuccess()">Close</button>
         </div>
     </div>
