@@ -143,7 +143,7 @@ document.head.appendChild(spinStyle);
    STEP 1 — CREATE RAZORPAY ORDER (backend)
 ════════════════════════════════════════════════════ */
 async function createOrder(name, email, amount) {
-  const res = await fetch(`${DONATE_PHP_BASE}/create-order.php`, {
+  const res = await fetch(`${DONATE_PHP_BASE}/backend/create-order.php`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, amount }),
