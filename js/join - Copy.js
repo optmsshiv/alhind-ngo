@@ -9,7 +9,7 @@ let currentEvent = null;
 
 /* ── Helpers ─────────────────────────────────────────────────── */
 function esc(s) {
-  return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return String(s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 function fmtDate(iso) {
   if (!iso) return '—';
@@ -22,7 +22,7 @@ function $(id) { return document.getElementById(id); }
 /* ── Load Event ──────────────────────────────────────────────── */
 async function loadEvent(id) {
   try {
-    const res = await fetch(`${API}/events`);
+    const res  = await fetch(`${API}/events`);
     const data = await res.json();
     const list = data.data || [];
     return list.find(e => String(e.id) === String(id)) || null;
@@ -49,7 +49,7 @@ function renderEvent(e) {
   // Status badge
   const badge = $('jn-status-badge');
   badge.textContent = isPast ? 'Past Event' : 'Upcoming';
-  badge.className = 'jn-status-badge ' + (isPast ? 'past' : 'upcoming');
+  badge.className   = 'jn-status-badge ' + (isPast ? 'past' : 'upcoming');
 
   // Category
   if (e.category) {
@@ -60,10 +60,10 @@ function renderEvent(e) {
   }
 
   // Details
-  $('jn-event-title').textContent = e.title || 'Event';
-  $('jn-event-date').textContent = fmtDate(e.date);
+  $('jn-event-title').textContent    = e.title || 'Event';
+  $('jn-event-date').textContent     = fmtDate(e.date);
   $('jn-event-location').textContent = e.location || '—';
-  $('jn-event-desc').textContent = e.description || '';
+  $('jn-event-desc').textContent     = e.description || '';
 
   // Page title
   document.title = `Join: ${e.title} | AL Hind Trust`;
@@ -91,7 +91,7 @@ function renderEvent(e) {
 
 /* ── Validation ──────────────────────────────────────────────── */
 function clearErrors() {
-  ['name', 'phone', 'email', 'city'].forEach(f => {
+  ['name','phone','email','city'].forEach(f => {
     $(`err-${f}`).textContent = '';
     $(`jn-${f}`).classList.remove('error');
   });
@@ -100,10 +100,10 @@ function clearErrors() {
 function validate() {
   let ok = true;
 
-  const name = $('jn-name').value.trim();
+  const name  = $('jn-name').value.trim();
   const phone = $('jn-phone').value.trim();
   const email = $('jn-email').value.trim();
-  const city = $('jn-city').value.trim();
+  const city  = $('jn-city').value.trim();
 
   if (!name || name.length < 2) {
     $('err-name').textContent = 'Please enter your full name.';
@@ -140,18 +140,18 @@ async function submitJoin() {
 
   const payload = {
     event_id: currentEvent.id,
-    name: $('jn-name').value.trim(),
-    phone: $('jn-phone').value.trim(),
-    email: $('jn-email').value.trim(),
-    city: $('jn-city').value.trim(),
-    message: $('jn-message').value.trim(),
+    name:     $('jn-name').value.trim(),
+    phone:    $('jn-phone').value.trim(),
+    email:    $('jn-email').value.trim(),
+    city:     $('jn-city').value.trim(),
+    message:  $('jn-message').value.trim(),
   };
 
   try {
-    const res = await fetch(`${API}/volunteers`, {
-      method: 'POST',
+    const res  = await fetch(`${API}/event-volunteers`, {
+      method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body:    JSON.stringify(payload),
     });
     const data = await res.json();
 
@@ -159,7 +159,7 @@ async function submitJoin() {
 
     // Show success
     $('jn-form-wrap').style.display = 'none';
-    $('jn-success').style.display = 'block';
+    $('jn-success').style.display   = 'block';
     $('jn-success-msg').textContent = `Thank you, ${payload.name}! You are registered for "${currentEvent.title}".`;
 
     if (payload.email) {
@@ -193,11 +193,11 @@ async function submitJoin() {
 /* ── Init ────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
-  const id = params.get('id');
+  const id     = params.get('id');
 
   if (!id) {
     $('jn-loading').style.display = 'none';
-    $('jn-error').style.display = 'block';
+    $('jn-error').style.display   = 'block';
     return;
   }
 

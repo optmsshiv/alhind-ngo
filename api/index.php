@@ -74,7 +74,7 @@ if ($resource === 'donate' && $method === 'PATCH' && $id) {
 }
 
 // Event volunteer registration — public (called from join page)
-if ($resource === 'event-volunteers' && $method === 'POST') {
+if ($resource === 'volunteers' && $method === 'POST') {
     require_once __DIR__ . '/endpoints/event-volunteers.php';
     registerVolunteer();
     exit;
@@ -134,7 +134,7 @@ switch ($resource) {
         break;
 
     // ── Event Volunteers (admin view) ───────────────────────
-    case 'event-volunteers':
+    case 'volunteers':
         require_once __DIR__ . '/endpoints/event-volunteers.php';
         if ($method === 'GET' && $id) getEventVolunteers($id);
         else notFound();
