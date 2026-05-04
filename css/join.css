@@ -1,0 +1,402 @@
+/* ── join.css — AL Hind Trust Event Join Page ─────────────── */
+
+:root {
+  --teal:       #0f766e;
+  --teal-light: #ccfbf1;
+  --teal-dark:  #0d5f58;
+  --amber:      #d97706;
+  --amber-bg:   #fef3c7;
+  --red:        #dc2626;
+  --red-bg:     #fee2e2;
+  --green:      #16a34a;
+  --green-bg:   #dcfce7;
+  --text:       #0f172a;
+  --muted:      #64748b;
+  --border:     #e2e8f0;
+  --bg:         #f8fafc;
+  --card:       #ffffff;
+  --radius:     14px;
+  --shadow:     0 4px 24px rgba(0,0,0,.07);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* ── Breadcrumb ──────────────────────────────────────────────── */
+.jn-breadcrumb {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: .65rem 0;
+}
+.jn-breadcrumb .jn-container {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+  font-size: .8rem;
+  color: var(--muted);
+}
+.jn-breadcrumb a {
+  color: var(--teal);
+  text-decoration: none;
+  font-weight: 500;
+}
+.jn-breadcrumb a:hover { text-decoration: underline; }
+.jn-breadcrumb .sep { font-size: .65rem; color: #cbd5e1; }
+
+/* ── Container ───────────────────────────────────────────────── */
+.jn-container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* ── Main ────────────────────────────────────────────────────── */
+.jn-main {
+  padding: 2.5rem 0 4rem;
+  min-height: 70vh;
+}
+
+/* ── Loading ─────────────────────────────────────────────────── */
+.jn-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 5rem 0;
+  color: var(--muted);
+  font-size: .9rem;
+}
+.jn-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--teal);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Error ───────────────────────────────────────────────────── */
+.jn-error {
+  text-align: center;
+  padding: 5rem 1rem;
+  color: var(--muted);
+}
+.jn-error i {
+  font-size: 3rem;
+  color: var(--amber);
+  margin-bottom: 1rem;
+  display: block;
+}
+.jn-error h2 { color: var(--text); margin-bottom: .5rem; font-size: 1.4rem; }
+.jn-error p  { margin-bottom: 1.5rem; }
+.jn-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  background: var(--teal);
+  color: #fff;
+  padding: .65rem 1.4rem;
+  border-radius: 99px;
+  font-size: .875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .15s;
+}
+.jn-back-btn:hover { background: var(--teal-dark); }
+
+/* ── Content Layout ──────────────────────────────────────────── */
+.jn-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+@media (max-width: 768px) {
+  .jn-content { grid-template-columns: 1fr; }
+}
+
+/* ── Event Card (left) ───────────────────────────────────────── */
+.jn-event-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.jn-event-img-wrap { position: relative; }
+.jn-event-img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  display: block;
+}
+.jn-event-img-placeholder {
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(135deg, #e0f2fe, #ccfbf1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.5rem;
+  color: var(--teal);
+}
+.jn-status-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.jn-status-badge.upcoming { background: var(--teal); color: #fff; }
+.jn-status-badge.past     { background: rgba(0,0,0,.5); color: #fff; }
+
+.jn-event-info { padding: 1.5rem; }
+
+.jn-category {
+  display: inline-block;
+  background: var(--teal-light);
+  color: var(--teal-dark);
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 99px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-bottom: .75rem;
+}
+
+.jn-event-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+  margin-bottom: 1rem;
+}
+
+.jn-meta-list {
+  display: flex;
+  flex-direction: column;
+  gap: .55rem;
+  margin-bottom: 1rem;
+}
+.jn-meta-item {
+  display: flex;
+  align-items: flex-start;
+  gap: .6rem;
+  font-size: .875rem;
+  color: var(--muted);
+}
+.jn-meta-item i {
+  color: var(--teal);
+  width: 16px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.jn-event-desc {
+  font-size: .875rem;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.jn-map-wrap { margin-bottom: 1rem; }
+
+.jn-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .8rem;
+  color: var(--teal);
+  text-decoration: none;
+  font-weight: 500;
+}
+.jn-back-link:hover { text-decoration: underline; }
+
+/* ── Form Card (right) ───────────────────────────────────────── */
+.jn-form-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  padding: 2rem;
+  position: sticky;
+  top: 1.5rem;
+}
+
+.jn-form-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.jn-form-header h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: .3rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.jn-form-header h2 i { color: var(--teal); }
+.jn-form-header p { font-size: .82rem; color: var(--muted); }
+
+/* ── Fields ──────────────────────────────────────────────────── */
+.jn-field {
+  margin-bottom: 1.1rem;
+}
+.jn-field label {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .78rem;
+  font-weight: 600;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: .4rem;
+}
+.jn-field label i { color: var(--teal); font-size: .75rem; }
+.req { color: var(--red); }
+.opt { color: var(--muted); font-weight: 400; text-transform: none; letter-spacing: 0; font-size: .75rem; }
+
+.jn-field input,
+.jn-field textarea,
+.jn-field select {
+  width: 100%;
+  padding: .65rem .9rem;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: .875rem;
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  transition: border-color .15s, box-shadow .15s;
+  outline: none;
+}
+.jn-field input:focus,
+.jn-field textarea:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(15,118,110,.1);
+  background: #fff;
+}
+.jn-field input.error,
+.jn-field textarea.error {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(220,38,38,.08);
+}
+.jn-field textarea { resize: vertical; min-height: 80px; }
+
+.jn-err {
+  display: block;
+  font-size: .75rem;
+  color: var(--red);
+  margin-top: .3rem;
+  min-height: 1rem;
+}
+
+/* ── Submit Button ───────────────────────────────────────────── */
+.jn-submit-btn {
+  width: 100%;
+  padding: .85rem 1.5rem;
+  background: var(--teal);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: .95rem;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  transition: background .15s, transform .1s;
+  margin-bottom: .75rem;
+}
+.jn-submit-btn:hover:not(:disabled) {
+  background: var(--teal-dark);
+  transform: translateY(-1px);
+}
+.jn-submit-btn:disabled {
+  opacity: .65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.jn-privacy {
+  font-size: .72rem;
+  color: var(--muted);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .35rem;
+}
+.jn-privacy i { color: var(--teal); }
+
+/* ── Success State ───────────────────────────────────────────── */
+.jn-success {
+  text-align: center;
+  padding: 1rem 0;
+}
+.jn-success-icon {
+  font-size: 3.5rem;
+  color: var(--green);
+  margin-bottom: 1rem;
+}
+.jn-success h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: .5rem;
+  color: var(--text);
+}
+.jn-success p {
+  font-size: .875rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+.jn-success-details {
+  background: var(--green-bg);
+  border-radius: 10px;
+  padding: 1rem;
+  font-size: .82rem;
+  color: #166534;
+  text-align: left;
+  line-height: 1.8;
+}
+
+/* ── Past event: form disabled state ────────────────────────── */
+.jn-past-notice {
+  background: var(--amber-bg);
+  border: 1.5px solid #fcd34d;
+  border-radius: 10px;
+  padding: 1.25rem;
+  text-align: center;
+  color: #92400e;
+  font-size: .875rem;
+}
+.jn-past-notice i { font-size: 1.5rem; display: block; margin-bottom: .5rem; }
+.jn-past-notice strong { display: block; font-size: 1rem; margin-bottom: .3rem; }
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .jn-form-card { padding: 1.25rem; }
+  .jn-event-title { font-size: 1.2rem; }
+  .jn-event-img { height: 180px; }
+}

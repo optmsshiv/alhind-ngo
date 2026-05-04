@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Join Event | AL Hind Educational and Charitable Trust</title>
+  <meta name="description" content="Register for this event organised by AL Hind Educational and Charitable Trust.">
+
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/pageload_animation.css">
+  <link rel="stylesheet" href="/css/join.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Meta Pixel -->
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init','1235764274660948');fbq('track','PageView');
+  </script>
+</head>
+<body>
+
+  <div id="header"></div>
+
+  <!-- BREADCRUMB -->
+  <nav class="jn-breadcrumb">
+    <div class="jn-container">
+      <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+      <i class="fa-solid fa-chevron-right sep"></i>
+      <a href="/events.html">Events</a>
+      <i class="fa-solid fa-chevron-right sep"></i>
+      <span>Join Event</span>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="jn-main">
+    <div class="jn-container">
+
+      <!-- Loading state -->
+      <div class="jn-loading" id="jn-loading">
+        <div class="jn-spinner"></div>
+        <p>Loading event details…</p>
+      </div>
+
+      <!-- Error state -->
+      <div class="jn-error" id="jn-error" style="display:none">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <h2>Event Not Found</h2>
+        <p>This event may have ended or the link is invalid.</p>
+        <a href="/events.html" class="jn-back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Events</a>
+      </div>
+
+      <!-- Content (hidden until loaded) -->
+      <div class="jn-content" id="jn-content" style="display:none">
+
+        <!-- Left: Event Details -->
+        <div class="jn-event-card">
+          <div class="jn-event-img-wrap" id="jn-img-wrap">
+            <img id="jn-event-img" src="" alt="" class="jn-event-img">
+            <div class="jn-event-img-placeholder" id="jn-img-placeholder" style="display:none">
+              <i class="fa-solid fa-calendar-days"></i>
+            </div>
+            <span class="jn-status-badge" id="jn-status-badge"></span>
+          </div>
+
+          <div class="jn-event-info">
+            <span class="jn-category" id="jn-category"></span>
+            <h1 class="jn-event-title" id="jn-event-title">Loading…</h1>
+
+            <div class="jn-meta-list">
+              <div class="jn-meta-item">
+                <i class="fa-solid fa-calendar-days"></i>
+                <span id="jn-event-date">—</span>
+              </div>
+              <div class="jn-meta-item">
+                <i class="fa-solid fa-location-dot"></i>
+                <span id="jn-event-location">—</span>
+              </div>
+            </div>
+
+            <p class="jn-event-desc" id="jn-event-desc"></p>
+
+            <!-- Map -->
+            <div class="jn-map-wrap" id="jn-map-wrap" style="display:none">
+              <iframe id="jn-map" src="" loading="lazy" allowfullscreen
+                style="width:100%;height:200px;border:none;border-radius:12px;"></iframe>
+            </div>
+
+            <a href="/events.html" class="jn-back-link">
+              <i class="fa-solid fa-arrow-left"></i> Back to all events
+            </a>
+          </div>
+        </div>
+
+        <!-- Right: Registration Form -->
+        <div class="jn-form-card" id="jn-form-card">
+          <!-- Success state (hidden initially) -->
+          <div class="jn-success" id="jn-success" style="display:none">
+            <div class="jn-success-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <h2>You're Registered!</h2>
+            <p id="jn-success-msg">Thank you for registering. We'll send details to your email shortly.</p>
+            <div class="jn-success-details" id="jn-success-details"></div>
+            <a href="/events.html" class="jn-submit-btn" style="text-align:center;display:block;margin-top:1.5rem;text-decoration:none">
+              <i class="fa-solid fa-calendar-days"></i> View All Events
+            </a>
+          </div>
+
+          <!-- Form -->
+          <div id="jn-form-wrap">
+            <div class="jn-form-header">
+              <h2><i class="fa-solid fa-user-plus"></i> Register for this Event</h2>
+              <p>Fill in your details below. We'll confirm via email.</p>
+            </div>
+
+            <div class="jn-field">
+              <label for="jn-name"><i class="fa-solid fa-user"></i> Full Name <span class="req">*</span></label>
+              <input type="text" id="jn-name" placeholder="e.g. Mohammad Irfan" autocomplete="name">
+              <span class="jn-err" id="err-name"></span>
+            </div>
+
+            <div class="jn-field">
+              <label for="jn-phone"><i class="fa-solid fa-phone"></i> Mobile Number <span class="req">*</span></label>
+              <input type="tel" id="jn-phone" placeholder="e.g. 9876543210" maxlength="10" autocomplete="tel">
+              <span class="jn-err" id="err-phone"></span>
+            </div>
+
+            <div class="jn-field">
+              <label for="jn-email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+              <input type="email" id="jn-email" placeholder="e.g. irfan@email.com" autocomplete="email">
+              <span class="jn-err" id="err-email"></span>
+            </div>
+
+            <div class="jn-field">
+              <label for="jn-city"><i class="fa-solid fa-map-pin"></i> City / District <span class="req">*</span></label>
+              <input type="text" id="jn-city" placeholder="e.g. Madhepura" autocomplete="address-level2">
+              <span class="jn-err" id="err-city"></span>
+            </div>
+
+            <div class="jn-field">
+              <label for="jn-message"><i class="fa-solid fa-comment"></i> Message <span class="opt">(optional)</span></label>
+              <textarea id="jn-message" rows="3" placeholder="Any questions or message for the organiser…"></textarea>
+            </div>
+
+            <button class="jn-submit-btn" id="jn-submit" onclick="submitJoin()">
+              <i class="fa-solid fa-paper-plane"></i> Register Now
+            </button>
+
+            <p class="jn-privacy">
+              <i class="fa-solid fa-lock"></i>
+              Your details are kept private and only shared with event organisers.
+            </p>
+          </div>
+        </div>
+
+      </div><!-- /jn-content -->
+    </div>
+  </main>
+
+  <div id="footer"></div>
+
+  <script src="/js/include.js"></script>
+  <script src="/js/main.js" defer></script>
+  <script src="/js/header-animate.js" defer></script>
+  <script src="/js/join.js" defer></script>
+
+</body>
+</html>
