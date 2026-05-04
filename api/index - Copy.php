@@ -73,13 +73,6 @@ if ($resource === 'donate' && $method === 'PATCH' && $id) {
     exit;
 }
 
-// Event volunteer registration — public (called from join page)
-if ($resource === 'event-volunteers' && $method === 'POST') {
-    require_once __DIR__ . '/endpoints/event-volunteers.php';
-    registerVolunteer();
-    exit;
-}
-
 // ── Protected routes — require JWT ───────────────────────────
 requireAuth();
 
@@ -131,13 +124,6 @@ switch ($resource) {
     case 'dashboard':
         require_once __DIR__ . '/endpoints/dashboard.php';
         getDashboardStats();
-        break;
-
-    // ── Event Volunteers (admin view) ───────────────────────
-    case 'event-volunteers':
-        require_once __DIR__ . '/endpoints/event-volunteers.php';
-        if ($method === 'GET' && $id) getEventVolunteers($id);
-        else notFound();
         break;
 
     // ── Categories ───────────────────────────────────────────
