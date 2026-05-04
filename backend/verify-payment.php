@@ -30,8 +30,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Razorpay\Api\Api;
 
 // ── Razorpay credentials (must match create-order.php) ───────
-define('RZP_KEY_ID',     'rzp_test_REPLACE_YOUR_KEY_ID');
-define('RZP_KEY_SECRET', 'REPLACE_YOUR_KEY_SECRET');
+define('RZP_KEY_ID',     'rzp_test_Sl9Q7wSNM1qyuf');
+define('RZP_KEY_SECRET', 'zQkpzkYxlWfYDyesrj2IMB6g');
 
 // ── Read input ────────────────────────────────────────────────
 $raw  = file_get_contents('php://input');

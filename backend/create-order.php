@@ -56,8 +56,8 @@ $amountPaise = (int)round($amount * 100); // Razorpay needs paise (integer)
 // Replace with your live keys when going live:
 //   Test  → rzp_test_XXXXXXXXXXXX
 //   Live  → rzp_live_XXXXXXXXXXXX
-define('RZP_KEY_ID',     'rzp_test_REPLACE_YOUR_KEY_ID');
-define('RZP_KEY_SECRET', 'REPLACE_YOUR_KEY_SECRET');
+define('RZP_KEY_ID',     'rzp_test_Sl9Q7wSNM1qyuf');
+define('RZP_KEY_SECRET', 'zQkpzkYxlWfYDyesrj2IMB6g');
 
 // ── Create Razorpay order ─────────────────────────────────────
 try {
