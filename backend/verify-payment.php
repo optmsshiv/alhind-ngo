@@ -81,7 +81,7 @@ try {
 try {
     $pdo = getDB();
 
-    // Update the pending record to paid
+    // Try to UPDATE existing pending record
     $stmt = $pdo->prepare("
         UPDATE donations
         SET
@@ -92,17 +92,53 @@ try {
             updated_at          = NOW()
         WHERE
             razorpay_order_id   = :order_id
-            AND payment_status  = 'pending'
         LIMIT 1
     ");
     $stmt->execute([
-        ':method'     => ucfirst($method),
+        ':method'     => $method,
         ':payment_id' => $razorpayPaymentId,
         ':signature'  => $razorpaySignature,
         ':order_id'   => $razorpayOrderId,
     ]);
 
-    // Fetch the updated record to return donor info
+    // If no row was matched (order_id not found) — insert a new record
+    // This handles cases where create-order.php DB insert failed
+    if ($stmt->rowCount() === 0) {
+        // Fetch donor details from Razorpay order notes
+        $chOrder = curl_init("https://api.razorpay.com/v1/orders/{$razorpayOrderId}");
+        curl_setopt_array($chOrder, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_USERPWD        => RZP_KEY_ID . ':' . RZP_KEY_SECRET,
+            CURLOPT_TIMEOUT        => 15,
+            CURLOPT_SSL_VERIFYPEER => true,
+        ]);
+        $orderResp = curl_exec($chOrder);
+        curl_close($chOrder);
+        $orderData  = json_decode($orderResp, true);
+        $donorName  = $orderData['notes']['donor_name']  ?? 'Unknown';
+        $donorEmail = $orderData['notes']['donor_email'] ?? '';
+        $amountINR  = ($orderData['amount'] ?? 0) / 100;
+
+        $ins = $pdo->prepare("
+            INSERT INTO donations
+                (donor_name, donor_email, amount, payment_method, payment_status,
+                 razorpay_order_id, razorpay_payment_id, razorpay_signature, created_at, updated_at)
+            VALUES
+                (:name, :email, :amount, :method, 'paid',
+                 :order_id, :payment_id, :signature, NOW(), NOW())
+        ");
+        $ins->execute([
+            ':name'       => $donorName,
+            ':email'      => $donorEmail,
+            ':amount'     => $amountINR,
+            ':method'     => $method,
+            ':order_id'   => $razorpayOrderId,
+            ':payment_id' => $razorpayPaymentId,
+            ':signature'  => $razorpaySignature,
+        ]);
+    }
+
+    // Fetch the final record to return to frontend
     $sel = $pdo->prepare("
         SELECT donor_name, donor_email, amount
         FROM donations
@@ -114,7 +150,6 @@ try {
 
 } catch (PDOException $e) {
     error_log('[AL Hind] DB update failed: ' . $e->getMessage());
-    // Payment is verified — still return success even if DB update glitched
     echo json_encode([
         'status'  => 'success',
         'message' => 'Payment verified',
