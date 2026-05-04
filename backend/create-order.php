@@ -26,8 +26,8 @@ try {
 
     /* ---------- INIT RAZORPAY ---------- */
     $api = new Api(
-        RAZORPAY_KEY_ID,
-        RAZORPAY_KEY_SECRET
+        rzp_test_Sl9Q7wSNM1qyuf,
+        zQkpzkYxlWfYDyesrj2IMB6g
     );
 
     /* ---------- CREATE ORDER ---------- */
