@@ -4,7 +4,7 @@
 //  AL Hind Educational and Charitable Trust
 //  Called by donate.js before opening Razorpay checkout
 // ============================================================
-
+date_default_timezone_set('Asia/Kolkata');
 header('Content-Type: application/json');
 
 // ── CORS ─────────────────────────────────────────────────────
