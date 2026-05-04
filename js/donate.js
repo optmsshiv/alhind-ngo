@@ -11,7 +11,7 @@
 'use strict';
 
 // ── API base (update if your PHP files are in a different folder) ──
-const DONATE_PHP_BASE = '/php'; // e.g. /php/create-order.php
+const DONATE_PHP_BASE = '/backend'; // e.g. /php/create-order.php
 
 /* ════════════════════════════════════════════════════
    PRESET AMOUNT BUTTONS
