@@ -10,8 +10,8 @@
 
 'use strict';
 
-// ── API base (update if your PHP files are in a different folder) ──
-const DONATE_PHP_BASE = '/backend'; // e.g. /php/create-order.php
+// ── API base — path to your PHP files on the server ──────────
+const DONATE_PHP_BASE = '/backend'; // your PHP files are at /public_html/backend/
 
 /* ════════════════════════════════════════════════════
    PRESET AMOUNT BUTTONS
@@ -218,6 +218,7 @@ function openRazorpay(orderData, name, email, amount, submitBtn) {
    STEP 3 — VERIFY PAYMENT SIGNATURE (backend)
 ════════════════════════════════════════════════════ */
 async function verifyPayment(razorpayOrderId, razorpayPaymentId, razorpaySignature) {
+  console.log('[AL Hind] Verifying payment:', razorpayPaymentId, '→', `${DONATE_PHP_BASE}/verify-payment.php`);
   const res = await fetch(`${DONATE_PHP_BASE}/verify-payment.php`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
