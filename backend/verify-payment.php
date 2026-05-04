@@ -25,13 +25,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // ── Dependencies ──────────────────────────────────────────────
 require_once __DIR__ . '/../config/db.php';
-require_once __DIR__ . '/../vendor/autoload.php';
+// No Composer/SDK needed — signature verified with native hash_hmac
 
-use Razorpay\Api\Api;
-
-// ── Razorpay credentials (must match create-order.php) ───────
-define('RZP_KEY_ID',     'rzp_test_Sl9Q7wSNM1qyuf');
-define('RZP_KEY_SECRET', 'zQkpzkYxlWfYDyesrj2IMB6g');
+// ── Razorpay Keys (must match create-order.php) ───────────────
+define('RZP_KEY_ID',     'rzp_test_SlDNLCDQLwY9Ck');
+define('RZP_KEY_SECRET', 'TRBmnePDq3zxJ5JQB60HU2lL');
 
 // ── Read input ────────────────────────────────────────────────
 $raw  = file_get_contents('php://input');
@@ -62,14 +60,21 @@ if (!hash_equals($expectedSignature, $razorpaySignature)) {
     exit;
 }
 
-// ── Fetch payment details from Razorpay ───────────────────────
+// ── Fetch payment method from Razorpay via cURL ───────────────
 try {
-    $api     = new Api(RZP_KEY_ID, RZP_KEY_SECRET);
-    $payment = $api->payment->fetch($razorpayPaymentId);
-    $method  = $payment['method'] ?? 'online'; // card, upi, netbanking, wallet, etc.
+    $ch = curl_init("https://api.razorpay.com/v1/payments/{$razorpayPaymentId}");
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_USERPWD        => RZP_KEY_ID . ':' . RZP_KEY_SECRET,
+        CURLOPT_TIMEOUT        => 15,
+        CURLOPT_SSL_VERIFYPEER => true,
+    ]);
+    $resp   = curl_exec($ch);
+    curl_close($ch);
+    $pdata  = json_decode($resp, true);
+    $method = ucfirst($pdata['method'] ?? 'online');
 } catch (Exception $e) {
-    error_log('[AL Hind] Razorpay payment fetch failed: ' . $e->getMessage());
-    $method = 'online';
+    $method = 'Razorpay';
 }
 
 // ── Update donation record in DB ──────────────────────────────
