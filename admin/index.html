@@ -1911,6 +1911,7 @@
                 <th>Status</th>
                 <th>Category</th>
                 <th>Location</th>
+                <th>Registrants</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -1948,13 +1949,8 @@
                 placeholder="Brief description…"></textarea></div>
             <div class="fg"><label>Map Search Query</label><input type="text" id="ef-map" placeholder="Madhepura,Bihar">
             </div>
-            <div class="fg">
-              <label><i class="fa-solid fa-link"></i> Join Page Link</label>
-              <div style="background:#f0fdf9;border:1.5px solid #99f6e4;border-radius:10px;padding:.65rem .9rem;font-size:.8rem;color:#0f766e;display:flex;align-items:center;gap:.5rem;">
-                <i class="fa-solid fa-circle-check"></i>
-                Auto-generated after saving — <code style="font-size:.78rem;color:#0d5f58">/events/join.html?id={event_id}</code>
-              </div>
-            </div>
+            <div class="fg"><label>Join / Register Link</label><input type="text" id="ef-link"
+                placeholder="join.html or https://…"></div>
             <div class="fg full">
               <label>Event Image</label>
               <div class="img-uz" id="ef-uz" onclick="document.getElementById('ef-img-file').click()">
@@ -2240,22 +2236,71 @@
         </div>
         <div class="fg full"><label>Description</label><textarea id="em-desc"></textarea></div>
         <div class="fg"><label>Map Query</label><input type="text" id="em-map"></div>
-        <div class="fg">
-          <label><i class="fa-solid fa-link"></i> Join Page Link</label>
-          <div style="background:#f0fdf9;border:1.5px solid #99f6e4;border-radius:10px;padding:.65rem .9rem;font-size:.8rem;color:#0f766e;display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap;">
-            <span id="em-join-link-display" style="word-break:break-all;"></span>
-            <button type="button" onclick="copyJoinLink()" title="Copy link"
-              style="background:none;border:none;cursor:pointer;color:#0f766e;font-size:.85rem;flex-shrink:0;padding:0">
-              <i class="fa-solid fa-copy"></i> Copy
-            </button>
-          </div>
-        </div>
+        <div class="fg"><label>Join Link</label><input type="text" id="em-link"></div>
         <div class="fg full"><label>Image URL / Path</label><input type="text" id="em-img"
             placeholder="images/event1.jpg"></div>
       </div>
       <div class="f-actions">
         <button class="btn-sub" onclick="saveEdit()"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
         <button class="btn-canc" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REGISTRATIONS MODAL -->
+  <div class="modal-ov" id="reg-modal">
+    <div class="modal" style="max-width:780px;width:95vw">
+      <div class="mh">
+        <div>
+          <h2><i class="fa-solid fa-users"></i> Registrations</h2>
+          <p id="reg-modal-subtitle" style="font-size:.8rem;color:var(--muted);margin-top:2px"></p>
+        </div>
+        <div style="display:flex;gap:.6rem;align-items:center">
+          <button onclick="exportRegCSV()" title="Export CSV"
+            style="display:inline-flex;align-items:center;gap:.4rem;padding:.4rem .9rem;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);font-size:.78rem;font-weight:600;cursor:pointer;color:var(--teal)">
+            <i class="fa-solid fa-file-csv"></i> Export CSV
+          </button>
+          <button class="mcl" onclick="closeRegModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+
+      <!-- Stats bar -->
+      <div id="reg-stats" style="display:flex;gap:1rem;padding:.75rem 0 1rem;border-bottom:1px solid var(--border);margin-bottom:1rem;flex-wrap:wrap"></div>
+
+      <!-- Search -->
+      <div style="position:relative;margin-bottom:1rem">
+        <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:.8rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.8rem"></i>
+        <input type="text" id="reg-search" placeholder="Search by name, phone or city…"
+          oninput="filterRegistrants()"
+          style="width:100%;padding:.55rem .9rem .55rem 2.2rem;border:1.5px solid var(--border);border-radius:10px;font-size:.85rem;font-family:inherit;background:var(--bg);outline:none">
+      </div>
+
+      <!-- Loading -->
+      <div id="reg-loading" style="text-align:center;padding:2.5rem;color:var(--muted)">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;margin-bottom:.5rem;display:block"></i>
+        Loading registrations…
+      </div>
+
+      <!-- Table -->
+      <div id="reg-table-wrap" style="display:none;overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:.82rem">
+          <thead>
+            <tr style="background:var(--bg)">
+              <th style="padding:.6rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">#</th>
+              <th style="padding:.6rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">Name</th>
+              <th style="padding:.6rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">Phone</th>
+              <th style="padding:.6rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">Email</th>
+              <th style="padding:.6rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">City</th>
+              <th style="padding:.6rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">Message</th>
+              <th style="padding:.6rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">Registered</th>
+            </tr>
+          </thead>
+          <tbody id="reg-tbody"></tbody>
+        </table>
+        <div id="reg-empty" style="display:none;text-align:center;padding:2.5rem;color:var(--muted)">
+          <i class="fa-solid fa-users-slash" style="font-size:2rem;margin-bottom:.75rem;display:block"></i>
+          No registrations yet for this event.
+        </div>
       </div>
     </div>
   </div>
@@ -2467,6 +2512,7 @@
         const res = await apiFetch('GET', 'events');
         events = res.data || [];
         renderEvtTable();
+        loadRegCounts();
       } catch (e) { toast('Failed to load events', 'error'); }
     }
 
@@ -2488,6 +2534,12 @@
     <td><span class="spill ${e.date < TODAY ? 'sp-past' : 'sp-up'}">${e.date < TODAY ? 'Past' : 'Upcoming'}</span></td>
     <td>${e.category ? `<span class="cat-tag">${esc(e.category)}</span>` : '-'}</td>
     <td style="color:var(--muted);font-size:.8rem">${esc(e.location || '-')}</td>
+    <td>
+      <button onclick="openRegistrations(${e.id},'${esc(e.title)}')"
+        style="display:inline-flex;align-items:center;gap:.35rem;padding:.3rem .75rem;border-radius:99px;border:1.5px solid var(--border);background:var(--bg);font-size:.75rem;font-weight:600;cursor:pointer;color:var(--teal)">
+        <i class="fa-solid fa-users"></i> <span id="reg-count-${e.id}">—</span>
+      </button>
+    </td>
     <td><div class="tbl-acts">
       <button class="btn-ed" onclick="openEdit(${e.id})"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
       <button class="btn-rm" style="background:none;border:1.5px solid var(--border);color:var(--teal);border-radius:8px;padding:.3rem .6rem;cursor:pointer;font-size:.75rem" title="Copy join link" onclick="navigator.clipboard.writeText('https://alhindtrust.com/events/join.html?id=${e.id}').then(()=>toast('Join link copied ✓','success'))"><i class="fa-solid fa-link"></i></button>
@@ -2496,7 +2548,160 @@
   </tr>`).join('');
     }
 
-    /* Add / Edit event */
+    /* ── Registrations ──────────────────────────────────────── */
+    let regData = [];
+    let regEventId = null;
+    let regEventTitle = '';
+
+    async function openRegistrations(eventId, title) {
+      regEventId    = eventId;
+      regEventTitle = title;
+      regData       = [];
+
+      // Show modal in loading state
+      document.getElementById('reg-modal').classList.add('open');
+      document.getElementById('reg-modal-subtitle').textContent = title;
+      document.getElementById('reg-loading').style.display  = 'block';
+      document.getElementById('reg-table-wrap').style.display = 'none';
+      document.getElementById('reg-search').value = '';
+      document.getElementById('reg-stats').innerHTML = '';
+
+      try {
+        const res = await apiFetch('GET', `event-volunteers/${eventId}`);
+        regData = res.data || [];
+      } catch (e) {
+        regData = [];
+        toast('Failed to load registrations', 'error');
+      }
+
+      document.getElementById('reg-loading').style.display   = 'none';
+      document.getElementById('reg-table-wrap').style.display = 'block';
+
+      renderRegStats();
+      renderRegTable(regData);
+
+      // Update count badge in events table
+      const countEl = document.getElementById(`reg-count-${eventId}`);
+      if (countEl) countEl.textContent = regData.length;
+    }
+
+    function closeRegModal() {
+      document.getElementById('reg-modal').classList.remove('open');
+      regEventId = null;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const m = document.getElementById('reg-modal');
+      if (m) m.addEventListener('click', e => { if (e.target === m) closeRegModal(); });
+    });
+
+    function renderRegStats() {
+      const total    = regData.length;
+      const withEmail = regData.filter(r => r.email).length;
+      const cities   = [...new Set(regData.map(r => r.city).filter(Boolean))].length;
+      const today    = new Date().toISOString().split('T')[0];
+      const todayReg = regData.filter(r => r.created_at && r.created_at.startsWith(today)).length;
+
+      document.getElementById('reg-stats').innerHTML = `
+        <div style="background:#f0fdf9;border:1px solid #99f6e4;border-radius:10px;padding:.6rem 1rem;text-align:center;min-width:90px">
+          <div style="font-size:1.4rem;font-weight:800;color:var(--teal)">${total}</div>
+          <div style="font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Total</div>
+        </div>
+        <div style="background:#f0fdf9;border:1px solid #99f6e4;border-radius:10px;padding:.6rem 1rem;text-align:center;min-width:90px">
+          <div style="font-size:1.4rem;font-weight:800;color:var(--teal)">${todayReg}</div>
+          <div style="font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Today</div>
+        </div>
+        <div style="background:#f0fdf9;border:1px solid #99f6e4;border-radius:10px;padding:.6rem 1rem;text-align:center;min-width:90px">
+          <div style="font-size:1.4rem;font-weight:800;color:var(--teal)">${withEmail}</div>
+          <div style="font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em">With Email</div>
+        </div>
+        <div style="background:#f0fdf9;border:1px solid #99f6e4;border-radius:10px;padding:.6rem 1rem;text-align:center;min-width:90px">
+          <div style="font-size:1.4rem;font-weight:800;color:var(--teal)">${cities}</div>
+          <div style="font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Cities</div>
+        </div>`;
+    }
+
+    function renderRegTable(data) {
+      const tb    = document.getElementById('reg-tbody');
+      const empty = document.getElementById('reg-empty');
+      if (!data.length) {
+        tb.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+      tb.innerHTML = data.map((r, i) => {
+        const date = r.created_at
+          ? new Date(r.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+          : '—';
+        return `<tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:.65rem .9rem;color:var(--muted);font-size:.75rem">${i + 1}</td>
+          <td style="padding:.65rem .9rem;font-weight:600">${esc(r.name)}</td>
+          <td style="padding:.65rem .9rem">
+            <a href="tel:${esc(r.phone)}" style="color:var(--teal);text-decoration:none;font-weight:500">
+              <i class="fa-solid fa-phone" style="font-size:.7rem"></i> ${esc(r.phone)}
+            </a>
+          </td>
+          <td style="padding:.65rem .9rem;color:var(--muted)">
+            ${r.email ? `<a href="mailto:${esc(r.email)}" style="color:var(--teal);text-decoration:none">${esc(r.email)}</a>` : '—'}
+          </td>
+          <td style="padding:.65rem .9rem">${esc(r.city || '—')}</td>
+          <td style="padding:.65rem .9rem;color:var(--muted);max-width:140px">
+            <span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px" title="${esc(r.message || '')}">
+              ${r.message ? esc(r.message) : '—'}
+            </span>
+          </td>
+          <td style="padding:.65rem .9rem;color:var(--muted);white-space:nowrap;font-size:.75rem">${date}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function filterRegistrants() {
+      const q = document.getElementById('reg-search').value.toLowerCase().trim();
+      if (!q) { renderRegTable(regData); return; }
+      const filtered = regData.filter(r =>
+        (r.name  || '').toLowerCase().includes(q) ||
+        (r.phone || '').toLowerCase().includes(q) ||
+        (r.city  || '').toLowerCase().includes(q) ||
+        (r.email || '').toLowerCase().includes(q)
+      );
+      renderRegTable(filtered);
+    }
+
+    function exportRegCSV() {
+      if (!regData.length) { toast('No data to export', 'error'); return; }
+      const headers = ['#', 'Name', 'Phone', 'Email', 'City', 'Message', 'Registered At'];
+      const rows    = regData.map((r, i) => [
+        i + 1,
+        `"${(r.name    || '').replace(/"/g, '""')}"`,
+        `"${(r.phone   || '').replace(/"/g, '""')}"`,
+        `"${(r.email   || '').replace(/"/g, '""')}"`,
+        `"${(r.city    || '').replace(/"/g, '""')}"`,
+        `"${(r.message || '').replace(/"/g, '""')}"`,
+        `"${(r.created_at || '').replace(/"/g, '""')}"`,
+      ]);
+      const csv  = [headers, ...rows].map(r => r.join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a    = document.createElement('a');
+      a.href     = URL.createObjectURL(blob);
+      a.download = `registrations-${regEventTitle.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      toast('CSV exported ✓', 'success');
+    }
+
+    // Load registration counts for all events after table renders
+    async function loadRegCounts() {
+      for (const e of events) {
+        try {
+          const res = await apiFetch('GET', `event-volunteers/${e.id}`);
+          const count = (res.data || []).length;
+          const el = document.getElementById(`reg-count-${e.id}`);
+          if (el) el.textContent = count;
+        } catch (_) {}
+      }
+    }
+
+
     function handleEvtImg(inp) {
       const f = inp.files[0]; if (!f) return;
       const r = new FileReader();
@@ -2525,26 +2730,17 @@
         description: document.getElementById('ef-desc').value.trim(),
         image_path: img,
         map_query: document.getElementById('ef-map').value.trim(),
+        join_link: document.getElementById('ef-link').value.trim(),
         category: document.getElementById('ef-cat').value,
       };
       const btn = document.getElementById('ef-sub');
       btn.disabled = true; btn.textContent = 'Saving…';
       try {
-        let savedEvent;
         if (editId) {
-          // Auto-set join_link using existing editId
-          payload.join_link = `https://alhindtrust.com/events/join.html?id=${editId}`;
-          savedEvent = await apiFetch('PUT', `events/${editId}`, payload);
+          await apiFetch('PUT', `events/${editId}`, payload);
           toast('Event updated ✓', 'success');
         } else {
-          // Create first without join_link, then update with real ID
-          savedEvent = await apiFetch('POST', 'events', payload);
-          const newId = savedEvent?.data?.id || savedEvent?.id;
-          if (newId) {
-            await apiFetch('PUT', `events/${newId}`, {
-              join_link: `https://alhindtrust.com/events/join.html?id=${newId}`
-            });
-          }
+          await apiFetch('POST', 'events', payload);
           toast('Event added ✓', 'success');
         }
         await loadEvents();
@@ -2554,8 +2750,7 @@
       } catch (e) {
         toast('Failed: ' + e.message, 'error');
       } finally {
-        btn.disabled = false;
-        btn.innerHTML = editId ? '<i class="fa-solid fa-floppy-disk"></i> Save Changes' : '<i class="fa-solid fa-plus"></i> Add Event';
+        btn.disabled = false; btn.textContent = editId ? '<i class="fa-solid fa-floppy-disk"></i> Save Changes' : '<i class="fa-solid fa-plus"></i> Add Event';
       }
     }
 
@@ -2571,7 +2766,7 @@
       };
     }
     function resetForm() {
-      ['ef-title', 'ef-date', 'ef-location', 'ef-desc', 'ef-map', 'ef-img-url'].forEach(i => document.getElementById(i).value = '');
+      ['ef-title', 'ef-date', 'ef-location', 'ef-desc', 'ef-map', 'ef-link', 'ef-img-url'].forEach(i => document.getElementById(i).value = '');
       document.getElementById('ef-cat').value = '';
       document.getElementById('ef-img-file').value = '';
       document.getElementById('ef-ip-wrap').style.display = 'none';
@@ -2592,22 +2787,11 @@
       document.getElementById('em-cat').value = e.category || '';
       document.getElementById('em-desc').value = e.description || '';
       document.getElementById('em-map').value = e.mapQuery || '';
+      document.getElementById('em-link').value = e.joinLink || '';
       document.getElementById('em-img').value = e.image || '';
-      // Auto join link display
-      const joinUrl = `https://alhindtrust.com/events/join.html?id=${id}`;
-      const disp = document.getElementById('em-join-link-display');
-      if (disp) disp.textContent = joinUrl;
       document.getElementById('edit-modal').classList.add('open');
     }
-
-    function copyJoinLink() {
-      const disp = document.getElementById('em-join-link-display');
-      if (!disp) return;
-      navigator.clipboard.writeText(disp.textContent).then(() => toast('Link copied ✓', 'success'));
-    }
-
     function closeModal() { document.getElementById('edit-modal').classList.remove('open'); editId = null; }
-
     async function saveEdit() {
       const t = document.getElementById('em-title').value.trim();
       const d = document.getElementById('em-date').value;
@@ -2618,7 +2802,7 @@
         category: document.getElementById('em-cat').value,
         description: document.getElementById('em-desc').value.trim(),
         map_query: document.getElementById('em-map').value.trim(),
-        join_link: `https://alhindtrust.com/events/join.html?id=${editId}`,
+        join_link: document.getElementById('em-link').value.trim(),
         image_path: document.getElementById('em-img').value.trim(),
       };
       try {

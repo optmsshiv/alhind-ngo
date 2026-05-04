@@ -1948,8 +1948,13 @@
                 placeholder="Brief description…"></textarea></div>
             <div class="fg"><label>Map Search Query</label><input type="text" id="ef-map" placeholder="Madhepura,Bihar">
             </div>
-            <div class="fg"><label>Join / Register Link</label><input type="text" id="ef-link"
-                placeholder="join.html or https://…"></div>
+            <div class="fg">
+              <label><i class="fa-solid fa-link"></i> Join Page Link</label>
+              <div style="background:#f0fdf9;border:1.5px solid #99f6e4;border-radius:10px;padding:.65rem .9rem;font-size:.8rem;color:#0f766e;display:flex;align-items:center;gap:.5rem;">
+                <i class="fa-solid fa-circle-check"></i>
+                Auto-generated after saving — <code style="font-size:.78rem;color:#0d5f58">/events/join.html?id={event_id}</code>
+              </div>
+            </div>
             <div class="fg full">
               <label>Event Image</label>
               <div class="img-uz" id="ef-uz" onclick="document.getElementById('ef-img-file').click()">
@@ -2235,7 +2240,16 @@
         </div>
         <div class="fg full"><label>Description</label><textarea id="em-desc"></textarea></div>
         <div class="fg"><label>Map Query</label><input type="text" id="em-map"></div>
-        <div class="fg"><label>Join Link</label><input type="text" id="em-link"></div>
+        <div class="fg">
+          <label><i class="fa-solid fa-link"></i> Join Page Link</label>
+          <div style="background:#f0fdf9;border:1.5px solid #99f6e4;border-radius:10px;padding:.65rem .9rem;font-size:.8rem;color:#0f766e;display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap;">
+            <span id="em-join-link-display" style="word-break:break-all;"></span>
+            <button type="button" onclick="copyJoinLink()" title="Copy link"
+              style="background:none;border:none;cursor:pointer;color:#0f766e;font-size:.85rem;flex-shrink:0;padding:0">
+              <i class="fa-solid fa-copy"></i> Copy
+            </button>
+          </div>
+        </div>
         <div class="fg full"><label>Image URL / Path</label><input type="text" id="em-img"
             placeholder="images/event1.jpg"></div>
       </div>
@@ -2476,6 +2490,7 @@
     <td style="color:var(--muted);font-size:.8rem">${esc(e.location || '-')}</td>
     <td><div class="tbl-acts">
       <button class="btn-ed" onclick="openEdit(${e.id})"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+      <button class="btn-rm" style="background:none;border:1.5px solid var(--border);color:var(--teal);border-radius:8px;padding:.3rem .6rem;cursor:pointer;font-size:.75rem" title="Copy join link" onclick="navigator.clipboard.writeText('https://alhindtrust.com/events/join.html?id=${e.id}').then(()=>toast('Join link copied ✓','success'))"><i class="fa-solid fa-link"></i></button>
       <button class="btn-rm" onclick="delEvt(${e.id})"><i class="fa-solid fa-trash-can"></i></button>
     </div></td>
   </tr>`).join('');
@@ -2510,17 +2525,26 @@
         description: document.getElementById('ef-desc').value.trim(),
         image_path: img,
         map_query: document.getElementById('ef-map').value.trim(),
-        join_link: document.getElementById('ef-link').value.trim(),
         category: document.getElementById('ef-cat').value,
       };
       const btn = document.getElementById('ef-sub');
       btn.disabled = true; btn.textContent = 'Saving…';
       try {
+        let savedEvent;
         if (editId) {
-          await apiFetch('PUT', `events/${editId}`, payload);
+          // Auto-set join_link using existing editId
+          payload.join_link = `https://alhindtrust.com/events/join.html?id=${editId}`;
+          savedEvent = await apiFetch('PUT', `events/${editId}`, payload);
           toast('Event updated ✓', 'success');
         } else {
-          await apiFetch('POST', 'events', payload);
+          // Create first without join_link, then update with real ID
+          savedEvent = await apiFetch('POST', 'events', payload);
+          const newId = savedEvent?.data?.id || savedEvent?.id;
+          if (newId) {
+            await apiFetch('PUT', `events/${newId}`, {
+              join_link: `https://alhindtrust.com/events/join.html?id=${newId}`
+            });
+          }
           toast('Event added ✓', 'success');
         }
         await loadEvents();
@@ -2530,7 +2554,8 @@
       } catch (e) {
         toast('Failed: ' + e.message, 'error');
       } finally {
-        btn.disabled = false; btn.textContent = editId ? '<i class="fa-solid fa-floppy-disk"></i> Save Changes' : '<i class="fa-solid fa-plus"></i> Add Event';
+        btn.disabled = false;
+        btn.innerHTML = editId ? '<i class="fa-solid fa-floppy-disk"></i> Save Changes' : '<i class="fa-solid fa-plus"></i> Add Event';
       }
     }
 
@@ -2546,7 +2571,7 @@
       };
     }
     function resetForm() {
-      ['ef-title', 'ef-date', 'ef-location', 'ef-desc', 'ef-map', 'ef-link', 'ef-img-url'].forEach(i => document.getElementById(i).value = '');
+      ['ef-title', 'ef-date', 'ef-location', 'ef-desc', 'ef-map', 'ef-img-url'].forEach(i => document.getElementById(i).value = '');
       document.getElementById('ef-cat').value = '';
       document.getElementById('ef-img-file').value = '';
       document.getElementById('ef-ip-wrap').style.display = 'none';
@@ -2567,11 +2592,22 @@
       document.getElementById('em-cat').value = e.category || '';
       document.getElementById('em-desc').value = e.description || '';
       document.getElementById('em-map').value = e.mapQuery || '';
-      document.getElementById('em-link').value = e.joinLink || '';
       document.getElementById('em-img').value = e.image || '';
+      // Auto join link display
+      const joinUrl = `https://alhindtrust.com/events/join.html?id=${id}`;
+      const disp = document.getElementById('em-join-link-display');
+      if (disp) disp.textContent = joinUrl;
       document.getElementById('edit-modal').classList.add('open');
     }
+
+    function copyJoinLink() {
+      const disp = document.getElementById('em-join-link-display');
+      if (!disp) return;
+      navigator.clipboard.writeText(disp.textContent).then(() => toast('Link copied ✓', 'success'));
+    }
+
     function closeModal() { document.getElementById('edit-modal').classList.remove('open'); editId = null; }
+
     async function saveEdit() {
       const t = document.getElementById('em-title').value.trim();
       const d = document.getElementById('em-date').value;
@@ -2582,7 +2618,7 @@
         category: document.getElementById('em-cat').value,
         description: document.getElementById('em-desc').value.trim(),
         map_query: document.getElementById('em-map').value.trim(),
-        join_link: document.getElementById('em-link').value.trim(),
+        join_link: `https://alhindtrust.com/events/join.html?id=${editId}`,
         image_path: document.getElementById('em-img').value.trim(),
       };
       try {
