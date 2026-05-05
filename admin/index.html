@@ -2865,6 +2865,9 @@
                 #</th>
               <th
                 style="padding:.6rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">
+                Ticket No.</th>
+              <th
+                style="padding:.6rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">
                 Name</th>
               <th
                 style="padding:.6rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">
@@ -3222,8 +3225,12 @@
         const date = r.created_at
           ? new Date(r.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
           : '—';
+        const ticketHtml = r.ticket_no
+          ? `<span style="font-family:monospace;font-size:.75rem;font-weight:700;color:#0a4e48;background:#f0fdf9;border:1.5px dashed #0f766e;border-radius:6px;padding:2px 8px;letter-spacing:1px">${esc(r.ticket_no)}</span>`
+          : `<span style="color:var(--muted);font-size:.75rem">—</span>`;
         return `<tr style="border-bottom:1px solid var(--border)">
           <td style="padding:.65rem .9rem;color:var(--muted);font-size:.75rem">${i + 1}</td>
+          <td style="padding:.65rem .9rem">${ticketHtml}</td>
           <td style="padding:.65rem .9rem;font-weight:600">${esc(r.name)}</td>
           <td style="padding:.65rem .9rem">
             <a href="tel:${esc(r.phone)}" style="color:var(--teal);text-decoration:none;font-weight:500">
@@ -3251,16 +3258,18 @@
         (r.name || '').toLowerCase().includes(q) ||
         (r.phone || '').toLowerCase().includes(q) ||
         (r.city || '').toLowerCase().includes(q) ||
-        (r.email || '').toLowerCase().includes(q)
+        (r.email || '').toLowerCase().includes(q) ||
+        (r.ticket_no || '').toLowerCase().includes(q)
       );
       renderRegTable(filtered);
     }
 
     function exportRegCSV() {
       if (!regData.length) { toast('No data to export', 'error'); return; }
-      const headers = ['#', 'Name', 'Phone', 'Email', 'City', 'Message', 'Registered At'];
+      const headers = ['#', 'Ticket No.', 'Name', 'Phone', 'Email', 'City', 'Message', 'Registered At'];
       const rows = regData.map((r, i) => [
         i + 1,
+        `"${(r.ticket_no || '').replace(/"/g, '""')}"`,
         `"${(r.name || '').replace(/"/g, '""')}"`,
         `"${(r.phone || '').replace(/"/g, '""')}"`,
         `"${(r.email || '').replace(/"/g, '""')}"`,
@@ -3277,16 +3286,16 @@
       toast('CSV exported ✓', 'success');
     }
 
-    // Load registration counts for all events after table renders
+    // Load registration counts for all events in parallel (not sequential)
     async function loadRegCounts() {
-      for (const e of events) {
+      await Promise.all(events.map(async e => {
         try {
           const res = await apiFetch('GET', `volunteers/${e.id}`);
           const count = (res.data || []).length;
           const el = document.getElementById(`reg-count-${e.id}`);
           if (el) el.textContent = count;
         } catch (_) { }
-      }
+      }));
     }
 
 
@@ -3816,8 +3825,8 @@
 
       /* dummy data shown when no real donations loaded */
       const src = donations.length ? donations : [
-        { id: 1, donor_name: 'Mohammad Aslam', donor_email: 'aslam@gmail.com', amount: 5000, payment_method: 'UPI', payment_status: 'paid', payment_id: 'pay_PxK8mN2qRt1Yz', created_at: new Date(Date.now() - 86400000).toISOString() },
-        { id: 2, donor_name: 'Fatima Begum', donor_email: 'fatima@yahoo.com', amount: 2500, payment_method: 'Bank', payment_status: 'pending', payment_id: '', created_at: new Date(Date.now() - 172800000).toISOString() },
+        { id: 1, donor_name: 'Mohammad Aslam', donor_email: 'aslam@gmail.com', amount: 5000, payment_method: 'UPI', payment_status: 'paid', razorpay_payment_id: 'pay_PxK8mN2qRt1Yz', created_at: new Date(Date.now() - 86400000).toISOString() },
+        { id: 2, donor_name: 'Fatima Begum', donor_email: 'fatima@yahoo.com', amount: 2500, payment_method: 'Bank', payment_status: 'pending', razorpay_payment_id: '', created_at: new Date(Date.now() - 172800000).toISOString() },
       ];
 
       const sorted = [...src].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -3837,7 +3846,7 @@
         if (q && !(
           (d.donor_name || '').toLowerCase().includes(q) ||
           (d.donor_email || '').toLowerCase().includes(q) ||
-          (d.payment_id || '').toLowerCase().includes(q)
+          (d.razorpay_payment_id || '').toLowerCase().includes(q)
         )) return false;
         return true;
       });
@@ -3865,8 +3874,8 @@
         const av = donAvatar(d.donor_name || '?');
         const ini = donInitials(d.donor_name || '?');
         const isPaid = d.payment_status === 'paid';
-        const payIdHtml = isPaid && d.payment_id
-          ? `<span class="pay-id-code">${esc(d.payment_id)}</span>`
+        const payIdHtml = isPaid && d.razorpay_payment_id
+          ? `<span class="pay-id-code">${esc(d.razorpay_payment_id)}</span>`
           : `<span style="color:var(--muted)">—</span>`;
         return `<tr>
           <td style="color:var(--muted);font-size:.78rem">${i + 1}</td>
@@ -3897,8 +3906,8 @@
 
     function openDonModal(id, mode) {
       const src = donations.length ? donations : [
-        { id: 1, donor_name: 'Mohammad Aslam', donor_email: 'aslam@gmail.com', amount: 5000, payment_method: 'UPI', payment_status: 'paid', payment_id: 'pay_PxK8mN2qRt1Yz', created_at: new Date(Date.now() - 86400000).toISOString() },
-        { id: 2, donor_name: 'Fatima Begum', donor_email: 'fatima@yahoo.com', amount: 2500, payment_method: 'Bank', payment_status: 'pending', payment_id: '', created_at: new Date(Date.now() - 172800000).toISOString() },
+        { id: 1, donor_name: 'Mohammad Aslam', donor_email: 'aslam@gmail.com', amount: 5000, payment_method: 'UPI', payment_status: 'paid', razorpay_payment_id: 'pay_PxK8mN2qRt1Yz', created_at: new Date(Date.now() - 86400000).toISOString() },
+        { id: 2, donor_name: 'Fatima Begum', donor_email: 'fatima@yahoo.com', amount: 2500, payment_method: 'Bank', payment_status: 'pending', razorpay_payment_id: '', created_at: new Date(Date.now() - 172800000).toISOString() },
       ];
       const d = src.find(x => x.id == id);
       if (!d) return;
@@ -3927,7 +3936,7 @@
               <div><div class="dd-lbl">Date</div><div class="dd-val">${fmtDateTime(d.created_at)}</div></div>
               <div><div class="dd-lbl">Method</div><div class="dd-val">${esc(d.payment_method || 'Online')}</div></div>
               <div><div class="dd-lbl">Status</div><div class="dd-val"><span class="status-paid"><span class="status-dot green"></span>Paid</span></div></div>
-              <div class="full"><div class="dd-lbl">Payment ID</div><div class="dd-val mono">${esc(d.payment_id || '—')}</div></div>
+              <div class="full"><div class="dd-lbl">Payment ID</div><div class="dd-val mono">${esc(d.razorpay_payment_id || '—')}</div></div>
             </div>
             <div style="text-align:center;font-size:.72rem;color:var(--muted);margin-top:.5rem">Thank you for your generous donation 🙏</div>
           </div>
@@ -3950,7 +3959,7 @@
             <div><div class="dd-lbl">Status</div><div class="dd-val">${isPaid ? '<span class="status-paid"><span class="status-dot green"></span>Paid</span>' : '<span class="status-pending"><span class="status-dot amber"></span>Pending</span>'}</div></div>
             <div><div class="dd-lbl">Method</div><div class="dd-val">${esc(d.payment_method || 'Online')}</div></div>
             <div><div class="dd-lbl">Receipt No.</div><div class="dd-val mono">${receiptNo}</div></div>
-            <div class="full"><div class="dd-lbl">Payment ID</div><div class="dd-val">${d.payment_id ? `<span class="dd-val mono">${esc(d.payment_id)}</span>` : '<span style="color:var(--muted)">—</span>'}</div></div>
+            <div class="full"><div class="dd-lbl">Payment ID</div><div class="dd-val">${d.razorpay_payment_id ? `<span class="dd-val mono">${esc(d.razorpay_payment_id)}</span>` : '<span style="color:var(--muted)">—</span>'}</div></div>
             <div class="full"><div class="dd-lbl">Date & Time</div><div class="dd-val">${fmtDateTime(d.created_at)}</div></div>
           </div>
           <div class="f-actions">
