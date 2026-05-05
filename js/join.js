@@ -213,7 +213,7 @@ function swalSuccess(name, email, eventTitle, eventDate, eventLocation, ticket) 
     cancelButtonColor: '#64748b',
     allowOutsideClick: false,
   }).then(result => {
-    if (result.isConfirmed) window.location.href = '/events.html';
+    if (result.isConfirmed) window.location.href = '/pages/events.html';
   });
 }
 
