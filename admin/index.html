@@ -1689,28 +1689,109 @@
     }
 
     /* Fix filter pill active states */
-    .don-fpill.active-all {
-      background: #0f766e;
-      color: #fff;
-      border-color: #0f766e;
+    .don-fpill.active-today {
+      background: #f0f9ff;
+      color: #0369a1;
+      border-color: #7dd3fc;
     }
 
-    .don-fpill.active-paid {
-      background: #dcfce7;
-      color: #166534;
-      border-color: #86efac;
+    .don-fpill.active-month {
+      background: #f5f3ff;
+      color: #6d28d9;
+      border-color: #c4b5fd;
     }
 
-    .don-fpill.active-pending {
-      background: #fef3c7;
-      color: #92400e;
-      border-color: #fcd34d;
+    .don-fpill-sep {
+      display: inline-block;
+      width: 1px;
+      height: 18px;
+      background: #e2e8f0;
+      margin: 0 .2rem;
+      align-self: center;
     }
 
-    .don-fpill.active-failed {
-      background: #fee2e2;
-      color: #991b1b;
-      border-color: #fca5a5;
+    /* Card-style table rows */
+    #don-tbody tr {
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
+    }
+
+    #don-tbody tr td:first-child {
+      border-radius: 10px 0 0 10px;
+    }
+
+    #don-tbody tr td:last-child {
+      border-radius: 0 10px 10px 0;
+    }
+
+    #don-tbody tr:hover td {
+      background: #f8fafc !important;
+    }
+
+    /* space between card rows */
+    #don-tbody tr {
+      border-bottom: none !important;
+    }
+
+    #don-tbody tr td {
+      border-bottom: none;
+      padding-top: .85rem;
+      padding-bottom: .85rem;
+    }
+
+    /* outer table needs gap feel — use outline trick */
+    #don-tbody tr {
+      outline: 1px solid #f1f5f9;
+    }
+
+    /* Donation detail modal */
+    .don-detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .75rem 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .don-detail-grid .full {
+      grid-column: 1/-1;
+    }
+
+    .dd-lbl {
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      margin-bottom: .18rem;
+    }
+
+    .dd-val {
+      font-size: .9rem;
+      color: #1e293b;
+      font-weight: 500;
+    }
+
+    .dd-val.mono {
+      font-family: 'Courier New', monospace;
+      font-size: .82rem;
+      background: #f0f9ff;
+      color: #0369a1;
+      padding: .25rem .55rem;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .don-modal-av {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .9rem;
+      font-weight: 800;
+      margin-right: .75rem;
+      flex-shrink: 0;
     }
 
     /* Fix status-pending pill */
@@ -2597,24 +2678,31 @@
             <button class="don-fpill" data-f="failed" onclick="donSetFilter(this)">
               <span class="fpill-dot red"></span>Failed
             </button>
+            <span class="don-fpill-sep"></span>
+            <button class="don-fpill" data-f="today" onclick="donSetFilter(this)">
+              <i class="fa-regular fa-calendar-day" style="font-size:.7rem"></i> Today
+            </button>
+            <button class="don-fpill" data-f="month" onclick="donSetFilter(this)">
+              <i class="fa-regular fa-calendar" style="font-size:.7rem"></i> This Month
+            </button>
           </div>
         </div>
 
         <!-- TABLE -->
-        <div class="tbl-wrap">
-          <table>
+        <div class="tbl-wrap" style="background:#f1f5f9;padding:6px;border-color:#e2e8f0;">
+          <table style="border-spacing:0 5px;border-collapse:separate;">
             <thead>
-              <tr>
-                <th style="width:36px">#</th>
-                <th style="width:90px">Receipt</th>
-                <th>Donor</th>
-                <th style="width:80px">Amount</th>
-                <th style="width:80px">Method</th>
-                <th style="width:80px">Status</th>
-                <th style="width:80px">Donor Type</th>
-                <th style="width:150px">Payment ID</th>
-                <th style="width:110px">Date & Time</th>
-                <th style="width:110px">Actions</th>
+              <tr style="background:transparent">
+                <th style="width:36px;background:#f1f5f9">#</th>
+                <th style="width:90px;background:#f1f5f9">Receipt</th>
+                <th style="background:#f1f5f9">Donor</th>
+                <th style="width:80px;background:#f1f5f9">Amount</th>
+                <th style="width:80px;background:#f1f5f9">Method</th>
+                <th style="width:80px;background:#f1f5f9">Status</th>
+                <th style="width:80px;background:#f1f5f9">Donor Type</th>
+                <th style="width:150px;background:#f1f5f9">Payment ID</th>
+                <th style="width:110px;background:#f1f5f9">Date & Time</th>
+                <th style="width:110px;background:#f1f5f9">Actions</th>
               </tr>
             </thead>
             <tbody id="don-tbody"></tbody>
@@ -2665,6 +2753,18 @@
       </div>
 
     </main>
+  </div>
+
+  <!-- DONATION DETAIL MODAL -->
+  <div class="modal-ov" id="don-modal">
+    <div class="modal" style="max-width:540px">
+      <div class="mh">
+        <h2><i class="fa-solid fa-hand-holding-dollar"></i> Donation Detail</h2>
+        <button class="mcl" onclick="document.getElementById('don-modal').classList.remove('open')"><i
+            class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="don-modal-body"></div>
+    </div>
   </div>
 
   <!-- MESSAGE DETAIL MODAL -->
@@ -3721,10 +3821,18 @@
 
       const sorted = [...src].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
+      const now = new Date();
+      const todayStr = now.toDateString();
+      const thisMonth = now.getMonth();
+      const thisYear = now.getFullYear();
+
       const filtered = sorted.filter(d => {
+        const dt = new Date(d.created_at);
         if (_donFilter === 'paid' && d.payment_status !== 'paid') return false;
         if (_donFilter === 'pending' && d.payment_status !== 'pending') return false;
         if (_donFilter === 'failed' && d.payment_status !== 'failed') return false;
+        if (_donFilter === 'today' && dt.toDateString() !== todayStr) return false;
+        if (_donFilter === 'month' && (dt.getMonth() !== thisMonth || dt.getFullYear() !== thisYear)) return false;
         if (q && !(
           (d.donor_name || '').toLowerCase().includes(q) ||
           (d.donor_email || '').toLowerCase().includes(q) ||
@@ -3778,12 +3886,79 @@
           <td>${payIdHtml}</td>
           <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">${fmtDateTime(d.created_at)}</td>
           <td><div class="tbl-acts">
-            <button class="btn-view-txt">View</button>
-            ${isPaid ? `<button class="btn-receipt-txt">Receipt</button>` : ''}
+            <button class="btn-view-txt" onclick="openDonModal(${d.id}, 'view')">View</button>
+            ${isPaid ? `<button class="btn-receipt-txt" onclick="openDonModal(${d.id}, 'receipt')">Receipt</button>` : ''}
             <button class="btn-rm" onclick="deleteDonation(${d.id})"><i class="fa-solid fa-trash-can"></i></button>
           </div></td>
         </tr>`;
       }).join('');
+    }
+
+    function openDonModal(id, mode) {
+      const src = donations.length ? donations : [
+        { id: 1, donor_name: 'Mohammad Aslam', donor_email: 'aslam@gmail.com', amount: 5000, payment_method: 'UPI', payment_status: 'paid', payment_id: 'pay_PxK8mN2qRt1Yz', created_at: new Date(Date.now() - 86400000).toISOString() },
+        { id: 2, donor_name: 'Fatima Begum', donor_email: 'fatima@yahoo.com', amount: 2500, payment_method: 'Bank', payment_status: 'pending', payment_id: '', created_at: new Date(Date.now() - 172800000).toISOString() },
+      ];
+      const d = src.find(x => x.id == id);
+      if (!d) return;
+      const av = donAvatar(d.donor_name || '?');
+      const ini = donInitials(d.donor_name || '?');
+      const isPaid = d.payment_status === 'paid';
+      const receiptNo = `DON-${String(d.id).padStart(4, '0')}`;
+      const isRepeat = parseInt(d.id) % 3 === 0;
+
+      if (mode === 'receipt') {
+        document.getElementById('don-modal-body').innerHTML = `
+          <div style="border:1.5px dashed #e2e8f0;border-radius:14px;padding:1.5rem;margin-bottom:1.2rem;">
+            <div style="display:flex;align-items:center;gap:.85rem;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid #f1f5f9">
+              <div class="don-modal-av" style="background:${av.bg};color:${av.color}">${ini}</div>
+              <div>
+                <div style="font-size:1rem;font-weight:800;color:#0f172a">${esc(d.donor_name || '—')}</div>
+                <div style="font-size:.8rem;color:var(--muted)">${esc(d.donor_email || '—')}</div>
+              </div>
+              <div style="margin-left:auto;text-align:right">
+                <div style="font-size:1.4rem;font-weight:800;color:#059669">₹${parseFloat(d.amount || 0).toLocaleString('en-IN')}</div>
+                <div style="font-size:.72rem;color:var(--muted)">${receiptNo}</div>
+              </div>
+            </div>
+            <div class="don-detail-grid">
+              <div><div class="dd-lbl">Receipt No.</div><div class="dd-val mono">${receiptNo}</div></div>
+              <div><div class="dd-lbl">Date</div><div class="dd-val">${fmtDateTime(d.created_at)}</div></div>
+              <div><div class="dd-lbl">Method</div><div class="dd-val">${esc(d.payment_method || 'Online')}</div></div>
+              <div><div class="dd-lbl">Status</div><div class="dd-val"><span class="status-paid"><span class="status-dot green"></span>Paid</span></div></div>
+              <div class="full"><div class="dd-lbl">Payment ID</div><div class="dd-val mono">${esc(d.payment_id || '—')}</div></div>
+            </div>
+            <div style="text-align:center;font-size:.72rem;color:var(--muted);margin-top:.5rem">Thank you for your generous donation 🙏</div>
+          </div>
+          <div class="f-actions">
+            <a href="mailto:${esc(d.donor_email || '')}?subject=Donation Receipt ${receiptNo}&body=Dear ${esc(d.donor_name || '')}, thank you for your donation of ₹${parseFloat(d.amount || 0).toLocaleString('en-IN')}. Receipt No: ${receiptNo}" class="btn-sub" style="text-decoration:none">✉️ Email Receipt</a>
+            <button class="btn-canc" onclick="document.getElementById('don-modal').classList.remove('open')">Close</button>
+          </div>`;
+      } else {
+        document.getElementById('don-modal-body').innerHTML = `
+          <div style="display:flex;align-items:center;gap:.85rem;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid #f1f5f9">
+            <div class="don-modal-av" style="background:${av.bg};color:${av.color}">${ini}</div>
+            <div>
+              <div style="font-size:1rem;font-weight:800;color:#0f172a">${esc(d.donor_name || '—')}</div>
+              <div style="font-size:.8rem;color:var(--muted)">${esc(d.donor_email || '—')}</div>
+            </div>
+            <div style="margin-left:auto">${isRepeat ? '<span class="don-type-repeat">Repeat Donor</span>' : '<span class="don-type-new">New Donor</span>'}</div>
+          </div>
+          <div class="don-detail-grid">
+            <div><div class="dd-lbl">Amount</div><div class="dd-val" style="color:#059669;font-weight:800;font-size:1.1rem">₹${parseFloat(d.amount || 0).toLocaleString('en-IN')}</div></div>
+            <div><div class="dd-lbl">Status</div><div class="dd-val">${isPaid ? '<span class="status-paid"><span class="status-dot green"></span>Paid</span>' : '<span class="status-pending"><span class="status-dot amber"></span>Pending</span>'}</div></div>
+            <div><div class="dd-lbl">Method</div><div class="dd-val">${esc(d.payment_method || 'Online')}</div></div>
+            <div><div class="dd-lbl">Receipt No.</div><div class="dd-val mono">${receiptNo}</div></div>
+            <div class="full"><div class="dd-lbl">Payment ID</div><div class="dd-val">${d.payment_id ? `<span class="dd-val mono">${esc(d.payment_id)}</span>` : '<span style="color:var(--muted)">—</span>'}</div></div>
+            <div class="full"><div class="dd-lbl">Date & Time</div><div class="dd-val">${fmtDateTime(d.created_at)}</div></div>
+          </div>
+          <div class="f-actions">
+            ${d.donor_email ? `<a href="mailto:${esc(d.donor_email)}?subject=Thank you for your donation" class="btn-sub" style="text-decoration:none">✉️ Send Email</a>` : ''}
+            ${isPaid ? `<button class="btn-sub" style="background:#1d4ed8" onclick="openDonModal(${d.id},'receipt')">🧾 View Receipt</button>` : ''}
+            <button class="btn-canc" onclick="document.getElementById('don-modal').classList.remove('open')">Close</button>
+          </div>`;
+      }
+      document.getElementById('don-modal').classList.add('open');
     }
 
     async function deleteDonation(id) {
