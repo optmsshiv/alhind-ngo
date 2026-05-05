@@ -170,10 +170,25 @@ function validate() {
 }
 
 /* ── SweetAlert helpers ──────────────────────────────────────── */
-function swalSuccess(name, email, eventTitle, eventDate, eventLocation) {
+function swalSuccess(name, email, eventTitle, eventDate, eventLocation, ticket) {
   const emailLine = email
     ? `<div style="margin-top:.5rem;font-size:.82rem;color:#64748b;">
          📧 Confirmation sent to <strong>${esc(email)}</strong>
+       </div>`
+    : '';
+
+  const ticketLine = ticket
+    ? `<div style="margin:12px 0 4px;background:#f0fdf9;border:2px dashed #0f766e;
+                   border-radius:10px;padding:10px;text-align:center;">
+         <div style="font-size:10px;font-weight:700;letter-spacing:.08em;
+                     text-transform:uppercase;color:#0f766e;margin-bottom:4px;">
+           Your Ticket Number
+         </div>
+         <div style="font-size:22px;font-weight:800;color:#0a4e48;
+                     letter-spacing:3px;font-family:monospace;">${esc(ticket)}</div>
+         <div style="font-size:10px;color:#64748b;margin-top:4px;">
+           Save this for entry at the event
+         </div>
        </div>`
     : '';
 
@@ -182,8 +197,9 @@ function swalSuccess(name, email, eventTitle, eventDate, eventLocation) {
     title: `You're Registered! 🎉`,
     html: `
       <div style="text-align:left;font-size:.9rem;line-height:1.7;">
-        <p style="margin-bottom:.75rem;">Thank you, <strong>${esc(name)}</strong>! Your spot is confirmed.</p>
-        <div style="background:#f0fdf4;border-radius:10px;padding:.85rem 1rem;margin-bottom:.5rem;">
+        <p style="margin-bottom:.5rem;">Thank you, <strong>${esc(name)}</strong>! Your spot is confirmed.</p>
+        ${ticketLine}
+        <div style="background:#f0fdf4;border-radius:10px;padding:.85rem 1rem;margin-top:.75rem;">
           <div>📅 <strong>Event:</strong> ${esc(eventTitle)}</div>
           <div>🗓️ <strong>Date:</strong> ${eventDate}</div>
           <div>📍 <strong>Venue:</strong> ${esc(eventLocation || '—')}</div>
@@ -196,14 +212,8 @@ function swalSuccess(name, email, eventTitle, eventDate, eventLocation) {
     cancelButtonText: 'Stay on Page',
     cancelButtonColor: '#64748b',
     allowOutsideClick: false,
-    customClass: {
-      popup: 'swal-alhind-popup',
-      title: 'swal-alhind-title',
-    },
   }).then(result => {
-    if (result.isConfirmed) {
-      window.location.href = '/pages/events.html';
-    }
+    if (result.isConfirmed) window.location.href = '/events.html';
   });
 }
 
@@ -316,17 +326,19 @@ async function submitJoin() {
 
     // ── Success ───────────────────────────────────────────────
     resetBtn(btn);
+    const ticket = data.data?.ticket_no || data.ticket_no || '';
 
     // Hide the form
     $('jn-form-wrap').style.display = 'none';
 
-    // Show inline success card too (good UX backup)
+    // Inline success card
     $('jn-success').style.display = 'block';
     $('jn-success-msg').textContent =
       `Thank you, ${payload.name}! You're registered for "${currentEvent.title}".` +
       (payload.email ? ` A confirmation has been sent to ${payload.email}.` : '');
 
     $('jn-success-details').innerHTML = `
+      ${ticket ? `<strong>🎟️ Ticket:</strong> <code style="background:#f0fdf9;padding:2px 8px;border-radius:5px;color:#0f766e;font-weight:800;letter-spacing:2px;">${esc(ticket)}</code><br>` : ''}
       <strong><i class="fa-solid fa-calendar-days"></i> Event:</strong> ${esc(currentEvent.title)}<br>
       <strong><i class="fa-solid fa-calendar-check"></i> Date:</strong> ${fmtDate(currentEvent.date)}<br>
       <strong><i class="fa-solid fa-location-dot"></i> Venue:</strong> ${esc(currentEvent.location || '—')}<br>
@@ -335,19 +347,19 @@ async function submitJoin() {
 
     $('jn-success').scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-    // Fire SweetAlert2 popup
+    // SweetAlert2 popup with ticket
     swalSuccess(
       payload.name,
       payload.email,
       currentEvent.title,
       fmtDate(currentEvent.date),
-      currentEvent.location
+      currentEvent.location,
+      ticket
     );
 
-    // Reset form fields
+    // Reset form
     ['jn-name', 'jn-phone', 'jn-email', 'jn-city', 'jn-message'].forEach(id => {
-      const el = $(id);
-      if (el) el.value = '';
+      const el = $(id); if (el) el.value = '';
     });
 
   } catch (err) {

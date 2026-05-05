@@ -1,15 +1,32 @@
 /**
  * join.js — AL Hind Trust
  * Reads ?id= from URL, fetches event, handles registration form.
+ * Fixes: duplicate phone handling, JSON parse errors, SweetAlert2 success popup
  */
 
 const API = 'https://api.alhindtrust.com';
 const today = new Date().toISOString().split('T')[0];
 let currentEvent = null;
 
+/* ── Load SweetAlert2 dynamically ────────────────────────────── */
+(function loadSwal() {
+  if (window.Swal) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css';
+  document.head.appendChild(link);
+
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+  script.async = true;
+  document.head.appendChild(script);
+})();
+
 /* ── Helpers ─────────────────────────────────────────────────── */
 function esc(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(s || '')
+    .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 function fmtDate(iso) {
   if (!iso) return '—';
@@ -19,11 +36,36 @@ function fmtDate(iso) {
 }
 function $(id) { return document.getElementById(id); }
 
+/* ── Safe JSON parse — handles HTML error pages from PHP ─────── */
+async function safeJson(res) {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    // API returned HTML (PHP error/duplicate entry page) instead of JSON
+    console.error('Non-JSON response from API:', text.slice(0, 200));
+
+    // Try to detect duplicate entry from common PHP/MySQL error strings
+    const lower = text.toLowerCase();
+    if (
+      lower.includes('duplicate') ||
+      lower.includes('already registered') ||
+      lower.includes('already exists') ||
+      lower.includes('unique') ||
+      res.status === 409
+    ) {
+      return { status: 'duplicate', message: 'already_registered' };
+    }
+
+    return { status: 'error', message: 'server_error' };
+  }
+}
+
 /* ── Load Event ──────────────────────────────────────────────── */
 async function loadEvent(id) {
   try {
-    const res  = await fetch(`${API}/events`);
-    const data = await res.json();
+    const res = await fetch(`${API}/events`);
+    const data = await safeJson(res);
     const list = data.data || [];
     return list.find(e => String(e.id) === String(id)) || null;
   } catch (e) {
@@ -49,7 +91,7 @@ function renderEvent(e) {
   // Status badge
   const badge = $('jn-status-badge');
   badge.textContent = isPast ? 'Past Event' : 'Upcoming';
-  badge.className   = 'jn-status-badge ' + (isPast ? 'past' : 'upcoming');
+  badge.className = 'jn-status-badge ' + (isPast ? 'past' : 'upcoming');
 
   // Category
   if (e.category) {
@@ -60,12 +102,11 @@ function renderEvent(e) {
   }
 
   // Details
-  $('jn-event-title').textContent    = e.title || 'Event';
-  $('jn-event-date').textContent     = fmtDate(e.date);
+  $('jn-event-title').textContent = e.title || 'Event';
+  $('jn-event-date').textContent = fmtDate(e.date);
   $('jn-event-location').textContent = e.location || '—';
-  $('jn-event-desc').textContent     = e.description || '';
+  $('jn-event-desc').textContent = e.description || '';
 
-  // Page title
   document.title = `Join: ${e.title} | AL Hind Trust`;
 
   // Map
@@ -74,7 +115,7 @@ function renderEvent(e) {
     $('jn-map-wrap').style.display = 'block';
   }
 
-  // If past event — show notice instead of form
+  // Past event — hide form
   if (isPast) {
     $('jn-form-wrap').innerHTML = `
       <div class="jn-past-notice">
@@ -91,7 +132,7 @@ function renderEvent(e) {
 
 /* ── Validation ──────────────────────────────────────────────── */
 function clearErrors() {
-  ['name','phone','email','city'].forEach(f => {
+  ['name', 'phone', 'email', 'city'].forEach(f => {
     $(`err-${f}`).textContent = '';
     $(`jn-${f}`).classList.remove('error');
   });
@@ -99,11 +140,10 @@ function clearErrors() {
 
 function validate() {
   let ok = true;
-
-  const name  = $('jn-name').value.trim();
+  const name = $('jn-name').value.trim();
   const phone = $('jn-phone').value.trim();
   const email = $('jn-email').value.trim();
-  const city  = $('jn-city').value.trim();
+  const city = $('jn-city').value.trim();
 
   if (!name || name.length < 2) {
     $('err-name').textContent = 'Please enter your full name.';
@@ -129,6 +169,83 @@ function validate() {
   return ok;
 }
 
+/* ── SweetAlert helpers ──────────────────────────────────────── */
+function swalSuccess(name, email, eventTitle, eventDate, eventLocation) {
+  const emailLine = email
+    ? `<div style="margin-top:.5rem;font-size:.82rem;color:#64748b;">
+         📧 Confirmation sent to <strong>${esc(email)}</strong>
+       </div>`
+    : '';
+
+  Swal.fire({
+    icon: 'success',
+    title: `You're Registered! 🎉`,
+    html: `
+      <div style="text-align:left;font-size:.9rem;line-height:1.7;">
+        <p style="margin-bottom:.75rem;">Thank you, <strong>${esc(name)}</strong>! Your spot is confirmed.</p>
+        <div style="background:#f0fdf4;border-radius:10px;padding:.85rem 1rem;margin-bottom:.5rem;">
+          <div>📅 <strong>Event:</strong> ${esc(eventTitle)}</div>
+          <div>🗓️ <strong>Date:</strong> ${eventDate}</div>
+          <div>📍 <strong>Venue:</strong> ${esc(eventLocation || '—')}</div>
+        </div>
+        ${emailLine}
+      </div>`,
+    confirmButtonText: 'View All Events',
+    confirmButtonColor: '#0f766e',
+    showCancelButton: true,
+    cancelButtonText: 'Stay on Page',
+    cancelButtonColor: '#64748b',
+    allowOutsideClick: false,
+    customClass: {
+      popup: 'swal-alhind-popup',
+      title: 'swal-alhind-title',
+    },
+  }).then(result => {
+    if (result.isConfirmed) {
+      window.location.href = '/pages/events.html';
+    }
+  });
+}
+
+function swalDuplicate(phone) {
+  Swal.fire({
+    icon: 'info',
+    title: 'Already Registered',
+    html: `
+      <p style="font-size:.92rem;color:#475569;line-height:1.6;">
+        The mobile number <strong>${esc(phone)}</strong> is already registered for this event.
+      </p>
+      <p style="font-size:.85rem;color:#94a3b8;margin-top:.5rem;">
+        If you think this is a mistake, please contact us.
+      </p>`,
+    confirmButtonText: 'OK, Got It',
+    confirmButtonColor: '#0f766e',
+    showCancelButton: true,
+    cancelButtonText: 'View Events',
+    cancelButtonColor: '#64748b',
+  }).then(result => {
+    if (!result.isConfirmed) {
+      window.location.href = '/events.html';
+    }
+  });
+}
+
+function swalError(message) {
+  Swal.fire({
+    icon: 'error',
+    title: 'Registration Failed',
+    text: message || 'Something went wrong. Please try again.',
+    confirmButtonText: 'Try Again',
+    confirmButtonColor: '#0f766e',
+  });
+}
+
+/* ── Reset button state ──────────────────────────────────────── */
+function resetBtn(btn) {
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Register Now';
+}
+
 /* ── Submit Registration ─────────────────────────────────────── */
 async function submitJoin() {
   clearErrors();
@@ -138,71 +255,120 @@ async function submitJoin() {
   btn.disabled = true;
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registering…';
 
+  // Remove any previous inline error
+  document.querySelector('.jn-api-err')?.remove();
+
   const payload = {
     event_id: currentEvent.id,
-    name:     $('jn-name').value.trim(),
-    phone:    $('jn-phone').value.trim(),
-    email:    $('jn-email').value.trim(),
-    city:     $('jn-city').value.trim(),
-    message:  $('jn-message').value.trim(),
+    name: $('jn-name').value.trim(),
+    phone: $('jn-phone').value.trim(),
+    email: $('jn-email').value.trim(),
+    city: $('jn-city').value.trim(),
+    message: $('jn-message').value.trim(),
   };
 
   try {
-    const res  = await fetch(`${API}/event-volunteers`, {
-      method:  'POST',
+    const res = await fetch(`${API}/volunteers`, {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(payload),
+      body: JSON.stringify(payload),
     });
-    const data = await res.json();
 
-    if (!res.ok) throw new Error(data.message || 'Registration failed');
-
-    // Show success
-    $('jn-form-wrap').style.display = 'none';
-    $('jn-success').style.display   = 'block';
-    $('jn-success-msg').textContent = `Thank you, ${payload.name}! You are registered for "${currentEvent.title}".`;
-
-    if (payload.email) {
-      $('jn-success-msg').textContent += ' A confirmation email has been sent to ' + payload.email + '.';
+    // Read raw text first — API may return HTML on errors
+    const rawText = await res.text();
+    let data = {};
+    try {
+      data = JSON.parse(rawText);
+    } catch {
+      console.warn('[AL Hind] Non-JSON response (status ' + res.status + '):', rawText.slice(0, 300));
     }
+
+    const lower = rawText.toLowerCase();
+
+    // ── Duplicate phone ───────────────────────────────────────
+    const isDuplicate =
+      res.status === 409 ||
+      data.status === 'duplicate' ||
+      (data.message || '').toLowerCase().includes('already') ||
+      (data.message || '').toLowerCase().includes('duplicate') ||
+      lower.includes('duplicate entry') ||
+      lower.includes('already registered');
+
+    if (isDuplicate) {
+      resetBtn(btn);
+      swalDuplicate(payload.phone);
+      return;
+    }
+
+    // ── Treat 200/201 as success always ──────────────────────
+    const isSuccess =
+      res.status === 200 ||
+      res.status === 201 ||
+      data.status === 'success' ||
+      data.status === 'ok';
+
+    if (!isSuccess) {
+      resetBtn(btn);
+      const errMsg = data.message || (res.status >= 500 ? 'Server error. Please try again.' : 'Registration failed.');
+      swalError(errMsg);
+      return;
+    }
+
+    // ── Success ───────────────────────────────────────────────
+    resetBtn(btn);
+
+    // Hide the form
+    $('jn-form-wrap').style.display = 'none';
+
+    // Show inline success card too (good UX backup)
+    $('jn-success').style.display = 'block';
+    $('jn-success-msg').textContent =
+      `Thank you, ${payload.name}! You're registered for "${currentEvent.title}".` +
+      (payload.email ? ` A confirmation has been sent to ${payload.email}.` : '');
 
     $('jn-success-details').innerHTML = `
       <strong><i class="fa-solid fa-calendar-days"></i> Event:</strong> ${esc(currentEvent.title)}<br>
       <strong><i class="fa-solid fa-calendar-check"></i> Date:</strong> ${fmtDate(currentEvent.date)}<br>
       <strong><i class="fa-solid fa-location-dot"></i> Venue:</strong> ${esc(currentEvent.location || '—')}<br>
-      ${payload.phone ? `<strong><i class="fa-solid fa-phone"></i> Your Phone:</strong> ${esc(payload.phone)}<br>` : ''}
+      ${payload.phone ? `<strong><i class="fa-solid fa-phone"></i> Phone:</strong> ${esc(payload.phone)}<br>` : ''}
     `;
 
-    // Scroll to success message
     $('jn-success').scrollIntoView({ behavior: 'smooth', block: 'center' });
 
+    // Fire SweetAlert2 popup
+    swalSuccess(
+      payload.name,
+      payload.email,
+      currentEvent.title,
+      fmtDate(currentEvent.date),
+      currentEvent.location
+    );
+
+    // Reset form fields
+    ['jn-name', 'jn-phone', 'jn-email', 'jn-city', 'jn-message'].forEach(id => {
+      const el = $(id);
+      if (el) el.value = '';
+    });
+
   } catch (err) {
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Register Now';
-    // Show error inline
-    const errDiv = document.createElement('div');
-    errDiv.style.cssText = 'background:#fee2e2;color:#991b1b;border-radius:8px;padding:.75rem 1rem;font-size:.82rem;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;';
-    errDiv.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> ${esc(err.message || 'Something went wrong. Please try again.')}`;
-    const existing = document.querySelector('.jn-api-err');
-    if (existing) existing.remove();
-    errDiv.className = 'jn-api-err';
-    $('jn-submit').insertAdjacentElement('beforebegin', errDiv);
+    console.error('[AL Hind] submitJoin error:', err);
+    resetBtn(btn);
+    swalError('Something went wrong. Please check your connection and try again.');
   }
 }
 
 /* ── Init ────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
-  const id     = params.get('id');
+  const id = params.get('id');
 
   if (!id) {
     $('jn-loading').style.display = 'none';
-    $('jn-error').style.display   = 'block';
+    $('jn-error').style.display = 'block';
     return;
   }
 
   const event = await loadEvent(id);
-
   $('jn-loading').style.display = 'none';
 
   if (!event) {

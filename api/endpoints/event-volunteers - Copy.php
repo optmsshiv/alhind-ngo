@@ -1,12 +1,29 @@
 <?php
 // endpoints/event-volunteers.php
 
-/* ── Register a volunteer for an event ─────────────────────── */
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+/* ── SMTP helper — matches existing join.php pattern ─────────── */
+function evtSmtp(): PHPMailer {
+    $m = new PHPMailer(true);
+    $m->isSMTP();
+    $m->Host       = 'smtp.gmail.com';
+    $m->SMTPAuth   = true;
+    $m->Username   = 'alhindtrust@gmail.com';
+    $m->Password   = 'yyym lxhp pyro alyk';
+    $m->SMTPSecure = 'tls';
+    $m->Port       = 587;
+    $m->setFrom('alhindtrust@gmail.com', 'AL Hind Trust');
+    $m->CharSet    = 'UTF-8';
+    return $m;
+}
+
+/* ── Register a volunteer for an event ───────────────────────── */
 function registerVolunteer(): void {
     $b  = body();
     $db = getDB();
 
-    // ── Validate required fields ─────────────────────────────
     $eventId = isset($b['event_id']) ? (int)$b['event_id'] : 0;
     $name    = sanitize($b['name']    ?? '');
     $phone   = sanitize($b['phone']   ?? '');
@@ -14,54 +31,42 @@ function registerVolunteer(): void {
     $city    = sanitize($b['city']    ?? '');
     $message = sanitize($b['message'] ?? '');
 
-    if (!$eventId)          error('event_id is required');
-    if (empty($name))       error('Name is required');
-    if (empty($phone))      error('Phone is required');
-    if (!preg_match('/^[6-9]\d{9}$/', $phone)) error('Enter a valid 10-digit phone number');
+    if (!$eventId)     error('event_id is required');
+    if (empty($name))  error('Name is required');
+    if (empty($phone)) error('Phone is required');
+    if (!preg_match('/^[6-9]\d{9}$/', $phone)) error('Enter a valid 10-digit Indian mobile number');
     if ($email && !filter_var($email, FILTER_VALIDATE_EMAIL)) error('Enter a valid email address');
+    if (empty($city))  error('City is required');
 
-    // ── Check event exists and is active ─────────────────────
     $evtStmt = $db->prepare("SELECT id, title, event_date, location FROM events WHERE id = ? AND is_active = 1");
     $evtStmt->execute([$eventId]);
     $event = $evtStmt->fetch();
     if (!$event) error('Event not found or no longer active', 404);
 
-    // ── Check for duplicate registration ─────────────────────
-    $dupStmt = $db->prepare("SELECT id FROM event_volunteers WHERE event_id = ? AND phone = ?");
-    $dupStmt->execute([$eventId, $phone]);
-    if ($dupStmt->fetch()) error('This phone number is already registered for this event', 409);
+    $dup = $db->prepare("SELECT id FROM event_volunteers WHERE event_id = ? AND phone = ?");
+    $dup->execute([$eventId, $phone]);
+    if ($dup->fetch()) error('This phone number is already registered for this event', 409);
 
-    // ── Insert registration ───────────────────────────────────
-    $stmt = $db->prepare("
+    $db->prepare("
         INSERT INTO event_volunteers (event_id, name, email, phone, city, message)
         VALUES (?, ?, ?, ?, ?, ?)
-    ");
-    $stmt->execute([$eventId, $name, $email ?: null, $phone, $city, $message ?: null]);
+    ")->execute([$eventId, $name, $email ?: null, $phone, $city, $message ?: null]);
+
     $volId = $db->lastInsertId();
 
-    // ── Send confirmation email if email provided ─────────────
-    if (!empty($email)) {
-        sendVolunteerEmail($email, $name, $event);
-    }
+    if (!empty($email)) sendVolunteerConfirmation($email, $name, $phone, $city, $event);
+    sendAdminVolunteerAlert($name, $phone, $email, $city, $message, $event);
 
-    // ── Notify admin ──────────────────────────────────────────
-    sendAdminNotification($name, $phone, $email, $city, $event);
-
-    ok([
-        'id'       => (int)$volId,
-        'name'     => $name,
-        'phone'    => $phone,
-        'email'    => $email,
-        'event_id' => $eventId,
-    ], 'Registration successful', 201);
+    ok(['id' => (int)$volId, 'name' => $name, 'phone' => $phone, 'email' => $email, 'event_id' => $eventId],
+       'Registration successful', 201);
 }
 
-/* ── Get all volunteers for an event (admin) ────────────────── */
+/* ── Get all volunteers for an event (admin) ─────────────────── */
 function getEventVolunteers(string $eventId): void {
-    $db   = getDB();
+    $db = getDB();
     $stmt = $db->prepare("
         SELECT ev.id, ev.name, ev.email, ev.phone, ev.city, ev.message, ev.created_at,
-               e.title AS event_title
+               e.title AS event_title, e.event_date
         FROM event_volunteers ev
         JOIN events e ON e.id = ev.event_id
         WHERE ev.event_id = ?
@@ -71,91 +76,110 @@ function getEventVolunteers(string $eventId): void {
     ok($stmt->fetchAll());
 }
 
-/* ── Send confirmation email to volunteer ───────────────────── */
-function sendVolunteerEmail(string $email, string $name, array $event): void {
+/* ── Confirmation email to visitor ───────────────────────────── */
+function sendVolunteerConfirmation(string $email, string $name, string $phone, string $city, array $event): void {
     try {
-        $mail = getMailer(); // Your existing PHPMailer instance
-
+        $mail    = evtSmtp();
         $dateStr = date('l, d F Y', strtotime($event['event_date']));
+        $sName   = htmlspecialchars($name);
+        $sTitle  = htmlspecialchars($event['title']);
+        $sLoc    = htmlspecialchars($event['location'] ?? 'To be announced');
+        $sCity   = htmlspecialchars($city);
 
+        $mail->addEmbeddedImage(__DIR__ . '/../../assets/logo.jpeg', 'ngologo');
         $mail->addAddress($email, $name);
-        $mail->Subject = '✅ Registration Confirmed — ' . $event['title'];
         $mail->isHTML(true);
+        $mail->Subject = "Registration Confirmed – {$event['title']} | AL Hind Trust";
         $mail->Body = "
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset='UTF-8'>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f8fafc; margin: 0; padding: 0; }
-    .wrap { max-width: 560px; margin: 2rem auto; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,.08); }
-    .header { background: #0f766e; padding: 2rem; text-align: center; }
-    .header h1 { color: #fff; font-size: 1.4rem; margin: 0; }
-    .header p  { color: #ccfbf1; font-size: .9rem; margin: .5rem 0 0; }
-    .body { padding: 2rem; }
-    .body h2 { color: #0f172a; font-size: 1.1rem; margin-bottom: 1rem; }
-    .details { background: #f0fdf9; border-left: 4px solid #0f766e; border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0; }
-    .details p { margin: .4rem 0; font-size: .9rem; color: #1e293b; }
-    .details strong { color: #0f766e; }
-    .footer { background: #f8fafc; padding: 1.25rem 2rem; text-align: center; font-size: .78rem; color: #94a3b8; border-top: 1px solid #e2e8f0; }
-    .btn { display: inline-block; background: #0f766e; color: #fff; padding: .7rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 700; margin-top: 1rem; }
-  </style>
-</head>
-<body>
-<div class='wrap'>
-  <div class='header'>
-    <h1>✅ Registration Confirmed!</h1>
-    <p>AL Hind Educational &amp; Charitable Trust</p>
-  </div>
-  <div class='body'>
-    <h2>Dear {$name},</h2>
-    <p>Thank you for registering for our event. Your spot has been confirmed.</p>
-    <div class='details'>
-      <p><strong>📅 Event:</strong> {$event['title']}</p>
-      <p><strong>🗓️ Date:</strong> {$dateStr}</p>
-      <p><strong>📍 Location:</strong> {$event['location']}</p>
+<table width='600' align='center' cellpadding='0' cellspacing='0'
+  style='font-family:Segoe UI,Arial,sans-serif;border:1px solid #e5e7eb;'>
+  <tr><td style='background:#0f766e;padding:20px;text-align:center;'>
+    <h2 style='color:#fff;margin:0;'>AL Hind Educational &amp; Charitable Trust</h2>
+    <p style='color:#ccfbf1;margin:6px 0 0;font-size:.875rem;'>Event Registration Confirmation</p>
+  </td></tr>
+  <tr><td style='text-align:center;padding:16px;'>
+    <img src='cid:ngologo' style='width:80px;height:80px;border-radius:50%;border:3px solid #0f766e;'>
+  </td></tr>
+  <tr><td style='padding:10px 28px 20px;color:#111827;font-size:14px;line-height:1.7;'>
+    <p>Dear <strong>{$sName}</strong>,</p>
+    <p>&#127881; You are successfully registered for our upcoming event. We look forward to seeing you there!</p>
+    <div style='background:#f0fdf9;border-left:4px solid #0f766e;border-radius:8px;padding:16px 20px;margin:16px 0;'>
+      <p style='margin:0 0 10px;font-weight:700;color:#0f766e;'>&#128197; Event Details</p>
+      <table style='font-size:13.5px;color:#1e293b;width:100%;'>
+        <tr><td style='padding:4px 0;width:110px;color:#64748b;'>Event</td><td><strong>{$sTitle}</strong></td></tr>
+        <tr><td style='padding:4px 0;color:#64748b;'>Date</td><td><strong>{$dateStr}</strong></td></tr>
+        <tr><td style='padding:4px 0;color:#64748b;'>Location</td><td><strong>{$sLoc}</strong></td></tr>
+        <tr><td style='padding:4px 0;color:#64748b;'>Your City</td><td>{$sCity}</td></tr>
+        <tr><td style='padding:4px 0;color:#64748b;'>Phone</td><td>{$phone}</td></tr>
+      </table>
     </div>
-    <p>Please arrive on time. If you have any questions, reply to this email or contact us.</p>
-    <a href='https://alhindtrust.com/events.html' class='btn'>View All Events</a>
-  </div>
-  <div class='footer'>
-    AL Hind Educational and Charitable Trust, Madhepura, Bihar<br>
-    &copy; " . date('Y') . " AL Hind Trust
-  </div>
-</div>
-</body>
-</html>";
-
-        $mail->AltBody = "Dear {$name},\n\nYour registration is confirmed for: {$event['title']}\nDate: {$dateStr}\nLocation: {$event['location']}\n\nThank you!\nAL Hind Trust";
-
+    <p>&#128204; <strong>Please note:</strong> Arrive 15-20 minutes before the event starts.</p>
+    <p>If you have any questions, reply to this email or contact us directly.</p>
+    <div style='text-align:center;margin:20px 0;'>
+      <a href='https://alhindtrust.com/events.html'
+         style='display:inline-block;background:#0f766e;color:#fff;padding:11px 24px;border-radius:8px;text-decoration:none;font-weight:700;'>
+        View All Events
+      </a>
+    </div>
+    <hr style='border:none;border-top:1px solid #e5e7eb;margin:16px 0;'>
+    <p style='font-size:12px;color:#6b7280;'>AL Hind Educational and Charitable Trust, Madhepura, Bihar</p>
+  </td></tr>
+  <tr><td style='background:#111827;color:#fff;text-align:center;padding:14px;font-size:13px;'>
+    AL Hind Team | Madhepura, Bihar<br>
+    <a href='https://alhindtrust.com' style='color:#6ee7b7;text-decoration:none;'>alhindtrust.com</a>
+  </td></tr>
+</table>";
+        $mail->AltBody = "Dear {$name},\n\nYou are registered for: {$event['title']}\nDate: {$dateStr}\nLocation: {$event['location']}\n\nThank you!\nAL Hind Trust";
         $mail->send();
     } catch (Exception $e) {
-        // Don't fail the request if email fails — just log
-        error_log('Volunteer email failed: ' . $e->getMessage());
+        error_log('Volunteer confirmation email failed: ' . $e->getMessage());
     }
 }
 
-/* ── Notify admin of new registration ───────────────────────── */
-function sendAdminNotification(string $name, string $phone, string $email, string $city, array $event): void {
+/* ── Admin alert email ───────────────────────────────────────── */
+function sendAdminVolunteerAlert(string $name, string $phone, string $email, string $city, string $message, array $event): void {
     try {
-        $mail = getMailer();
-        $adminEmail = defined('ADMIN_EMAIL') ? ADMIN_EMAIL : 'admin@alhindtrust.com';
+        $admin   = evtSmtp();
+        $dateStr = date('d M Y', strtotime($event['event_date']));
+        $sName   = htmlspecialchars($name);
+        $sTitle  = htmlspecialchars($event['title']);
+        $sEmail  = htmlspecialchars($email ?: 'Not provided');
+        $sCity   = htmlspecialchars($city);
+        $sMsg    = nl2br(htmlspecialchars($message ?: '—'));
 
-        $mail->addAddress($adminEmail, 'AL Hind Admin');
-        $mail->Subject = '🔔 New Event Registration — ' . $event['title'];
-        $mail->isHTML(true);
-        $mail->Body = "
-<div style='font-family:Arial,sans-serif;max-width:480px;'>
-  <h2 style='color:#0f766e;'>New Registration</h2>
-  <p><strong>Event:</strong> {$event['title']}</p>
-  <p><strong>Name:</strong> {$name}</p>
-  <p><strong>Phone:</strong> {$phone}</p>
-  <p><strong>Email:</strong> " . ($email ?: 'Not provided') . "</p>
-  <p><strong>City:</strong> {$city}</p>
-  <p><strong>Time:</strong> " . date('d M Y, h:i A') . "</p>
-</div>";
-        $mail->send();
+        $admin->addAddress('alhindtrust@gmail.com', 'AL Hind Admin');
+        if ($email) $admin->addReplyTo($email, $name);
+        $admin->isHTML(true);
+        $admin->Subject = "NEW Registration – {$event['title']} | {$name}";
+        $admin->Body = "
+<table width='540' align='center' cellpadding='0' cellspacing='0'
+  style='font-family:Segoe UI,Arial,sans-serif;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;'>
+  <tr><td style='background:#0f766e;padding:16px 20px;'>
+    <h3 style='color:#fff;margin:0;'>New Event Registration</h3>
+    <p style='color:#ccfbf1;margin:4px 0 0;font-size:13px;'>{$sTitle} — {$dateStr}</p>
+  </td></tr>
+  <tr><td style='padding:20px 24px;'>
+    <table width='100%' style='border-collapse:collapse;font-size:13.5px;color:#1e293b;'>
+      <tr style='background:#f8fafc;'><td style='padding:8px 12px;font-weight:600;color:#64748b;width:130px;'>Name</td><td style='padding:8px 12px;'><strong>{$sName}</strong></td></tr>
+      <tr><td style='padding:8px 12px;font-weight:600;color:#64748b;'>Phone</td><td style='padding:8px 12px;'>{$phone}</td></tr>
+      <tr style='background:#f8fafc;'><td style='padding:8px 12px;font-weight:600;color:#64748b;'>Email</td><td style='padding:8px 12px;'>{$sEmail}</td></tr>
+      <tr><td style='padding:8px 12px;font-weight:600;color:#64748b;'>City</td><td style='padding:8px 12px;'>{$sCity}</td></tr>
+      <tr style='background:#f8fafc;'><td style='padding:8px 12px;font-weight:600;color:#64748b;'>Message</td><td style='padding:8px 12px;'>{$sMsg}</td></tr>
+      <tr><td style='padding:8px 12px;font-weight:600;color:#64748b;'>Time</td><td style='padding:8px 12px;'>" . date('d M Y, h:i A') . "</td></tr>
+    </table>
+    <div style='text-align:center;margin-top:20px;'>
+      <a href='https://alhindtrust.com/admin/'
+         style='display:inline-block;background:#0f766e;color:#fff;padding:10px 22px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px;'>
+        View in Admin Panel
+      </a>
+    </div>
+  </td></tr>
+  <tr><td style='background:#f1f5f9;text-align:center;padding:12px;font-size:12px;color:#94a3b8;'>
+    AL Hind Trust Admin Notification
+  </td></tr>
+</table>";
+        $admin->send();
     } catch (Exception $e) {
-        error_log('Admin notification failed: ' . $e->getMessage());
+        error_log('Admin volunteer alert failed: ' . $e->getMessage());
     }
 }
