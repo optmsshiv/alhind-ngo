@@ -202,7 +202,7 @@ function swalSuccess(name, email, eventTitle, eventDate, eventLocation) {
     },
   }).then(result => {
     if (result.isConfirmed) {
-      window.location.href = '/events.html';
+      window.location.href = '/pages/events.html';
     }
   });
 }
