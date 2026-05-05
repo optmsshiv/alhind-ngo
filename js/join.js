@@ -274,26 +274,43 @@ async function submitJoin() {
       body: JSON.stringify(payload),
     });
 
-    // Use safe parser — handles HTML error pages from PHP
-    const data = await safeJson(res);
+    // Read raw text first — API may return HTML on errors
+    const rawText = await res.text();
+    let data = {};
+    try {
+      data = JSON.parse(rawText);
+    } catch {
+      console.warn('[AL Hind] Non-JSON response (status ' + res.status + '):', rawText.slice(0, 300));
+    }
 
-    // ── Duplicate phone number ────────────────────────────────
-    if (
-      data.status === 'duplicate' ||
-      data.message === 'already_registered' ||
+    const lower = rawText.toLowerCase();
+
+    // ── Duplicate phone ───────────────────────────────────────
+    const isDuplicate =
       res.status === 409 ||
+      data.status === 'duplicate' ||
       (data.message || '').toLowerCase().includes('already') ||
-      (data.message || '').toLowerCase().includes('duplicate')
-    ) {
+      (data.message || '').toLowerCase().includes('duplicate') ||
+      lower.includes('duplicate entry') ||
+      lower.includes('already registered');
+
+    if (isDuplicate) {
       resetBtn(btn);
       swalDuplicate(payload.phone);
       return;
     }
 
-    // ── Other API error ───────────────────────────────────────
-    if (!res.ok || data.status === 'error') {
+    // ── Treat 200/201 as success always ──────────────────────
+    const isSuccess =
+      res.status === 200 ||
+      res.status === 201 ||
+      data.status === 'success' ||
+      data.status === 'ok';
+
+    if (!isSuccess) {
       resetBtn(btn);
-      swalError(data.message || 'Registration failed. Please try again.');
+      const errMsg = data.message || (res.status >= 500 ? 'Server error. Please try again.' : 'Registration failed.');
+      swalError(errMsg);
       return;
     }
 
