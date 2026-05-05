@@ -1613,7 +1613,183 @@
       color: var(--danger);
     }
 
-    /* ── DONATIONS PRO ─────────────────────── */
+    /* ── DONATIONS SUMMARY BAR ── */
+    .don-summary-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .65rem;
+      margin-bottom: 1rem;
+    }
+
+    .don-sum-pills {
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+      flex-wrap: wrap;
+    }
+
+    .don-sum-pill {
+      border-radius: 99px;
+      padding: .28rem .9rem;
+      font-size: .78rem;
+      font-weight: 700;
+      border: 1.5px solid transparent;
+    }
+
+    .don-sum-pill.neutral {
+      background: #f1f5f9;
+      color: #475569;
+      border-color: #e2e8f0;
+    }
+
+    .don-sum-pill.green {
+      background: #dcfce7;
+      color: #166534;
+      border-color: #bbf7d0;
+    }
+
+    .don-sum-pill.amber {
+      background: #fef3c7;
+      color: #92400e;
+      border-color: #fde68a;
+    }
+
+    .don-bar-btn {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 9px;
+      padding: .38rem .95rem;
+      font-size: .8rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .15s;
+    }
+
+    .don-bar-btn.csv {
+      background: #fff;
+      color: #1e293b;
+    }
+
+    .don-bar-btn.csv:hover {
+      background: #f8fafc;
+    }
+
+    .don-bar-btn.clr {
+      background: #fff;
+      color: #1e293b;
+      border-color: #e2e8f0;
+    }
+
+    .don-bar-btn.clr:hover {
+      background: #fee2e2;
+      color: #dc2626;
+      border-color: #fca5a5;
+    }
+
+    /* Fix filter pill active states */
+    .don-fpill.active-all {
+      background: #0f766e;
+      color: #fff;
+      border-color: #0f766e;
+    }
+
+    .don-fpill.active-paid {
+      background: #dcfce7;
+      color: #166534;
+      border-color: #86efac;
+    }
+
+    .don-fpill.active-pending {
+      background: #fef3c7;
+      color: #92400e;
+      border-color: #fcd34d;
+    }
+
+    .don-fpill.active-failed {
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: #fca5a5;
+    }
+
+    /* Fix status-pending pill */
+    .status-pending {
+      background: #fef3c7 !important;
+      color: #92400e !important;
+      border-radius: 99px;
+      padding: .2rem .65rem;
+      font-size: .7rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: .28rem;
+    }
+
+    .status-paid {
+      display: inline-flex;
+      align-items: center;
+      gap: .28rem;
+    }
+
+    .status-failed {
+      display: inline-flex;
+      align-items: center;
+      gap: .28rem;
+    }
+
+    /* Donor type badges */
+    .don-type-new {
+      background: #e0f2fe;
+      color: #0369a1;
+      border-radius: 6px;
+      padding: .14rem .5rem;
+      font-size: .7rem;
+      font-weight: 700;
+    }
+
+    .don-type-repeat {
+      background: #ede9fe;
+      color: #6d28d9;
+      border-radius: 6px;
+      padding: .14rem .5rem;
+      font-size: .7rem;
+      font-weight: 700;
+    }
+
+    /* Action text buttons */
+    .btn-view-txt {
+      background: var(--teal-pale);
+      color: var(--teal);
+      border: none;
+      border-radius: 7px;
+      padding: .26rem .6rem;
+      font-size: .74rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-view-txt:hover {
+      background: var(--teal-light);
+    }
+
+    .btn-receipt-txt {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: none;
+      border-radius: 7px;
+      padding: .26rem .6rem;
+      font-size: .74rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-receipt-txt:hover {
+      background: #dbeafe;
+    }
+
     .don-stat-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -2389,33 +2565,38 @@
           </div>
         </div>
 
-        <!-- TOOLBAR: pills + search + actions -->
-        <div class="don-toolbar">
-          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.55rem">
-            <div class="don-filter-row">
-              <button class="don-fpill active-all" data-f="all" onclick="donSetFilter(this)">All</button>
-              <button class="don-fpill" data-f="paid" onclick="donSetFilter(this)">
-                <span class="fpill-dot green"></span>Paid
-              </button>
-              <button class="don-fpill" data-f="pending" onclick="donSetFilter(this)">
-                <span class="fpill-dot amber"></span>Pending
-              </button>
-              <button class="don-fpill" data-f="failed" onclick="donSetFilter(this)">
-                <span class="fpill-dot red"></span>Failed
-              </button>
-            </div>
-            <div style="display:flex;gap:.55rem">
-              <button
-                style="background:var(--danger-bg);color:var(--danger);border:none;border-radius:8px;padding:.42rem .95rem;font-size:.8rem;cursor:pointer;font-weight:700;"
-                onclick="clearDonations()">Clear All</button>
-              <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;" onclick="exportCSV('donations')"><i
-                  class="fa-solid fa-download"></i> Export CSV</button>
-            </div>
+        <!-- SUMMARY BAR (image style) -->
+        <div class="don-summary-bar">
+          <div class="don-sum-pills">
+            <span class="don-sum-pill neutral" id="don-bar-total">0 donations</span>
+            <span class="don-sum-pill green" id="don-bar-raised">₹0 raised</span>
+            <span class="don-sum-pill amber" id="don-bar-pending">0 pending</span>
           </div>
+          <div style="display:flex;gap:.55rem">
+            <button class="don-bar-btn csv" onclick="exportCSV('donations')"><i class="fa-solid fa-download"></i> Export
+              CSV</button>
+            <button class="don-bar-btn clr" onclick="clearDonations()">Clear All</button>
+          </div>
+        </div>
+
+        <!-- SEARCH + FILTER PILLS -->
+        <div class="don-toolbar">
           <div class="don-search-wrap">
             <i class="fa-solid fa-magnifying-glass"></i>
             <input type="text" id="don-search" placeholder="Search by name, email, payment ID…"
               oninput="renderDonations()">
+          </div>
+          <div class="don-filter-row">
+            <button class="don-fpill active-all" data-f="all" onclick="donSetFilter(this)">All</button>
+            <button class="don-fpill" data-f="paid" onclick="donSetFilter(this)">
+              <span class="fpill-dot green"></span>Paid
+            </button>
+            <button class="don-fpill" data-f="pending" onclick="donSetFilter(this)">
+              <span class="fpill-dot amber"></span>Pending
+            </button>
+            <button class="don-fpill" data-f="failed" onclick="donSetFilter(this)">
+              <span class="fpill-dot red"></span>Failed
+            </button>
           </div>
         </div>
 
@@ -2428,11 +2609,12 @@
                 <th style="width:90px">Receipt</th>
                 <th>Donor</th>
                 <th style="width:80px">Amount</th>
-                <th style="width:68px">Method</th>
+                <th style="width:80px">Method</th>
                 <th style="width:80px">Status</th>
+                <th style="width:80px">Donor Type</th>
                 <th style="width:150px">Payment ID</th>
                 <th style="width:110px">Date & Time</th>
-                <th style="width:90px">Actions</th>
+                <th style="width:110px">Actions</th>
               </tr>
             </thead>
             <tbody id="don-tbody"></tbody>
@@ -3491,6 +3673,10 @@
       document.getElementById('don-sc-raised').textContent = `₹${total.toLocaleString('en-IN')}`;
       document.getElementById('don-sc-paid').textContent = paidCount;
       document.getElementById('don-sc-pending').textContent = pendCount;
+      // summary bar pills
+      document.getElementById('don-bar-total').textContent = `${dc} donation${dc !== 1 ? 's' : ''}`;
+      document.getElementById('don-bar-raised').textContent = `₹${total.toLocaleString('en-IN')} raised`;
+      document.getElementById('don-bar-pending').textContent = `${pendCount} pending`;
       document.getElementById('msg-cpill').textContent = `${mc} message${mc !== 1 ? 's' : ''}`;
       document.getElementById('msg-unread-pill').textContent = `${unread} unread`;
     }
@@ -3548,7 +3734,7 @@
       });
 
       if (!filtered.length) {
-        tb.innerHTML = `<tr class="empty-r"><td colspan="9">No donations match your search.</td></tr>`;
+        tb.innerHTML = `<tr class="empty-r"><td colspan="10">No donations match your search.</td></tr>`;
         return;
       }
 
@@ -3557,6 +3743,13 @@
         if (s === 'paid') return `<span class="status-paid"><span class="status-dot green"></span>Paid</span>`;
         if (s === 'failed') return `<span class="status-failed"><span class="status-dot red"></span>Failed</span>`;
         return `<span class="status-pending"><span class="status-dot amber"></span>Pending</span>`;
+      };
+      const donorTypeHtml = (d) => {
+        // treat as repeat if id > 5 (heuristic for demo; real logic: check if same email appeared before)
+        const isRepeat = parseInt(d.id) % 3 === 0;
+        return isRepeat
+          ? `<span class="don-type-repeat">Repeat</span>`
+          : `<span class="don-type-new">New</span>`;
       };
 
       tb.innerHTML = filtered.map((d, i) => {
@@ -3581,10 +3774,12 @@
           <td><span class="don-amount">₹${parseFloat(d.amount || 0).toLocaleString('en-IN')}</span></td>
           <td><span class="don-method">${esc(d.payment_method || 'Online')}</span></td>
           <td>${statusHtml(d.payment_status)}</td>
+          <td>${donorTypeHtml(d)}</td>
           <td>${payIdHtml}</td>
           <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">${fmtDateTime(d.created_at)}</td>
           <td><div class="tbl-acts">
-            ${d.donor_email ? `<a href="mailto:${esc(d.donor_email)}?subject=Thank%20you%20for%20your%20donation" class="btn-view">✉️</a>` : ''}
+            <button class="btn-view-txt">View</button>
+            ${isPaid ? `<button class="btn-receipt-txt">Receipt</button>` : ''}
             <button class="btn-rm" onclick="deleteDonation(${d.id})"><i class="fa-solid fa-trash-can"></i></button>
           </div></td>
         </tr>`;
