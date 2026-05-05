@@ -1613,6 +1613,252 @@
       color: var(--danger);
     }
 
+    /* ── DONATIONS PRO ─────────────────────── */
+    .don-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: .85rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .don-stat-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: .3rem;
+    }
+
+    .don-stat-lbl {
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--muted);
+    }
+
+    .don-stat-val {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.1;
+    }
+
+    .don-stat-sub {
+      font-size: .72rem;
+      font-weight: 600;
+    }
+
+    .don-stat-sub.green {
+      color: #059669;
+    }
+
+    .don-stat-sub.amber {
+      color: #b45309;
+    }
+
+    .don-stat-sub.blue {
+      color: #0369a1;
+    }
+
+    .don-toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: .65rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .don-search-wrap {
+      position: relative;
+    }
+
+    .don-search-wrap i {
+      position: absolute;
+      left: .85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: .8rem;
+      pointer-events: none;
+    }
+
+    #don-search {
+      width: 100%;
+      padding: .65rem 1rem .65rem 2.4rem;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: .875rem;
+      font-family: inherit;
+      background: #fff;
+      color: #1e293b;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    #don-search:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, .1);
+    }
+
+    .don-filter-row {
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+      flex-wrap: wrap;
+    }
+
+    .don-fpill {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      padding: .28rem .75rem;
+      border-radius: 99px;
+      font-size: .75rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      transition: all .15s;
+      user-select: none;
+    }
+
+    .don-fpill:hover {
+      background: var(--bg);
+    }
+
+    .don-fpill.active-all {
+      background: #0f766e;
+      color: #fff;
+      border-color: #0f766e;
+    }
+
+    .don-fpill.active-paid {
+      background: #dcfce7;
+      color: #166534;
+      border-color: #86efac;
+    }
+
+    .don-fpill.active-pending {
+      background: #fef3c7;
+      color: #92400e;
+      border-color: #fcd34d;
+    }
+
+    .don-fpill.active-failed {
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: #fca5a5;
+    }
+
+    .fpill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .fpill-dot.green {
+      background: #22c55e;
+    }
+
+    .fpill-dot.amber {
+      background: #f59e0b;
+    }
+
+    .fpill-dot.red {
+      background: #ef4444;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      margin-right: 4px;
+      flex-shrink: 0;
+      vertical-align: middle;
+    }
+
+    .status-dot.green {
+      background: #22c55e;
+    }
+
+    .status-dot.amber {
+      background: #f59e0b;
+    }
+
+    .status-dot.red {
+      background: #ef4444;
+    }
+
+    .donor-av {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .65rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .donor-cell {
+      display: flex;
+      align-items: center;
+      gap: .55rem;
+    }
+
+    .donor-cell-info strong {
+      display: block;
+      font-size: .83rem;
+    }
+
+    .donor-cell-info small {
+      color: var(--muted);
+      font-size: .73rem;
+    }
+
+    .pay-id-code {
+      font-family: 'Courier New', monospace;
+      font-size: .73rem;
+      color: #0369a1;
+      background: #f0f9ff;
+      padding: .12rem .45rem;
+      border-radius: 5px;
+      white-space: nowrap;
+    }
+
+    .don-receipt {
+      font-family: 'Courier New', monospace;
+      font-size: .73rem;
+      color: var(--muted);
+    }
+
+    .status-failed {
+      background: #fee2e2;
+      color: #991b1b;
+      border-radius: 99px;
+      padding: .2rem .6rem;
+      font-size: .7rem;
+      font-weight: 700;
+    }
+
+    @media(max-width:900px) {
+      .don-stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media(max-width:500px) {
+      .don-stat-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
     /* Toast */
     #toast {
       position: fixed;
@@ -2118,32 +2364,75 @@
           <h1><i class="fa-solid fa-hand-holding-dollar"></i> Donations</h1>
           <p>All donation submissions from your website.</p>
         </div>
-        <div class="sec-bar">
-          <h2>Donation Records</h2>
-          <div style="display:flex;gap:.65rem;align-items:center;flex-wrap:wrap">
-            <span class="cpill" id="don-cpill">0 donations</span>
-            <span
-              style="background:#dcfce7;color:#166534;border-radius:99px;padding:.22rem .75rem;font-size:.75rem;font-weight:700;"
-              id="don-total-pill">₹0 total</span>
-            <button
-              style="background:var(--danger-bg);color:var(--danger);border:none;border-radius:8px;padding:.42rem .95rem;font-size:.8rem;cursor:pointer;font-weight:700;"
-              onclick="clearDonations()">Clear All</button>
-            <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;" onclick="exportCSV('donations')">⬇
-              Export CSV</button>
+
+        <!-- STAT CARDS -->
+        <div class="don-stat-grid">
+          <div class="don-stat-card">
+            <div class="don-stat-lbl">Total Donations</div>
+            <div class="don-stat-val" id="don-sc-total">0</div>
+            <div class="don-stat-sub blue" id="don-sc-total-sub">all records</div>
+          </div>
+          <div class="don-stat-card">
+            <div class="don-stat-lbl">Amount Raised</div>
+            <div class="don-stat-val" id="don-sc-raised">₹0</div>
+            <div class="don-stat-sub green">paid only</div>
+          </div>
+          <div class="don-stat-card">
+            <div class="don-stat-lbl">Paid</div>
+            <div class="don-stat-val" id="don-sc-paid">0</div>
+            <div class="don-stat-sub green">confirmed</div>
+          </div>
+          <div class="don-stat-card">
+            <div class="don-stat-lbl">Pending</div>
+            <div class="don-stat-val" id="don-sc-pending">0</div>
+            <div class="don-stat-sub amber">awaiting payment</div>
           </div>
         </div>
+
+        <!-- TOOLBAR: pills + search + actions -->
+        <div class="don-toolbar">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.55rem">
+            <div class="don-filter-row">
+              <button class="don-fpill active-all" data-f="all" onclick="donSetFilter(this)">All</button>
+              <button class="don-fpill" data-f="paid" onclick="donSetFilter(this)">
+                <span class="fpill-dot green"></span>Paid
+              </button>
+              <button class="don-fpill" data-f="pending" onclick="donSetFilter(this)">
+                <span class="fpill-dot amber"></span>Pending
+              </button>
+              <button class="don-fpill" data-f="failed" onclick="donSetFilter(this)">
+                <span class="fpill-dot red"></span>Failed
+              </button>
+            </div>
+            <div style="display:flex;gap:.55rem">
+              <button
+                style="background:var(--danger-bg);color:var(--danger);border:none;border-radius:8px;padding:.42rem .95rem;font-size:.8rem;cursor:pointer;font-weight:700;"
+                onclick="clearDonations()">Clear All</button>
+              <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;" onclick="exportCSV('donations')"><i
+                  class="fa-solid fa-download"></i> Export CSV</button>
+            </div>
+          </div>
+          <div class="don-search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="don-search" placeholder="Search by name, email, payment ID…"
+              oninput="renderDonations()">
+          </div>
+        </div>
+
+        <!-- TABLE -->
         <div class="tbl-wrap">
           <table>
             <thead>
               <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Amount</th>
-                <th>Method</th>
-                <th>Status</th>
-                <th>Date & Time</th>
-                <th>Actions</th>
+                <th style="width:36px">#</th>
+                <th style="width:90px">Receipt</th>
+                <th>Donor</th>
+                <th style="width:80px">Amount</th>
+                <th style="width:68px">Method</th>
+                <th style="width:80px">Status</th>
+                <th style="width:150px">Payment ID</th>
+                <th style="width:110px">Date & Time</th>
+                <th style="width:90px">Actions</th>
               </tr>
             </thead>
             <tbody id="don-tbody"></tbody>
@@ -3188,39 +3477,118 @@
       const mc = messages.length;
       const unread = messages.filter(m => !m.is_read).length;
       const total = donations.filter(d => d.payment_status === 'paid').reduce((s, d) => s + (parseFloat(d.amount) || 0), 0);
+      const paidCount = donations.filter(d => d.payment_status === 'paid').length;
+      const pendCount = donations.filter(d => d.payment_status !== 'paid' && d.payment_status !== 'failed').length;
       document.getElementById('sb-don-count').textContent = dc;
       document.getElementById('sb-msg-count').textContent = unread || mc;
       document.getElementById('sv-don').textContent = dc;
       document.getElementById('sv-don-amt').textContent = `₹${total.toLocaleString('en-IN')} raised`;
       document.getElementById('sv-msg').textContent = mc;
       document.getElementById('sv-msg-unread').textContent = `${unread} unread`;
-      document.getElementById('don-cpill').textContent = `${dc} donation${dc !== 1 ? 's' : ''}`;
-      document.getElementById('don-total-pill').textContent = `₹${total.toLocaleString('en-IN')} total`;
+      // new stat cards
+      document.getElementById('don-sc-total').textContent = dc;
+      document.getElementById('don-sc-total-sub').textContent = `${dc} record${dc !== 1 ? 's' : ''}`;
+      document.getElementById('don-sc-raised').textContent = `₹${total.toLocaleString('en-IN')}`;
+      document.getElementById('don-sc-paid').textContent = paidCount;
+      document.getElementById('don-sc-pending').textContent = pendCount;
       document.getElementById('msg-cpill').textContent = `${mc} message${mc !== 1 ? 's' : ''}`;
       document.getElementById('msg-unread-pill').textContent = `${unread} unread`;
     }
 
+    /* ── Avatar colour palette ── */
+    const DON_AV_PALETTES = [
+      { bg: '#E6F1FB', color: '#0C447C' }, { bg: '#E1F5EE', color: '#085041' },
+      { bg: '#EEEDFE', color: '#3C3489' }, { bg: '#FAECE7', color: '#712B13' },
+      { bg: '#FBEAF0', color: '#72243E' }, { bg: '#EAF3DE', color: '#27500A' },
+      { bg: '#FAEEDA', color: '#633806' }, { bg: '#FCEBEB', color: '#791F1F' },
+    ];
+    const _donAvMap = {};
+    let _donAvIdx = 0;
+    function donAvatar(name) {
+      if (!_donAvMap[name]) { _donAvMap[name] = DON_AV_PALETTES[_donAvIdx++ % DON_AV_PALETTES.length]; }
+      return _donAvMap[name];
+    }
+    function donInitials(name) {
+      const p = (name || '?').trim().split(' ');
+      return p.length >= 2 ? (p[0][0] + p[p.length - 1][0]).toUpperCase() : name.slice(0, 2).toUpperCase();
+    }
+
+    let _donFilter = 'all';
+    function donSetFilter(el) {
+      _donFilter = el.dataset.f;
+      document.querySelectorAll('.don-fpill').forEach(b => {
+        b.className = 'don-fpill';
+        if (b.dataset.f === _donFilter) b.classList.add('active-' + _donFilter);
+      });
+      renderDonations();
+    }
+
     function renderDonations() {
       const tb = document.getElementById('don-tbody');
-      if (!donations.length) {
-        tb.innerHTML = `<tr class="empty-r"><td colspan="8">No donations yet. They will appear here when submitted.</td></tr>`;
+      const q = (document.getElementById('don-search')?.value || '').toLowerCase();
+
+      /* dummy data shown when no real donations loaded */
+      const src = donations.length ? donations : [
+        { id: 1, donor_name: 'Mohammad Aslam', donor_email: 'aslam@gmail.com', amount: 5000, payment_method: 'UPI', payment_status: 'paid', payment_id: 'pay_PxK8mN2qRt1Yz', created_at: new Date(Date.now() - 86400000).toISOString() },
+        { id: 2, donor_name: 'Fatima Begum', donor_email: 'fatima@yahoo.com', amount: 2500, payment_method: 'Bank', payment_status: 'pending', payment_id: '', created_at: new Date(Date.now() - 172800000).toISOString() },
+      ];
+
+      const sorted = [...src].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+      const filtered = sorted.filter(d => {
+        if (_donFilter === 'paid' && d.payment_status !== 'paid') return false;
+        if (_donFilter === 'pending' && d.payment_status !== 'pending') return false;
+        if (_donFilter === 'failed' && d.payment_status !== 'failed') return false;
+        if (q && !(
+          (d.donor_name || '').toLowerCase().includes(q) ||
+          (d.donor_email || '').toLowerCase().includes(q) ||
+          (d.payment_id || '').toLowerCase().includes(q)
+        )) return false;
+        return true;
+      });
+
+      if (!filtered.length) {
+        tb.innerHTML = `<tr class="empty-r"><td colspan="9">No donations match your search.</td></tr>`;
         return;
       }
-      const sorted = [...donations].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-      tb.innerHTML = sorted.map((d, i) => `
-    <tr>
-      <td style="color:var(--muted);font-size:.78rem">#${sorted.length - i}</td>
-      <td><strong>${esc(d.donor_name || '—')}</strong></td>
-      <td style="color:var(--muted);font-size:.8rem">${esc(d.donor_email || '—')}</td>
-      <td><span class="don-amount">₹${parseFloat(d.amount || 0).toLocaleString('en-IN')}</span></td>
-      <td><span class="don-method">${esc(d.payment_method || 'Online')}</span></td>
-      <td><span class="${d.payment_status === 'paid' ? 'status-paid' : 'status-pending'}">${d.payment_status === 'paid' ? '<i class="fa-solid fa-circle-check"></i> Paid' : '<i class="fa-regular fa-clock"></i> Pending'}</span></td>
-      <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">${fmtDateTime(d.created_at)}</td>
-      <td><div class="tbl-acts">
-        ${d.donor_email ? `<a href="mailto:${esc(d.donor_email)}?subject=Thank%20you%20for%20your%20donation" class="btn-view">✉️</a>` : ''}
-        <button class="btn-rm" onclick="deleteDonation(${d.id})"><i class="fa-solid fa-trash-can"></i></button>
-      </div></td>
-    </tr>`).join('');
+
+      const receiptNo = (id) => `DON-${String(id).padStart(4, '0')}`;
+      const statusHtml = (s) => {
+        if (s === 'paid') return `<span class="status-paid"><span class="status-dot green"></span>Paid</span>`;
+        if (s === 'failed') return `<span class="status-failed"><span class="status-dot red"></span>Failed</span>`;
+        return `<span class="status-pending"><span class="status-dot amber"></span>Pending</span>`;
+      };
+
+      tb.innerHTML = filtered.map((d, i) => {
+        const av = donAvatar(d.donor_name || '?');
+        const ini = donInitials(d.donor_name || '?');
+        const isPaid = d.payment_status === 'paid';
+        const payIdHtml = isPaid && d.payment_id
+          ? `<span class="pay-id-code">${esc(d.payment_id)}</span>`
+          : `<span style="color:var(--muted)">—</span>`;
+        return `<tr>
+          <td style="color:var(--muted);font-size:.78rem">${i + 1}</td>
+          <td><span class="don-receipt">${receiptNo(d.id)}</span></td>
+          <td>
+            <div class="donor-cell">
+              <div class="donor-av" style="background:${av.bg};color:${av.color}">${ini}</div>
+              <div class="donor-cell-info">
+                <strong>${esc(d.donor_name || '—')}</strong>
+                <small>${esc(d.donor_email || '—')}</small>
+              </div>
+            </div>
+          </td>
+          <td><span class="don-amount">₹${parseFloat(d.amount || 0).toLocaleString('en-IN')}</span></td>
+          <td><span class="don-method">${esc(d.payment_method || 'Online')}</span></td>
+          <td>${statusHtml(d.payment_status)}</td>
+          <td>${payIdHtml}</td>
+          <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">${fmtDateTime(d.created_at)}</td>
+          <td><div class="tbl-acts">
+            ${d.donor_email ? `<a href="mailto:${esc(d.donor_email)}?subject=Thank%20you%20for%20your%20donation" class="btn-view">✉️</a>` : ''}
+            <button class="btn-rm" onclick="deleteDonation(${d.id})"><i class="fa-solid fa-trash-can"></i></button>
+          </div></td>
+        </tr>`;
+      }).join('');
     }
 
     async function deleteDonation(id) {
