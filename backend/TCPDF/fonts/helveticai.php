@@ -1,10 +1,6 @@
 <?php
-// TCPDF helvetica.php - standard font definition
-// This is the standard Helvetica (Arial equivalent) font descriptor for TCPDF
-// Source: TCPDF official repository
-
 $type = 'Core';
-$name = 'Helvetica';
+$name = 'Helvetica-Oblique';
 $up   = -100;
 $ut   = 50;
 $dw   = 278;
@@ -13,9 +9,9 @@ $enc  = '';
 $file = '';
 $ctg  = '';
 $desc = array(
-    'Flags'        => 32,
-    'FontBBox'     => '[-166 -225 1000 931]',
-    'ItalicAngle'  => 0,
+    'Flags'        => 96,
+    'FontBBox'     => '[-170 -225 1116 931]',
+    'ItalicAngle'  => -12,
     'Ascent'       => 931,
     'Descent'      => -225,
     'Leading'      => 0,
@@ -24,7 +20,7 @@ $desc = array(
     'StemV'        => 80,
     'StemH'        => 0,
     'AvgWidth'     => 441,
-    'MaxWidth'     => 1000,
+    'MaxWidth'     => 1116,
     'MissingWidth' => 278,
 );
 $cw = array(
