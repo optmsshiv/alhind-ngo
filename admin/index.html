@@ -3407,11 +3407,10 @@
             </div>
           </td>
           <td style="padding:.6rem .9rem">
-            <a href="tel:${esc(r.phone)}" style="color:var(--teal);text-decoration:none;font-weight:500;font-size:.82rem">
-              ${esc(r.phone)}
-            </a>
+            <a href="tel:${esc(r.phone)}" style="color:var(--teal);text-decoration:none;font-weight:500;font-size:.82rem">${esc(r.phone)}</a>
           </td>
-          <td style="padding:.6rem .9rem;font-size:.78rem;color:var(--muted);white-space:nowrap;font-size:.75rem">${fmtRegDate(r.created_at)}</td>
+          <td style="padding:.6rem .9rem">${cityBadge(r.city)}</td>
+          <td style="padding:.6rem .9rem;color:var(--muted);white-space:nowrap;font-size:.75rem">${fmtRegDate(r.created_at)}</td>
         </tr>`;
       }).join('');
     }
