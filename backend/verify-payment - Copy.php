@@ -90,7 +90,8 @@ try {
             razorpay_payment_id = :payment_id,
             razorpay_signature  = :signature,
             updated_at          = NOW()
-        WHERE razorpay_order_id = :order_id
+        WHERE
+            razorpay_order_id   = :order_id
         LIMIT 1
     ");
     $stmt->execute([

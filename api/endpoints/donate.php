@@ -1,74 +1,58 @@
 <?php
 // endpoints/donate.php
-// Writes to BOTH donations AND donations_pending (keeps your existing table intact)
-
-function submitDonation(): void {
-    $b = body();
-    if (empty($b['name']) || empty($b['amount'])) {
-        error('Name and amount are required');
-    }
-
-    $db  = getDB();
-    $amt = round((float)$b['amount'], 2);
-
-    // ── Write to new donations table ─────────────────────────
-    $stmt = $db->prepare("
-        INSERT INTO donations
-            (donor_name, donor_email, amount, payment_method, payment_status, razorpay_order_id, notes)
-        VALUES (?, ?, ?, ?, 'pending', ?, ?)
-    ");
-    $stmt->execute([
-        sanitize($b['name']),
-        sanitize($b['email']  ?? ''),
-        $amt,
-        sanitize($b['method'] ?? 'Online'),
-        sanitize($b['razorpay_order_id'] ?? ''),
-        sanitize($b['notes'] ?? ''),
-    ]);
-    $newId = $db->lastInsertId();
-
-    // ── Also write to donations_pending (preserve existing flow)
-    $stmt2 = $db->prepare("
-        INSERT INTO donations_pending (order_id, amount, status, donor_name, donor_email, created_at)
-        VALUES (?, ?, 'pending', ?, ?, NOW())
-    ");
-    $stmt2->execute([
-        sanitize($b['razorpay_order_id'] ?? ''),
-        $amt,
-        sanitize($b['name']),
-        sanitize($b['email'] ?? ''),
-    ]);
-
-    ok(['id' => $newId], 'Donation recorded', 201);
-}
-
-function confirmDonation(string $id): void {
-    $b  = body();
-    $db = getDB();
-    $pid = sanitize($b['razorpay_payment_id'] ?? '');
-
-    // Update new donations table
-    $db->prepare("
-        UPDATE donations
-        SET payment_status = 'paid', razorpay_payment_id = ?, paid_at = NOW(), updated_at = NOW()
-        WHERE id = ?
-    ")->execute([$pid, $id]);
-
-    // Update donations_pending too
-    $db->prepare("
-        UPDATE donations_pending SET status = 'paid'
-        WHERE order_id = (SELECT razorpay_order_id FROM donations WHERE id = ? LIMIT 1)
-    ")->execute([$id]);
-
-    ok(null, 'Payment confirmed');
-}
+// ============================================================
+//  Donation records — read/delete only.
+//  Writing handled by:
+//    /backend/create-order.php   → inserts pending row
+//    /backend/verify-payment.php → updates to paid + payment_id
+// ============================================================
 
 function getAllDonations(): void {
-    $db   = getDB();
-    $stmt = $db->query("SELECT * FROM donations ORDER BY created_at DESC");
-    $rows = $stmt->fetchAll();
-    $total = $db->query("SELECT COALESCE(SUM(amount),0) FROM donations WHERE payment_status='paid'")->fetchColumn();
-    ok(['donations' => $rows, 'total_paid' => (float)$total, 'count' => count($rows)]);
+    $db = getDB();
+
+    // Clean up orphan duplicates: pending rows with no order_id
+    // These were created by the old submitDonation() flow
+    $db->exec("
+        DELETE FROM donations
+        WHERE payment_status = 'pending'
+          AND (razorpay_order_id IS NULL OR razorpay_order_id = '')
+          AND created_at < NOW() - INTERVAL 1 HOUR
+    ");
+
+    // Also deduplicate: if same order_id has both a paid and pending row,
+    // remove the pending one
+    $db->exec("
+        DELETE d1 FROM donations d1
+        INNER JOIN donations d2
+            ON d1.razorpay_order_id = d2.razorpay_order_id
+            AND d1.razorpay_order_id != ''
+            AND d1.payment_status = 'pending'
+            AND d2.payment_status = 'paid'
+            AND d1.id != d2.id
+    ");
+
+    $rows = $db->query("
+        SELECT
+            id, donor_name, donor_email, amount,
+            payment_method, payment_status,
+            razorpay_order_id, razorpay_payment_id,
+            created_at, updated_at
+        FROM donations
+        ORDER BY created_at DESC
+    ")->fetchAll();
+
+    $total = (float)$db->query("
+        SELECT COALESCE(SUM(amount),0)
+        FROM donations WHERE payment_status = 'paid'
+    ")->fetchColumn();
+
+    ok([
+        'donations'     => $rows,
+        'total_paid'    => $total,
+        'count'         => count($rows),
+        'paid_count'    => count(array_filter($rows, fn($r) => $r['payment_status'] === 'paid')),
+        'pending_count' => count(array_filter($rows, fn($r) => $r['payment_status'] === 'pending')),
+    ]);
 }
 
 function deleteDonation(string $id): void {
@@ -82,4 +66,12 @@ function deleteDonation(string $id): void {
 function clearDonations(): void {
     getDB()->exec("DELETE FROM donations");
     ok(null, 'All donations cleared');
+}
+
+// Stubs — kept so router doesn't crash on old route calls
+function submitDonation(): void {
+    ok(['message' => 'Use /backend/create-order.php'], 'OK');
+}
+function confirmDonation(string $id): void {
+    ok(['message' => 'Use /backend/verify-payment.php'], 'OK');
 }
