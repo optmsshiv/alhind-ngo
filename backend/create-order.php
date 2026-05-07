@@ -2,7 +2,7 @@
 // ============================================================
 //  create-order.php — Razorpay Order Creation
 //  AL Hind Educational and Charitable Trust
-//  Called by donate.js before opening Razorpay checkout
+//  FIXED: IST datetime on insert
 // ============================================================
 date_default_timezone_set('Asia/Kolkata');
 header('Content-Type: application/json');
@@ -17,7 +17,6 @@ header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 
-// ── Only allow POST ───────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['status' => 'error', 'message' => 'Method not allowed']);
@@ -26,7 +25,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // ── Dependencies ──────────────────────────────────────────────
 require_once __DIR__ . '/../config/db.php';
-// No Composer/SDK needed — using raw cURL instead
 
 // ── Read & validate input ─────────────────────────────────────
 $raw  = file_get_contents('php://input');
@@ -50,7 +48,7 @@ if ($amount < 10 || $amount > 500000) {
 
 $amountPaise = (int)round($amount * 100);
 
-// ── Create Razorpay order via cURL (no SDK needed) ───────────
+// ── Create Razorpay order via cURL ────────────────────────────
 function razorpayCreateOrder($keyId, $keySecret, $amountPaise, $name, $email) {
     $payload = json_encode([
         'amount'          => $amountPaise,
@@ -80,7 +78,6 @@ function razorpayCreateOrder($keyId, $keySecret, $amountPaise, $name, $email) {
     curl_close($ch);
 
     if ($curlError) throw new Exception('cURL error: ' . $curlError);
-
     $result = json_decode($response, true);
 
     if ($httpCode !== 200 || empty($result['id'])) {
@@ -110,7 +107,12 @@ try {
 try {
     $pdo = getDB();
 
-    // Create the donations table if it doesn't exist yet
+    // FIX: Set MySQL session timezone to IST
+    $pdo->exec("SET time_zone = '+05:30'");
+
+    // FIX: Use PHP-computed IST timestamp
+    $nowIST = date('Y-m-d H:i:s');
+
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS donations (
             id                  INT AUTO_INCREMENT PRIMARY KEY,
@@ -131,20 +133,22 @@ try {
 
     $stmt = $pdo->prepare("
         INSERT INTO donations
-            (donor_name, donor_email, amount, payment_method, payment_status, razorpay_order_id, created_at)
+            (donor_name, donor_email, amount, payment_method, payment_status,
+             razorpay_order_id, created_at, updated_at)
         VALUES
-            (:name, :email, :amount, 'Razorpay', 'pending', :order_id, NOW())
+            (:name, :email, :amount, 'Razorpay', 'pending', :order_id, :now, :now)
     ");
     $stmt->execute([
         ':name'     => $name,
         ':email'    => $email,
         ':amount'   => $amount,
         ':order_id' => $orderId,
+        ':now'      => $nowIST,
     ]);
 
 } catch (PDOException $e) {
     error_log('[AL Hind] DB insert failed: ' . $e->getMessage());
-    // Still return the order — payment can proceed, we'll capture on verify
+    // Still proceed — verify-payment.php will insert if needed
 }
 
 // ── Return order details to frontend ─────────────────────────

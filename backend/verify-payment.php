@@ -2,7 +2,7 @@
 // ============================================================
 //  verify-payment.php — Razorpay Payment Verification
 //  AL Hind Educational and Charitable Trust
-//  Called by donate.js after Razorpay handler fires
+//  FIXED: Status update, payment_id storage, IST datetime
 // ============================================================
 date_default_timezone_set('Asia/Kolkata');
 header('Content-Type: application/json');
@@ -25,9 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // ── Dependencies ──────────────────────────────────────────────
 require_once __DIR__ . '/../config/db.php';
-// No Composer/SDK needed — signature verified with native hash_hmac
 
-// ── Razorpay Keys (must match create-order.php) ───────────────
+// ── Razorpay Keys ─────────────────────────────────────────────
 define('RZP_KEY_ID',     'rzp_test_SlDNLCDQLwY9Ck');
 define('RZP_KEY_SECRET', 'TRBmnePDq3zxJ5JQB60HU2lL');
 
@@ -46,7 +45,6 @@ if (!$razorpayOrderId || !$razorpayPaymentId || !$razorpaySignature) {
 }
 
 // ── Verify Razorpay signature (HMAC SHA256) ───────────────────
-// This is the critical security step — prevents fake payment callbacks
 $expectedSignature = hash_hmac(
     'sha256',
     $razorpayOrderId . '|' . $razorpayPaymentId,
@@ -60,7 +58,8 @@ if (!hash_equals($expectedSignature, $razorpaySignature)) {
     exit;
 }
 
-// ── Fetch payment method from Razorpay via cURL ───────────────
+// ── Fetch payment method from Razorpay ───────────────────────
+$method = 'Razorpay';
 try {
     $ch = curl_init("https://api.razorpay.com/v1/payments/{$razorpayPaymentId}");
     curl_setopt_array($ch, [
@@ -69,19 +68,28 @@ try {
         CURLOPT_TIMEOUT        => 15,
         CURLOPT_SSL_VERIFYPEER => true,
     ]);
-    $resp   = curl_exec($ch);
+    $resp  = curl_exec($ch);
     curl_close($ch);
-    $pdata  = json_decode($resp, true);
-    $method = ucfirst($pdata['method'] ?? 'online');
+    $pdata = json_decode($resp, true);
+    if (!empty($pdata['method'])) {
+        $method = ucfirst($pdata['method']);
+    }
 } catch (Exception $e) {
-    $method = 'Razorpay';
+    error_log('[AL Hind] Could not fetch payment method: ' . $e->getMessage());
 }
+
+// ── FIX: Use PHP-computed IST timestamp (bypasses MySQL timezone issue) ──
+$nowIST = date('Y-m-d H:i:s'); // PHP already set to Asia/Kolkata above
 
 // ── Update donation record in DB ──────────────────────────────
 try {
     $pdo = getDB();
 
-    // Try to UPDATE existing pending record
+    // FIX: Set MySQL session timezone to IST so any MySQL NOW() calls also use IST
+    $pdo->exec("SET time_zone = '+05:30'");
+
+    // FIX: Use PHP timestamp instead of MySQL NOW() to ensure correct IST time
+    // Also removed LIMIT 1 — PDO UPDATE doesn't always respect it
     $stmt = $pdo->prepare("
         UPDATE donations
         SET
@@ -89,69 +97,85 @@ try {
             payment_method      = :method,
             razorpay_payment_id = :payment_id,
             razorpay_signature  = :signature,
-            updated_at          = NOW()
+            updated_at          = :now
         WHERE razorpay_order_id = :order_id
-        LIMIT 1
+          AND payment_status    = 'pending'
     ");
     $stmt->execute([
         ':method'     => $method,
         ':payment_id' => $razorpayPaymentId,
         ':signature'  => $razorpaySignature,
+        ':now'        => $nowIST,
         ':order_id'   => $razorpayOrderId,
     ]);
 
-    // If no row was matched (order_id not found) — insert a new record
-    // This handles cases where create-order.php DB insert failed
-    if ($stmt->rowCount() === 0) {
-        // Fetch donor details from Razorpay order notes
-        $chOrder = curl_init("https://api.razorpay.com/v1/orders/{$razorpayOrderId}");
-        curl_setopt_array($chOrder, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_USERPWD        => RZP_KEY_ID . ':' . RZP_KEY_SECRET,
-            CURLOPT_TIMEOUT        => 15,
-            CURLOPT_SSL_VERIFYPEER => true,
-        ]);
-        $orderResp = curl_exec($chOrder);
-        curl_close($chOrder);
-        $orderData  = json_decode($orderResp, true);
-        $donorName  = $orderData['notes']['donor_name']  ?? 'Unknown';
-        $donorEmail = $orderData['notes']['donor_email'] ?? '';
-        $amountINR  = ($orderData['amount'] ?? 0) / 100;
+    $updated = $stmt->rowCount();
+    error_log("[AL Hind] Updated rows for order {$razorpayOrderId}: {$updated}");
 
-        $ins = $pdo->prepare("
-            INSERT INTO donations
-                (donor_name, donor_email, amount, payment_method, payment_status,
-                 razorpay_order_id, razorpay_payment_id, razorpay_signature, created_at, updated_at)
-            VALUES
-                (:name, :email, :amount, :method, 'paid',
-                 :order_id, :payment_id, :signature, NOW(), NOW())
-        ");
-        $ins->execute([
-            ':name'       => $donorName,
-            ':email'      => $donorEmail,
-            ':amount'     => $amountINR,
-            ':method'     => $method,
-            ':order_id'   => $razorpayOrderId,
-            ':payment_id' => $razorpayPaymentId,
-            ':signature'  => $razorpaySignature,
-        ]);
+    // If no pending row matched — insert a fresh paid record
+    if ($updated === 0) {
+        // Check if already paid (duplicate callback)
+        $check = $pdo->prepare("SELECT id, payment_status FROM donations WHERE razorpay_order_id = :order_id");
+        $check->execute([':order_id' => $razorpayOrderId]);
+        $existing = $check->fetch();
+
+        if ($existing && $existing['payment_status'] === 'paid') {
+            // Already verified — just return the record
+            error_log("[AL Hind] Order {$razorpayOrderId} already marked paid, returning existing record");
+        } else {
+            // No record at all — fetch from Razorpay and insert
+            $chOrder = curl_init("https://api.razorpay.com/v1/orders/{$razorpayOrderId}");
+            curl_setopt_array($chOrder, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_USERPWD        => RZP_KEY_ID . ':' . RZP_KEY_SECRET,
+                CURLOPT_TIMEOUT        => 15,
+                CURLOPT_SSL_VERIFYPEER => true,
+            ]);
+            $orderResp = curl_exec($chOrder);
+            curl_close($chOrder);
+            $orderData  = json_decode($orderResp, true);
+            $donorName  = $orderData['notes']['donor_name']  ?? 'Unknown';
+            $donorEmail = $orderData['notes']['donor_email'] ?? '';
+            $amountINR  = ($orderData['amount'] ?? 0) / 100;
+
+            $ins = $pdo->prepare("
+                INSERT INTO donations
+                    (donor_name, donor_email, amount, payment_method, payment_status,
+                     razorpay_order_id, razorpay_payment_id, razorpay_signature,
+                     created_at, updated_at)
+                VALUES
+                    (:name, :email, :amount, :method, 'paid',
+                     :order_id, :payment_id, :signature,
+                     :now, :now)
+            ");
+            $ins->execute([
+                ':name'       => $donorName,
+                ':email'      => $donorEmail,
+                ':amount'     => $amountINR,
+                ':method'     => $method,
+                ':order_id'   => $razorpayOrderId,
+                ':payment_id' => $razorpayPaymentId,
+                ':signature'  => $razorpaySignature,
+                ':now'        => $nowIST,
+            ]);
+        }
     }
 
-    // Fetch the final record to return to frontend
+    // Fetch final record to return to frontend
     $sel = $pdo->prepare("
         SELECT donor_name, donor_email, amount
         FROM donations
         WHERE razorpay_order_id = :order_id
-        LIMIT 1
     ");
     $sel->execute([':order_id' => $razorpayOrderId]);
-    $donation = $sel->fetch();
+    $donation = $sel->fetch(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
     error_log('[AL Hind] DB update failed: ' . $e->getMessage());
+    // Payment is valid — return success even if DB write failed (webhook is fallback)
     echo json_encode([
         'status'  => 'success',
-        'message' => 'Payment verified',
+        'message' => 'Payment verified (DB write failed — check logs)',
         'name'    => '',
         'amount'  => '',
     ]);
