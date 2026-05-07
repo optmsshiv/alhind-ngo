@@ -2423,6 +2423,123 @@
         </div>
       </div>
 
+      <!-- REGISTRANTS FULL PAGE -->
+      <div class="tab-panel" id="page-registrants">
+        <div class="pg-header"
+          style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+          <div>
+            <button onclick="goTo('events')"
+              style="display:inline-flex;align-items:center;gap:.4rem;background:none;border:none;color:var(--teal);font-size:.85rem;font-weight:600;cursor:pointer;padding:0;font-family:inherit;margin-bottom:.5rem;">
+              <i class="fa-solid fa-arrow-left"></i> Back to Events
+            </button>
+            <h1 id="rp-title" style="margin:0"><i class="fa-solid fa-users"></i> Registrants</h1>
+            <p id="rp-meta" style="color:var(--muted);font-size:.875rem;margin-top:.25rem"></p>
+          </div>
+          <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;">
+            <button onclick="exportRegCSV()"
+              style="display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-size:.82rem;font-weight:600;cursor:pointer;color:var(--teal);font-family:inherit;">
+              <i class="fa-solid fa-file-csv"></i> Export CSV
+            </button>
+            <button onclick="printRegistrants()"
+              style="display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-size:.82rem;font-weight:600;cursor:pointer;color:var(--muted);font-family:inherit;">
+              <i class="fa-solid fa-print"></i> Print
+            </button>
+          </div>
+        </div>
+
+        <div
+          style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.75rem;margin-bottom:1.5rem;">
+          <div class="panel-card" style="padding:.9rem 1rem;text-align:center;border-radius:12px;">
+            <div style="font-size:1.6rem;font-weight:800;color:var(--teal)" id="rp-sc-total">—</div>
+            <div
+              style="font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;margin-top:3px;">
+              Total</div>
+          </div>
+          <div class="panel-card" style="padding:.9rem 1rem;text-align:center;border-radius:12px;">
+            <div style="font-size:1.6rem;font-weight:800;color:var(--teal)" id="rp-sc-today">—</div>
+            <div
+              style="font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;margin-top:3px;">
+              Today</div>
+          </div>
+          <div class="panel-card" style="padding:.9rem 1rem;text-align:center;border-radius:12px;">
+            <div style="font-size:1.6rem;font-weight:800;color:var(--teal)" id="rp-sc-email">—</div>
+            <div
+              style="font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;margin-top:3px;">
+              With email</div>
+          </div>
+          <div class="panel-card" style="padding:.9rem 1rem;text-align:center;border-radius:12px;">
+            <div style="font-size:1.6rem;font-weight:800;color:var(--teal)" id="rp-sc-cities">—</div>
+            <div
+              style="font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;margin-top:3px;">
+              Cities</div>
+          </div>
+        </div>
+
+        <div class="panel-card"
+          style="padding:.75rem 1rem;margin-bottom:1rem;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;border-radius:12px;">
+          <div style="position:relative;flex:1;min-width:200px;">
+            <i class="fa-solid fa-magnifying-glass"
+              style="position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.8rem;pointer-events:none"></i>
+            <input type="text" id="rp-search" placeholder="Search name, phone, ticket, city, email…"
+              oninput="filterRpTable()"
+              style="width:100%;padding:.55rem .9rem .55rem 2.2rem;border:1.5px solid var(--border);border-radius:9px;font-size:.85rem;font-family:inherit;background:var(--bg);outline:none;color:inherit;">
+          </div>
+          <select id="rp-city-filter" onchange="filterRpTable()"
+            style="padding:.55rem .9rem;border:1.5px solid var(--border);border-radius:9px;font-size:.82rem;font-family:inherit;background:var(--bg);color:inherit;outline:none;cursor:pointer;">
+            <option value="">All cities</option>
+          </select>
+          <span style="font-size:.8rem;color:var(--muted)" id="rp-count-label"></span>
+        </div>
+
+        <div class="panel-card" style="padding:0;overflow:hidden;border-radius:12px;">
+          <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:.84rem;min-width:700px;">
+              <thead>
+                <tr style="background:var(--bg);">
+                  <th
+                    style="padding:.65rem 1rem;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border);white-space:nowrap;">
+                    #</th>
+                  <th
+                    style="padding:.65rem 1rem;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border);white-space:nowrap;">
+                    Ticket</th>
+                  <th
+                    style="padding:.65rem 1rem;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border);">
+                    Name</th>
+                  <th
+                    style="padding:.65rem 1rem;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border);">
+                    Phone</th>
+                  <th
+                    style="padding:.65rem 1rem;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border);">
+                    Email</th>
+                  <th
+                    style="padding:.65rem 1rem;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border);">
+                    City</th>
+                  <th
+                    style="padding:.65rem 1rem;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border);">
+                    Message</th>
+                  <th
+                    style="padding:.65rem 1rem;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border);white-space:nowrap;">
+                    Registered</th>
+                </tr>
+              </thead>
+              <tbody id="rp-tbody">
+                <tr>
+                  <td colspan="8" style="text-align:center;padding:3rem;color:var(--muted);">
+                    <i class="fa-solid fa-spinner fa-spin"
+                      style="font-size:1.4rem;display:block;margin-bottom:.5rem;opacity:.5"></i>
+                    Loading…
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="rp-empty" style="display:none;text-align:center;padding:3rem;color:var(--muted);">
+            <i class="fa-solid fa-users-slash" style="font-size:2rem;display:block;margin-bottom:.75rem;opacity:.4"></i>
+            No registrations found.
+          </div>
+        </div>
+      </div>
+
       <!-- ADD EVENT -->
       <div class="tab-panel" id="page-add-event">
         <div class="pg-header">
@@ -2819,80 +2936,98 @@
     </div>
   </div>
 
-  <!-- REGISTRATIONS MODAL -->
+  <!-- REGISTRATIONS MODAL — redesigned -->
   <div class="modal-ov" id="reg-modal">
-    <div class="modal" style="max-width:780px;width:95vw">
-      <div class="mh">
+    <div class="modal" style="max-width:760px;width:95vw;padding:0;overflow:hidden;border-radius:16px;">
+
+      <!-- Teal header -->
+      <div
+        style="background:#0f766e;padding:14px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
         <div>
-          <h2><i class="fa-solid fa-users"></i> Registrations</h2>
-          <p id="reg-modal-subtitle" style="font-size:.8rem;color:var(--muted);margin-top:2px"></p>
+          <div style="color:#fff;font-size:.95rem;font-weight:700;line-height:1.3" id="reg-modal-subtitle">—</div>
+          <div style="color:#9FE1CB;font-size:.78rem;margin-top:3px" id="reg-modal-meta"></div>
         </div>
-        <div style="display:flex;gap:.6rem;align-items:center">
-          <button onclick="exportRegCSV()" title="Export CSV"
-            style="display:inline-flex;align-items:center;gap:.4rem;padding:.4rem .9rem;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);font-size:.78rem;font-weight:600;cursor:pointer;color:var(--teal)">
-            <i class="fa-solid fa-file-csv"></i> Export CSV
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <button onclick="exportRegCSV()"
+            style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:5px 13px;font-size:.78rem;font-weight:600;cursor:pointer;font-family:inherit;">
+            <i class="fa-solid fa-file-csv" style="font-size:.75rem"></i> Export CSV
           </button>
-          <button class="mcl" onclick="closeRegModal()"><i class="fa-solid fa-xmark"></i></button>
+          <button onclick="openFullRegistrantsPage()"
+            style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:5px 13px;font-size:.78rem;font-weight:600;cursor:pointer;font-family:inherit;">
+            <i class="fa-solid fa-up-right-from-square" style="font-size:.72rem"></i> Full page
+          </button>
+          <button onclick="closeRegModal()"
+            style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.95rem;flex-shrink:0;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
         </div>
       </div>
 
-      <!-- Stats bar -->
+      <!-- Stat cells -->
       <div id="reg-stats"
-        style="display:flex;gap:1rem;padding:.75rem 0 1rem;border-bottom:1px solid var(--border);margin-bottom:1rem;flex-wrap:wrap">
-      </div>
+        style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border)"></div>
 
-      <!-- Search -->
-      <div style="position:relative;margin-bottom:1rem">
-        <i class="fa-solid fa-magnifying-glass"
-          style="position:absolute;left:.8rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.8rem"></i>
-        <input type="text" id="reg-search" placeholder="Search by name, phone or city…" oninput="filterRegistrants()"
-          style="width:100%;padding:.55rem .9rem .55rem 2.2rem;border:1.5px solid var(--border);border-radius:10px;font-size:.85rem;font-family:inherit;background:var(--bg);outline:none">
+      <!-- Toolbar -->
+      <div
+        style="padding:8px 14px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--border);background:var(--bg);">
+        <div style="position:relative;flex:1">
+          <i class="fa-solid fa-magnifying-glass"
+            style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.75rem;pointer-events:none"></i>
+          <input type="text" id="reg-search" placeholder="Search name, phone, ticket, city…"
+            oninput="filterRegistrants()"
+            style="width:100%;padding:.45rem .9rem .45rem 2rem;border:1.5px solid var(--border);border-radius:8px;font-size:.82rem;font-family:inherit;background:#fff;outline:none;color:inherit">
+        </div>
       </div>
 
       <!-- Loading -->
       <div id="reg-loading" style="text-align:center;padding:2.5rem;color:var(--muted)">
-        <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;margin-bottom:.5rem;display:block"></i>
+        <i class="fa-solid fa-spinner fa-spin" style="font-size:1.4rem;margin-bottom:.5rem;display:block"></i>
         Loading registrations…
       </div>
 
       <!-- Table -->
-      <div id="reg-table-wrap" style="display:none;overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse;font-size:.82rem">
+      <div id="reg-table-wrap" style="display:none;overflow-x:auto;max-height:340px;overflow-y:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:.82rem;min-width:580px;">
           <thead>
-            <tr style="background:var(--bg)">
+            <tr style="background:var(--bg);position:sticky;top:0;z-index:1;">
               <th
-                style="padding:.6rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">
+                style="padding:.55rem .9rem;text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border);white-space:nowrap">
                 #</th>
               <th
-                style="padding:.6rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">
-                Ticket No.</th>
+                style="padding:.55rem .9rem;text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border);white-space:nowrap">
+                Ticket</th>
               <th
-                style="padding:.6rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">
+                style="padding:.55rem .9rem;text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border)">
                 Name</th>
               <th
-                style="padding:.6rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">
+                style="padding:.55rem .9rem;text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border)">
                 Phone</th>
               <th
-                style="padding:.6rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">
-                Email</th>
-              <th
-                style="padding:.6rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">
+                style="padding:.55rem .9rem;text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border)">
                 City</th>
               <th
-                style="padding:.6rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">
-                Message</th>
-              <th
-                style="padding:.6rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">
+                style="padding:.55rem .9rem;text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border)">
                 Registered</th>
             </tr>
           </thead>
           <tbody id="reg-tbody"></tbody>
         </table>
         <div id="reg-empty" style="display:none;text-align:center;padding:2.5rem;color:var(--muted)">
-          <i class="fa-solid fa-users-slash" style="font-size:2rem;margin-bottom:.75rem;display:block"></i>
+          <i class="fa-solid fa-users-slash" style="font-size:1.8rem;margin-bottom:.6rem;display:block;opacity:.4"></i>
           No registrations yet for this event.
         </div>
       </div>
+
+      <!-- Footer -->
+      <div
+        style="padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);background:var(--bg);">
+        <span style="font-size:.78rem;color:var(--muted)" id="reg-footer-count"></span>
+        <button onclick="openFullRegistrantsPage()"
+          style="display:inline-flex;align-items:center;gap:6px;background:#0f766e;color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit;">
+          <i class="fa-solid fa-table-list" style="font-size:.75rem"></i> Open full page
+        </button>
+      </div>
+
     </div>
   </div>
 
@@ -3126,7 +3261,7 @@
     <td>${e.category ? `<span class="cat-tag">${esc(e.category)}</span>` : '-'}</td>
     <td style="color:var(--muted);font-size:.8rem">${esc(e.location || '-')}</td>
     <td>
-      <button onclick="openRegistrations(${e.id},'${esc(e.title)}')"
+      <button onclick="openRegistrations(${e.id},'${esc(e.title)}','${esc(e.date)} · ${esc(e.location || '')}')"
         style="display:inline-flex;align-items:center;gap:.35rem;padding:.3rem .75rem;border-radius:99px;border:1.5px solid var(--border);background:var(--bg);font-size:.75rem;font-weight:600;cursor:pointer;color:var(--teal)">
         <i class="fa-solid fa-users"></i> <span id="reg-count-${e.id}">—</span>
       </button>
@@ -3143,19 +3278,51 @@
     let regData = [];
     let regEventId = null;
     let regEventTitle = '';
+    let regEventMeta = '';
 
-    async function openRegistrations(eventId, title) {
+    // Avatar colour palette — deterministic from name initials
+    const AV_COLORS = [
+      ['#E1F5EE', '#085041'], ['#E6F1FB', '#0C447C'], ['#FAEEDA', '#633806'],
+      ['#FBEAF0', '#72243E'], ['#EAF3DE', '#27500A'], ['#EDE9FE', '#4C1D95'],
+      ['#FEF3C7', '#92400E'], ['#CFFAFE', '#155E75'],
+    ];
+    function avatarColor(name) {
+      let h = 0;
+      for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
+      return AV_COLORS[Math.abs(h) % AV_COLORS.length];
+    }
+    function initials(name) {
+      return (name || '?').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+    }
+    function ticketBadge(t) {
+      if (!t) return '<span style="color:var(--muted);font-size:.75rem">—</span>';
+      return `<span style="font-family:monospace;font-size:.72rem;font-weight:700;color:#085041;background:#E1F5EE;border:1.5px dashed #1D9E75;border-radius:5px;padding:2px 7px;letter-spacing:.8px;white-space:nowrap">${esc(t)}</span>`;
+    }
+    function cityBadge(c) {
+      if (!c) return '—';
+      return `<span style="background:var(--bg);border:1px solid var(--border);border-radius:99px;padding:2px 9px;font-size:.75rem;color:var(--muted)">${esc(c)}</span>`;
+    }
+    function fmtRegDate(dt) {
+      if (!dt) return '—';
+      return new Date(dt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    }
+
+    async function openRegistrations(eventId, title, meta) {
       regEventId = eventId;
       regEventTitle = title;
+      regEventMeta = meta || '';
       regData = [];
 
-      // Show modal in loading state
-      document.getElementById('reg-modal').classList.add('open');
+      // Modal state — loading
+      const modal = document.getElementById('reg-modal');
+      modal.classList.add('open');
       document.getElementById('reg-modal-subtitle').textContent = title;
+      document.getElementById('reg-modal-meta').textContent = meta || '';
       document.getElementById('reg-loading').style.display = 'block';
       document.getElementById('reg-table-wrap').style.display = 'none';
-      document.getElementById('reg-search').value = '';
       document.getElementById('reg-stats').innerHTML = '';
+      document.getElementById('reg-search').value = '';
+      document.getElementById('reg-footer-count').textContent = '';
 
       try {
         const res = await apiFetch('GET', `volunteers/${eventId}`);
@@ -3190,63 +3357,61 @@
       const total = regData.length;
       const withEmail = regData.filter(r => r.email).length;
       const cities = [...new Set(regData.map(r => r.city).filter(Boolean))].length;
-      const today = new Date().toISOString().split('T')[0];
-      const todayReg = regData.filter(r => r.created_at && r.created_at.startsWith(today)).length;
+      const todayStr = new Date().toISOString().split('T')[0];
+      const todayReg = regData.filter(r => r.created_at && r.created_at.startsWith(todayStr)).length;
 
-      document.getElementById('reg-stats').innerHTML = `
-        <div style="background:#f0fdf9;border:1px solid #99f6e4;border-radius:10px;padding:.6rem 1rem;text-align:center;min-width:90px">
-          <div style="font-size:1.4rem;font-weight:800;color:var(--teal)">${total}</div>
-          <div style="font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Total</div>
-        </div>
-        <div style="background:#f0fdf9;border:1px solid #99f6e4;border-radius:10px;padding:.6rem 1rem;text-align:center;min-width:90px">
-          <div style="font-size:1.4rem;font-weight:800;color:var(--teal)">${todayReg}</div>
-          <div style="font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Today</div>
-        </div>
-        <div style="background:#f0fdf9;border:1px solid #99f6e4;border-radius:10px;padding:.6rem 1rem;text-align:center;min-width:90px">
-          <div style="font-size:1.4rem;font-weight:800;color:var(--teal)">${withEmail}</div>
-          <div style="font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em">With Email</div>
-        </div>
-        <div style="background:#f0fdf9;border:1px solid #99f6e4;border-radius:10px;padding:.6rem 1rem;text-align:center;min-width:90px">
-          <div style="font-size:1.4rem;font-weight:800;color:var(--teal)">${cities}</div>
-          <div style="font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Cities</div>
+      const cell = (n, l) => `
+        <div style="text-align:center;padding:.75rem .5rem;border-right:1px solid var(--border)">
+          <div style="font-size:1.35rem;font-weight:800;color:var(--teal);line-height:1">${n}</div>
+          <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;margin-top:3px">${l}</div>
+        </div>`;
+
+      document.getElementById('reg-stats').innerHTML =
+        cell(total, 'Total') + cell(todayReg, 'Today') + cell(withEmail, 'With email') +
+        `<div style="text-align:center;padding:.75rem .5rem">
+          <div style="font-size:1.35rem;font-weight:800;color:var(--teal);line-height:1">${cities}</div>
+          <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;margin-top:3px">Cities</div>
         </div>`;
     }
 
     function renderRegTable(data) {
       const tb = document.getElementById('reg-tbody');
       const empty = document.getElementById('reg-empty');
+      const wrap = document.getElementById('reg-table-wrap');
+      const footer = document.getElementById('reg-footer-count');
+
       if (!data.length) {
         tb.innerHTML = '';
         empty.style.display = 'block';
+        wrap.style.display = 'block';
+        if (footer) footer.textContent = 'No registrations found';
         return;
       }
       empty.style.display = 'none';
+
+      if (footer) {
+        footer.textContent = data.length === regData.length
+          ? `${data.length} registrant${data.length !== 1 ? 's' : ''}`
+          : `Showing ${data.length} of ${regData.length}`;
+      }
+
       tb.innerHTML = data.map((r, i) => {
-        const date = r.created_at
-          ? new Date(r.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-          : '—';
-        const ticketHtml = r.ticket_no
-          ? `<span style="font-family:monospace;font-size:.75rem;font-weight:700;color:#0a4e48;background:#f0fdf9;border:1.5px dashed #0f766e;border-radius:6px;padding:2px 8px;letter-spacing:1px">${esc(r.ticket_no)}</span>`
-          : `<span style="color:var(--muted);font-size:.75rem">—</span>`;
-        return `<tr style="border-bottom:1px solid var(--border)">
-          <td style="padding:.65rem .9rem;color:var(--muted);font-size:.75rem">${i + 1}</td>
-          <td style="padding:.65rem .9rem">${ticketHtml}</td>
-          <td style="padding:.65rem .9rem;font-weight:600">${esc(r.name)}</td>
-          <td style="padding:.65rem .9rem">
-            <a href="tel:${esc(r.phone)}" style="color:var(--teal);text-decoration:none;font-weight:500">
-              <i class="fa-solid fa-phone" style="font-size:.7rem"></i> ${esc(r.phone)}
+        const [bg, fg] = avatarColor(r.name || '?');
+        return `<tr style="border-bottom:1px solid var(--border)" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">
+          <td style="padding:.6rem .9rem;color:var(--muted);font-size:.75rem">${i + 1}</td>
+          <td style="padding:.6rem .9rem">${ticketBadge(r.ticket_no)}</td>
+          <td style="padding:.6rem .9rem">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:28px;height:28px;border-radius:50%;background:${bg};color:${fg};display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;flex-shrink:0">${initials(r.name)}</div>
+              <span style="font-weight:600">${esc(r.name)}</span>
+            </div>
+          </td>
+          <td style="padding:.6rem .9rem">
+            <a href="tel:${esc(r.phone)}" style="color:var(--teal);text-decoration:none;font-weight:500;font-size:.82rem">
+              ${esc(r.phone)}
             </a>
           </td>
-          <td style="padding:.65rem .9rem;color:var(--muted)">
-            ${r.email ? `<a href="mailto:${esc(r.email)}" style="color:var(--teal);text-decoration:none">${esc(r.email)}</a>` : '—'}
-          </td>
-          <td style="padding:.65rem .9rem">${esc(r.city || '—')}</td>
-          <td style="padding:.65rem .9rem;color:var(--muted);max-width:140px">
-            <span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px" title="${esc(r.message || '')}">
-              ${r.message ? esc(r.message) : '—'}
-            </span>
-          </td>
-          <td style="padding:.65rem .9rem;color:var(--muted);white-space:nowrap;font-size:.75rem">${date}</td>
+          <td style="padding:.6rem .9rem;font-size:.78rem;color:var(--muted);white-space:nowrap;font-size:.75rem">${fmtRegDate(r.created_at)}</td>
         </tr>`;
       }).join('');
     }
@@ -3254,14 +3419,13 @@
     function filterRegistrants() {
       const q = document.getElementById('reg-search').value.toLowerCase().trim();
       if (!q) { renderRegTable(regData); return; }
-      const filtered = regData.filter(r =>
+      renderRegTable(regData.filter(r =>
         (r.name || '').toLowerCase().includes(q) ||
         (r.phone || '').toLowerCase().includes(q) ||
         (r.city || '').toLowerCase().includes(q) ||
         (r.email || '').toLowerCase().includes(q) ||
         (r.ticket_no || '').toLowerCase().includes(q)
-      );
-      renderRegTable(filtered);
+      ));
     }
 
     function exportRegCSV() {
@@ -3286,7 +3450,133 @@
       toast('CSV exported ✓', 'success');
     }
 
-    // Load registration counts for all events in parallel (not sequential)
+    /* ── Full registrants page ──────────────────────────────── */
+    let rpData = [];
+
+    function openFullRegistrantsPage() {
+      closeRegModal();
+      rpData = [...regData];
+
+      // Update page header
+      document.getElementById('rp-title').innerHTML =
+        `<i class="fa-solid fa-users"></i> ${esc(regEventTitle)}`;
+      document.getElementById('rp-meta').textContent = regEventMeta || '';
+
+      // Stat cards
+      const todayStr = new Date().toISOString().split('T')[0];
+      document.getElementById('rp-sc-total').textContent = rpData.length;
+      document.getElementById('rp-sc-today').textContent = rpData.filter(r => r.created_at && r.created_at.startsWith(todayStr)).length;
+      document.getElementById('rp-sc-email').textContent = rpData.filter(r => r.email).length;
+      document.getElementById('rp-sc-cities').textContent = [...new Set(rpData.map(r => r.city).filter(Boolean))].length;
+
+      // City filter dropdown
+      const cities = [...new Set(rpData.map(r => r.city).filter(Boolean))].sort();
+      const citySel = document.getElementById('rp-city-filter');
+      citySel.innerHTML = '<option value="">All cities</option>' +
+        cities.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+
+      // Clear search
+      document.getElementById('rp-search').value = '';
+      document.getElementById('rp-count-label').textContent = '';
+
+      renderRpTable(rpData);
+      goTo('registrants');
+    }
+
+    function renderRpTable(data) {
+      const tb = document.getElementById('rp-tbody');
+      const empty = document.getElementById('rp-empty');
+      const label = document.getElementById('rp-count-label');
+
+      if (label) label.textContent = data.length === rpData.length
+        ? `${data.length} registrant${data.length !== 1 ? 's' : ''}`
+        : `${data.length} of ${rpData.length} shown`;
+
+      if (!data.length) {
+        tb.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+
+      tb.innerHTML = data.map((r, i) => {
+        const [bg, fg] = avatarColor(r.name || '?');
+        return `<tr style="border-bottom:1px solid var(--border)" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">
+          <td style="padding:.65rem 1rem;color:var(--muted);font-size:.78rem">${i + 1}</td>
+          <td style="padding:.65rem 1rem">${ticketBadge(r.ticket_no)}</td>
+          <td style="padding:.65rem 1rem">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:30px;height:30px;border-radius:50%;background:${bg};color:${fg};display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0">${initials(r.name)}</div>
+              <span style="font-weight:600">${esc(r.name)}</span>
+            </div>
+          </td>
+          <td style="padding:.65rem 1rem">
+            <a href="tel:${esc(r.phone)}" style="color:var(--teal);text-decoration:none;font-weight:500">${esc(r.phone)}</a>
+          </td>
+          <td style="padding:.65rem 1rem;font-size:.8rem;color:var(--muted)">
+            ${r.email ? `<a href="mailto:${esc(r.email)}" style="color:var(--teal);text-decoration:none">${esc(r.email)}</a>` : '—'}
+          </td>
+          <td style="padding:.65rem 1rem">${cityBadge(r.city)}</td>
+          <td style="padding:.65rem 1rem;color:var(--muted);font-size:.8rem;max-width:160px">
+            <span style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px" title="${esc(r.message || '')}">
+              ${r.message ? esc(r.message) : '—'}
+            </span>
+          </td>
+          <td style="padding:.65rem 1rem;color:var(--muted);white-space:nowrap;font-size:.78rem">${fmtRegDate(r.created_at)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function filterRpTable() {
+      const q = (document.getElementById('rp-search').value || '').toLowerCase().trim();
+      const city = (document.getElementById('rp-city-filter').value || '').toLowerCase();
+      let data = [...rpData];
+      if (q) data = data.filter(r =>
+        (r.name || '').toLowerCase().includes(q) ||
+        (r.phone || '').toLowerCase().includes(q) ||
+        (r.email || '').toLowerCase().includes(q) ||
+        (r.city || '').toLowerCase().includes(q) ||
+        (r.ticket_no || '').toLowerCase().includes(q)
+      );
+      if (city) data = data.filter(r => (r.city || '').toLowerCase() === city);
+      renderRpTable(data);
+    }
+
+    function printRegistrants() {
+      const rows = rpData.map((r, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td style="font-family:monospace;font-size:11px">${r.ticket_no || '—'}</td>
+          <td>${r.name || ''}</td>
+          <td>${r.phone || ''}</td>
+          <td>${r.email || '—'}</td>
+          <td>${r.city || '—'}</td>
+        </tr>`).join('');
+
+      const win = window.open('', '_blank');
+      win.document.write(`<!DOCTYPE html><html><head>
+        <title>Registrants — ${regEventTitle}</title>
+        <style>
+          body{font-family:Arial,sans-serif;font-size:12px;padding:20px}
+          h2{color:#0f766e;margin-bottom:4px}
+          p{color:#64748b;margin:0 0 16px;font-size:11px}
+          table{width:100%;border-collapse:collapse}
+          th{background:#0f766e;color:#fff;padding:7px 10px;text-align:left;font-size:11px}
+          td{padding:6px 10px;border-bottom:1px solid #e5e7eb;font-size:11px}
+          tr:nth-child(even) td{background:#f8fafc}
+        </style></head><body>
+        <h2>Registrants — ${regEventTitle}</h2>
+        <p>${regEventMeta} &nbsp;·&nbsp; Printed on ${new Date().toLocaleDateString('en-IN')}</p>
+        <table>
+          <thead><tr><th>#</th><th>Ticket</th><th>Name</th><th>Phone</th><th>Email</th><th>City</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <script>window.onload=()=>window.print()<\/script>
+      </body></html>`);
+      win.document.close();
+    }
+
+    // Load registration counts for all events in parallel
     async function loadRegCounts() {
       await Promise.all(events.map(async e => {
         try {

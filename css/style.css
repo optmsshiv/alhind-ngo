@@ -8,7 +8,7 @@ body {
     color: #1F2933;
     background: #F8FAFC;
     line-height: 1.7;
-    padding-top: 110px;
+    padding-top: 90px;
     /* space for fixed header */
 }
 
@@ -1256,7 +1256,7 @@ nav a {
     width: 100%;
     background: #1e6f5c;
     will-change: transform, opacity;
-    padding: 22px 30px;
+    padding: 5px 28px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1290,7 +1290,7 @@ nav a {
 
 /* ---------------- SCROLL STATE ---------------- */
 .site-header.scrolled {
-    padding: 14px 30px;
+    padding: 10px 30px;
     background: #207662;
     /* slightly darker */
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
