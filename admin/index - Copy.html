@@ -40,143 +40,6 @@
       line-height: 1.5
     }
 
-    /* Interest-type badge */
-    .int-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: .28rem;
-      padding: .18rem .6rem;
-      border-radius: 99px;
-      font-size: .7rem;
-      font-weight: 700;
-    }
-
-    .int-volunteer {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .int-team {
-      background: #ede9fe;
-      color: #6d28d9;
-    }
-
-    .int-partner {
-      background: #dbeafe;
-      color: #1d4ed8;
-    }
-
-    .int-general {
-      background: #f1f5f9;
-      color: #475569;
-    }
-
-    /* Status badge */
-    .st-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: .28rem;
-      padding: .18rem .6rem;
-      border-radius: 99px;
-      font-size: .7rem;
-      font-weight: 700;
-    }
-
-    .st-submitted {
-      background: #f0fdf4;
-      color: #15803d;
-    }
-
-    .st-payment_pending {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .st-approved {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .st-payment_failed {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    /* Ticket mono */
-    .tkt-mono {
-      font-family: 'Courier New', monospace;
-      font-size: .72rem;
-      color: #0369a1;
-      background: #eff6ff;
-      padding: .1rem .42rem;
-      border-radius: 5px;
-      white-space: nowrap;
-    }
-
-    /* Resend-link button */
-    .btn-resend {
-      background: #fef3c7;
-      color: #92400e;
-      border: none;
-      border-radius: 7px;
-      padding: .26rem .6rem;
-      font-size: .72rem;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-    }
-
-    .btn-resend:hover {
-      background: #fde68a;
-    }
-
-    /* Message filter pills (reuse don-fpill pattern) */
-    .msg-fpill {
-      display: inline-flex;
-      align-items: center;
-      gap: .3rem;
-      padding: .25rem .7rem;
-      border-radius: 99px;
-      font-size: .74rem;
-      font-weight: 700;
-      cursor: pointer;
-      border: 1.5px solid var(--border);
-      background: #fff;
-      color: var(--muted);
-      transition: all .15s;
-      user-select: none;
-    }
-
-    .msg-fpill:hover {
-      background: var(--bg);
-    }
-
-    .msg-fpill.mf-all {
-      background: #0f766e;
-      color: #fff;
-      border-color: #0f766e;
-    }
-
-    .msg-fpill.mf-pending {
-      background: #fef3c7;
-      color: #92400e;
-      border-color: #fcd34d;
-    }
-
-    .msg-fpill.mf-paid {
-      background: #dcfce7;
-      color: #166534;
-      border-color: #86efac;
-    }
-
-    .msg-fpill.mf-free {
-      background: #ede9fe;
-      color: #6d28d9;
-      border-color: #c4b5fd;
-    }
-
-
-
     /* ── LOGIN ──────────────────────────── */
     #login-screen {
       display: flex;
@@ -2969,107 +2832,43 @@
       <div class="tab-panel" id="page-messages">
         <div class="pg-header">
           <h1><i class="fa-solid fa-envelope-open-text"></i> Contact Messages</h1>
-          <p>Messages and join inquiries submitted via the contact form.</p>
+          <p>Messages and inquiries submitted via your contact form.</p>
         </div>
-
-        <!-- Stat cards -->
-        <div class="don-stat-grid" style="margin-bottom:1.25rem">
-          <div class="don-stat-card">
-            <div class="don-stat-lbl">Total</div>
-            <div class="don-stat-val" id="mst-total">—</div>
-            <div class="don-stat-sub blue">all messages</div>
-          </div>
-          <div class="don-stat-card">
-            <div class="don-stat-lbl">Unread</div>
-            <div class="don-stat-val" id="mst-unread" style="color:#dc2626">—</div>
-            <div class="don-stat-sub" style="color:#dc2626">need attention</div>
-          </div>
-          <div class="don-stat-card">
-            <div class="don-stat-lbl">Payment Pending</div>
-            <div class="don-stat-val" id="mst-pending" style="color:#b45309">—</div>
-            <div class="don-stat-sub amber">awaiting payment</div>
-          </div>
-          <div class="don-stat-card">
-            <div class="don-stat-lbl">Approved</div>
-            <div class="don-stat-val" id="mst-approved" style="color:#0f766e">—</div>
-            <div class="don-stat-sub green">confirmed</div>
+        <div class="sec-bar">
+          <h2>All Messages</h2>
+          <div style="display:flex;gap:.65rem;align-items:center;flex-wrap:wrap">
+            <span class="cpill" id="msg-cpill">0 messages</span>
+            <span
+              style="background:#fee2e2;color:#dc2626;border-radius:99px;padding:.22rem .75rem;font-size:.75rem;font-weight:700;"
+              id="msg-unread-pill">0 unread</span>
+            <button
+              style="background:var(--danger-bg);color:var(--danger);border:none;border-radius:8px;padding:.42rem .95rem;font-size:.8rem;cursor:pointer;font-weight:700;"
+              onclick="clearMessages()">Clear All</button>
+            <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;" onclick="markAllRead()"><i
+                class="fa-solid fa-check-double"></i> Mark All
+              Read</button>
+            <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem;background:#475569;"
+              onclick="exportCSV('messages')">⬇ Export CSV</button>
           </div>
         </div>
-
-        <!-- Summary bar -->
-        <div class="don-summary-bar" style="margin-bottom:1.1rem">
-          <div class="don-sum-pills">
-            <span class="don-sum-pill neutral" id="msg-bar-total">0 messages</span>
-            <span class="don-sum-pill" style="background:#fee2e2;color:#991b1b" id="msg-bar-unread">0 unread</span>
-            <span class="don-sum-pill amber" id="msg-bar-pending">0 pending payment</span>
-          </div>
-          <div style="display:flex;gap:.55rem">
-            <button class="don-bar-btn csv" onclick="exportCSV('messages')">
-              <i class="fa-solid fa-download"></i> Export CSV
-            </button>
-            <button class="don-bar-btn clr" onclick="clearMessages()">Clear All</button>
-          </div>
-        </div>
-
-        <!-- Toolbar: filter pills + actions -->
-        <div
-          style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.65rem;margin-bottom:.85rem">
-          <div style="display:flex;gap:.45rem;align-items:center;flex-wrap:wrap">
-            <button class="msg-fpill mf-all" data-mf="all" onclick="msgSetFilter(this)">All</button>
-            <button class="msg-fpill" data-mf="pending" onclick="msgSetFilter(this)">
-              <span
-                style="width:7px;height:7px;border-radius:50%;background:#f59e0b;flex-shrink:0;display:inline-block"></span>
-              Payment Pending
-            </button>
-            <button class="msg-fpill" data-mf="free" onclick="msgSetFilter(this)">
-              <span
-                style="width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0;display:inline-block"></span>
-              Free Roles
-            </button>
-            <button class="msg-fpill" data-mf="unread" onclick="msgSetFilter(this)">
-              <i class="fa-solid fa-circle" style="font-size:.5rem;color:#dc2626"></i> Unread
-            </button>
-          </div>
-          <div style="display:flex;gap:.55rem">
-            <button class="btn-sub" style="padding:.4rem .9rem;font-size:.8rem" onclick="markAllRead()">
-              <i class="fa-solid fa-check-double"></i> Mark All Read
-            </button>
-          </div>
-        </div>
-
-        <!-- Search -->
-        <div style="position:relative;margin-bottom:1rem">
-          <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:.9rem;top:50%;transform:translateY(-50%);
-                    color:var(--muted);font-size:.8rem;pointer-events:none"></i>
-          <input type="text" id="msg-search" placeholder="Search name, email, phone, ticket…" oninput="renderMessages()"
-            style="width:100%;padding:.65rem 1rem .65rem 2.5rem;border:1.5px solid var(--border);
-                   border-radius:10px;font-size:.875rem;font-family:inherit;background:#fff;
-                   color:#1e293b;transition:border-color .2s,box-shadow .2s"
-            onfocus="this.style.borderColor='var(--teal)';this.style.boxShadow='0 0 0 3px rgba(15,118,110,.1)'"
-            onblur="this.style.borderColor='';this.style.boxShadow=''">
-        </div>
-
-        <!-- Table -->
         <div class="tbl-wrap">
           <table>
             <thead>
               <tr>
-                <th style="width:32px">#</th>
+                <th>#</th>
                 <th>Name</th>
-                <th>Email / Phone</th>
-                <th style="width:96px">Type</th>
-                <th style="width:112px">Status</th>
-                <th style="width:118px">Ticket</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Type</th>
                 <th>Message</th>
-                <th style="width:108px">Date</th>
-                <th style="width:110px">Actions</th>
+                <th>Date & Time</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="msg-tbody"></tbody>
           </table>
         </div>
-      </div><!-- end #page-messages -->
-
+      </div>
 
     </main>
   </div>
@@ -3088,24 +2887,18 @@
 
   <!-- MESSAGE DETAIL MODAL -->
   <div class="modal-ov" id="msg-modal">
-    <div class="modal" style="max-width:540px">
+    <div class="modal" style="max-width:520px">
       <div class="mh">
-        <h2><i class="fa-solid fa-envelope-open-text"></i> Message Detail</h2>
-        <button class="mcl" onclick="closeMsgModal()"><i class="fa-solid fa-xmark"></i></button>
+        <h2><i class="fa-solid fa-envelope-open-text"></i> Message Detail</h2><button class="mcl"
+          onclick="closeMsgModal()"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="msg-detail" id="msg-detail-body"></div>
-      <div class="f-actions" style="margin-top:1.5rem" id="msg-modal-actions">
-        <a id="msg-reply-link" href="" class="btn-sub" style="text-decoration:none;display:none">
-          <i class="fa-solid fa-reply"></i> Reply via Email
-        </a>
-        <button id="msg-resend-btn" class="btn-resend" onclick="resendPaymentLink()" style="display:none">
-          <i class="fa-solid fa-link"></i> Resend Payment Link
-        </button>
+      <div class="f-actions" style="margin-top:1.5rem">
+        <a id="msg-reply-link" href="" class="btn-sub" style="text-decoration:none">✉️ Reply via Email</a>
         <button class="btn-canc" onclick="closeMsgModal()">Close</button>
       </div>
     </div>
   </div>
-
 
   <!-- EDIT MODAL -->
   <div class="modal-ov" id="edit-modal">
@@ -4486,215 +4279,62 @@
       } catch (e) { toast('Failed', 'error'); }
     }
 
-    /* ── Messages state ──────────────────────────────── */
-    let _msgFilter = 'all';   // 'all' | 'pending' | 'free' | 'unread'
-    let _msgDetailId = null;   // id of currently open modal record
-
-    /* ── Filter pill click ───────────────────────────── */
-    function msgSetFilter(btn) {
-      document.querySelectorAll('.msg-fpill').forEach(b =>
-        b.classList.remove('mf-all', 'mf-pending', 'mf-free', 'mf-unread'));
-      _msgFilter = btn.dataset.mf;
-      const cls = { all: 'mf-all', pending: 'mf-pending', free: 'mf-free', unread: 'mf-unread' }[_msgFilter];
-      btn.classList.add(cls);
-      renderMessages();
-    }
-
-    /* ── Render messages table ───────────────────────── */
     function renderMessages() {
       const tb = document.getElementById('msg-tbody');
-      const q = (document.getElementById('msg-search')?.value || '').trim().toLowerCase();
-      const FREE_ROLES = ['volunteer', 'partner', 'general'];
-
-      /* stat counters */
-      const total = messages.length;
-      const unread = messages.filter(m => !m.is_read).length;
-      const pending = messages.filter(m => m.status === 'payment_pending').length;
-      const approved = messages.filter(m => m.status === 'approved').length;
-
-      const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-      set('mst-total', total);
-      set('mst-unread', unread);
-      set('mst-pending', pending);
-      set('mst-approved', approved);
-      set('msg-bar-total', total + ' message' + (total !== 1 ? 's' : ''));
-      set('msg-bar-unread', unread + ' unread');
-      set('msg-bar-pending', pending + ' pending payment');
-
-      /* also keep sidebar / header badges in sync */
-      const msgUnreadPill = document.getElementById('msg-unread-pill');
-      if (msgUnreadPill) msgUnreadPill.textContent = unread + ' unread';
-      const msgCpill = document.getElementById('msg-cpill');
-      if (msgCpill) msgCpill.textContent = total + ' messages';
-      const sbBadge = document.getElementById('sb-msg-count');
-      if (sbBadge) sbBadge.textContent = unread || '';
-
       if (!messages.length) {
-        tb.innerHTML = `<tr class="empty-r"><td colspan="9">No messages yet. They will appear here when submitted.</td></tr>`;
+        tb.innerHTML = `<tr class="empty-r"><td colspan="8">No messages yet. They will appear here when submitted.</td></tr>`;
         return;
       }
-
-      let rows = [...messages].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-      /* apply filter */
-      if (_msgFilter === 'pending') rows = rows.filter(m => m.status === 'payment_pending');
-      if (_msgFilter === 'free') rows = rows.filter(m => FREE_ROLES.includes(m.interest_type));
-      if (_msgFilter === 'unread') rows = rows.filter(m => !m.is_read);
-
-      /* apply search */
-      if (q) rows = rows.filter(m =>
-        [m.sender_name, m.sender_email, m.sender_phone, m.ticket_id, m.message]
-          .join(' ').toLowerCase().includes(q));
-
-      if (!rows.length) {
-        tb.innerHTML = `<tr class="empty-r"><td colspan="9">No messages match your filter.</td></tr>`;
-        return;
-      }
-
-      tb.innerHTML = rows.map((m, i) => `
-        <tr class="${!m.is_read ? 'row-unread' : ''}">
-          <td style="color:var(--muted);font-size:.78rem">${rows.length - i}</td>
-          <td>
-            <strong>${esc(m.sender_name || '—')}</strong>
-            ${!m.is_read ? '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#dc2626;margin-left:5px;vertical-align:middle"></span>' : ''}
-          </td>
-          <td>
-            <div style="font-size:.82rem;color:#1e293b">${esc(m.sender_email || '—')}</div>
-            <div style="font-size:.75rem;color:var(--muted)">${esc(m.sender_phone || '')}</div>
-          </td>
-          <td>${msgIntBadge(m.interest_type)}</td>
-          <td>${msgStBadge(m.status || 'submitted')}</td>
-          <td>${m.ticket_id ? `<span class="tkt-mono">${esc(m.ticket_id)}</span>` : '<span style="color:var(--muted)">—</span>'}</td>
-          <td><span class="msg-preview">${esc(m.message || '—')}</span></td>
-          <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">${fmtDateTime(m.created_at)}</td>
-          <td><div class="tbl-acts">
-            <button class="btn-view" onclick="viewMessage(${m.id})">
-              <i class="fa-solid fa-eye"></i> View
-            </button>
-            <button class="btn-rm" onclick="deleteMessage(${m.id})">
-              <i class="fa-solid fa-trash-can"></i>
-            </button>
-          </div></td>
-        </tr>`).join('');
+      const sorted = [...messages].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      tb.innerHTML = sorted.map((m, i) => `
+    <tr class="${!m.is_read ? 'row-unread' : ''}">
+      <td style="color:var(--muted);font-size:.78rem">#${sorted.length - i}</td>
+      <td><strong>${esc(m.sender_name || '—')}</strong></td>
+      <td style="color:var(--muted);font-size:.8rem">${esc(m.sender_email || '—')}</td>
+      <td style="color:var(--muted);font-size:.8rem">${esc(m.sender_phone || '—')}</td>
+      <td><span class="msg-type">${esc(labelInterest(m.interest_type))}</span></td>
+      <td><span class="msg-preview">${esc(m.message || '—')}</span></td>
+      <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">${fmtDateTime(m.created_at)}</td>
+      <td><div class="tbl-acts">
+        <button class="btn-view" onclick="viewMessage(${m.id})"><i class="fa-solid fa-eye"></i> View</button>
+        <button class="btn-rm"   onclick="deleteMessage(${m.id})"><i class="fa-solid fa-trash-can"></i></button>
+      </div></td>
+    </tr>`).join('');
     }
 
-    /* ── Badge helpers ───────────────────────────────── */
-    function msgIntBadge(v) {
-      const map = {
-        volunteer: ['int-volunteer', 'Volunteer'],
-        team: ['int-team', 'Member'],
-        partner: ['int-partner', 'Partner'],
-        general: ['int-general', 'General'],
-      };
-      const [cls, lbl] = map[v] || ['int-general', v || 'General'];
-      return `<span class="int-badge ${cls}">${lbl}</span>`;
-    }
-    function msgStBadge(s) {
-      const map = {
-        submitted: ['st-submitted', '✓ Submitted'],
-        payment_pending: ['st-payment_pending', '⏳ Pay Pending'],
-        approved: ['st-approved', '✅ Approved'],
-        payment_failed: ['st-payment_failed', '✗ Pay Failed'],
-      };
-      const [cls, lbl] = map[s] || ['st-submitted', s];
-      return `<span class="st-badge ${cls}">${lbl}</span>`;
-    }
-
-    /* ── labelInterest (kept for CSV export compat) ── */
     function labelInterest(v) {
       const map = { volunteer: 'Volunteer', team: 'Member', partner: 'Partner', general: 'General' };
       return map[v] || v || 'General';
     }
 
-    /* ── View message modal ──────────────────────────── */
     async function viewMessage(id) {
-      const m = messages.find(x => x.id === id);
-      if (!m) return;
-      _msgDetailId = id;
-
-      /* mark as read */
+      const m = messages.find(x => x.id === id); if (!m) return;
       if (!m.is_read) {
         try {
           await apiFetch('PATCH', `messages/${id}`, { read: true });
           m.is_read = true;
-          updateInboxCounts?.();
+          updateInboxCounts();
           renderMessages();
         } catch (e) { }
       }
-
-      const isPending = m.status === 'payment_pending';
-      const FEE_MAP = { team: 500 };
-      const fee = FEE_MAP[m.interest_type] || 0;
-
       document.getElementById('msg-detail-body').innerHTML = `
-        <div class="md-label">From</div>
-        <div class="md-val"><strong>${esc(m.sender_name)}</strong></div>
-
-        <div class="md-label">Email</div>
-        <div class="md-val">${m.sender_email
-          ? `<a href="mailto:${esc(m.sender_email)}" style="color:var(--teal)">${esc(m.sender_email)}</a>`
-          : '—'}</div>
-
-        <div class="md-label">Phone</div>
-        <div class="md-val">${m.sender_phone
-          ? `<a href="tel:${esc(m.sender_phone)}" style="color:var(--teal)">${esc(m.sender_phone)}</a>`
-          : '—'}</div>
-
-        <div class="md-label">Type</div>
-        <div class="md-val">${msgIntBadge(m.interest_type)}</div>
-
-        <div class="md-label">Status</div>
-        <div class="md-val" style="display:flex;align-items:center;gap:.65rem;flex-wrap:wrap">
-          ${msgStBadge(m.status || 'submitted')}
-          ${isPending ? `<span style="font-size:.78rem;color:#b45309">Joining fee: <strong>₹${fee}</strong></span>` : ''}
-        </div>
-
-        <div class="md-label">Ticket</div>
-        <div class="md-val">${m.ticket_id
-          ? `<span class="tkt-mono">${esc(m.ticket_id)}</span>`
-          : '—'}</div>
-
-        <div class="md-label">Received</div>
-        <div class="md-val">${fmtDateTime(m.created_at)}</div>
-
-        <div class="md-label">Message</div>
-        <div class="md-body">${esc(m.message || '—')}</div>`;
-
-      /* reply link */
+    <div class="md-label">From</div><div class="md-val"><strong>${esc(m.sender_name)}</strong></div>
+    <div class="md-label">Email</div><div class="md-val">${esc(m.sender_email || '—')}</div>
+    <div class="md-label">Phone</div><div class="md-val">${esc(m.sender_phone || '—')}</div>
+    <div class="md-label">Type</div><div class="md-val"><span class="msg-type">${esc(labelInterest(m.interest_type))}</span></div>
+    <div class="md-label">Received</div><div class="md-val">${fmtDateTime(m.created_at)}</div>
+    <div class="md-label">Message</div><div class="md-body">${esc(m.message || '—')}</div>`;
       const replyLink = document.getElementById('msg-reply-link');
       if (m.sender_email) {
-        replyLink.href = `mailto:${m.sender_email}?subject=Re: Your inquiry to AL Hind Trust (${m.ticket_id || ''})`;
+        replyLink.href = `mailto:${m.sender_email}?subject=Re: Your message to AL Hind Trust`;
         replyLink.style.display = 'inline-flex';
-      } else {
-        replyLink.style.display = 'none';
-      }
-
-      /* resend payment link — only for payment_pending */
-      document.getElementById('msg-resend-btn').style.display = isPending ? 'inline-flex' : 'none';
-
+      } else { replyLink.style.display = 'none'; }
       document.getElementById('msg-modal').classList.add('open');
     }
-
-    function closeMsgModal() {
-      document.getElementById('msg-modal').classList.remove('open');
-      _msgDetailId = null;
-    }
+    function closeMsgModal() { document.getElementById('msg-modal').classList.remove('open'); }
     document.getElementById('msg-modal').addEventListener('click', e => {
       if (e.target === document.getElementById('msg-modal')) closeMsgModal();
     });
-
-    /* ── Resend payment link ─────────────────────────── */
-    async function resendPaymentLink() {
-      if (!_msgDetailId) return;
-      const m = messages.find(x => x.id === _msgDetailId);
-      if (!m || !m.ticket_id) return;
-      try {
-        await apiFetch('POST', `messages/${_msgDetailId}/resend-payment`);
-        toast('Payment link resent ✓', 'success');
-      } catch (e) { toast('Failed to resend', 'error'); }
-    }
-
-    /* ── Delete / clear / markAllRead ───────────────── */
     async function deleteMessage(id) {
       if (!confirm('Delete this message?')) return;
       try {
@@ -4714,7 +4354,7 @@
     async function markAllRead() {
       try {
         await apiFetch('PATCH', 'messages', {});
-        toast('All marked read ✓', 'success');
+        toast('All marked read', 'success');
         await loadInbox();
       } catch (e) { toast('Failed', 'error'); }
     }
