@@ -4267,24 +4267,35 @@
       const total = donations.filter(d => d.payment_status === 'paid').reduce((s, d) => s + (parseFloat(d.amount) || 0), 0);
       const paidCount = donations.filter(d => d.payment_status === 'paid').length;
       const pendCount = donations.filter(d => d.payment_status !== 'paid' && d.payment_status !== 'failed').length;
-      document.getElementById('sb-don-count').textContent = dc;
-      document.getElementById('sb-msg-count').textContent = unread || mc;
-      document.getElementById('sv-don').textContent = dc;
-      document.getElementById('sv-don-amt').textContent = `₹${total.toLocaleString('en-IN')} raised`;
-      document.getElementById('sv-msg').textContent = mc;
-      document.getElementById('sv-msg-unread').textContent = `${unread} unread`;
-      // new stat cards
-      document.getElementById('don-sc-total').textContent = dc;
-      document.getElementById('don-sc-total-sub').textContent = `${dc} record${dc !== 1 ? 's' : ''}`;
-      document.getElementById('don-sc-raised').textContent = `₹${total.toLocaleString('en-IN')}`;
-      document.getElementById('don-sc-paid').textContent = paidCount;
-      document.getElementById('don-sc-pending').textContent = pendCount;
-      // summary bar pills
-      document.getElementById('don-bar-total').textContent = `${dc} donation${dc !== 1 ? 's' : ''}`;
-      document.getElementById('don-bar-raised').textContent = `₹${total.toLocaleString('en-IN')} raised`;
-      document.getElementById('don-bar-pending').textContent = `${pendCount} pending`;
-      document.getElementById('msg-cpill').textContent = `${mc} message${mc !== 1 ? 's' : ''}`;
-      document.getElementById('msg-unread-pill').textContent = `${unread} unread`;
+      const pending = messages.filter(m => m.status === 'payment_pending').length;
+      // helper — never crashes on missing element
+      const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+      // sidebar badges
+      set('sb-don-count', dc);
+      set('sb-msg-count', unread || mc);
+      // dashboard stat cards
+      set('sv-don', dc);
+      set('sv-don-amt', `₹${total.toLocaleString('en-IN')} raised`);
+      set('sv-msg', mc);
+      set('sv-msg-unread', `${unread} unread`);
+      // donations stat cards + bar
+      set('don-sc-total', dc);
+      set('don-sc-total-sub', `${dc} record${dc !== 1 ? 's' : ''}`);
+      set('don-sc-raised', `₹${total.toLocaleString('en-IN')}`);
+      set('don-sc-paid', paidCount);
+      set('don-sc-pending', pendCount);
+      set('don-bar-total', `${dc} donation${dc !== 1 ? 's' : ''}`);
+      set('don-bar-raised', `₹${total.toLocaleString('en-IN')} raised`);
+      set('don-bar-pending', `${pendCount} pending`);
+      // messages summary bar pills (these IDs exist in #page-messages)
+      set('msg-bar-total', `${mc} message${mc !== 1 ? 's' : ''}`);
+      set('msg-bar-unread', `${unread} unread`);
+      set('msg-bar-pending', `${pending} pending payment`);
+      // messages stat cards
+      set('mst-total', mc);
+      set('mst-unread', unread);
+      set('mst-pending', pending);
+      set('mst-approved', messages.filter(m => m.status === 'approved').length);
     }
 
     /* ── Avatar colour palette ── */
@@ -4750,6 +4761,9 @@
       const btn = document.querySelector(`[data-page="${p}"]`); if (btn) btn.classList.add('active');
       if (window.innerWidth < 900) document.getElementById('sidebar').classList.remove('open');
       window.scrollTo(0, 0);
+      // Fetch fresh data when switching to data tabs
+      if (p === 'messages') loadInbox();
+      if (p === 'donations') loadInbox();
     }
     function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
     function toggleAvMenu() { document.getElementById('av-menu').classList.toggle('open'); }
