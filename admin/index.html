@@ -3101,6 +3101,9 @@
         <button id="msg-resend-btn" class="btn-resend" onclick="resendPaymentLink()" style="display:none">
           <i class="fa-solid fa-link"></i> Resend Payment Link
         </button>
+        <button id="msg-approve-btn" class="btn-approve" onclick="approveVolunteer()" style="display:none">
+          <i class="fa-solid fa-check"></i> Approve Volunteer
+        </button>
         <button class="btn-canc" onclick="closeMsgModal()">Close</button>
       </div>
     </div>
@@ -4268,6 +4271,7 @@
       const paidCount = donations.filter(d => d.payment_status === 'paid').length;
       const pendCount = donations.filter(d => d.payment_status !== 'paid' && d.payment_status !== 'failed').length;
       const pending = messages.filter(m => m.status === 'payment_pending').length;
+      const needsApproval = messages.filter(m => m.status === 'pending_approval').length;
       // helper — never crashes on missing element
       const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
       // sidebar badges
@@ -4291,6 +4295,7 @@
       set('msg-bar-total', `${mc} message${mc !== 1 ? 's' : ''}`);
       set('msg-bar-unread', `${unread} unread`);
       set('msg-bar-pending', `${pending} pending payment`);
+      set('msg-bar-approval', needsApproval ? `${needsApproval} need approval` : '');
       // messages stat cards
       set('mst-total', mc);
       set('mst-unread', unread);
@@ -4682,6 +4687,9 @@
 
       /* resend payment link — only for payment_pending */
       document.getElementById('msg-resend-btn').style.display = isPending ? 'inline-flex' : 'none';
+      /* approve button — only for pending_approval volunteers */
+      const isApproval = m.status === 'pending_approval';
+      document.getElementById('msg-approve-btn').style.display = isApproval ? 'inline-flex' : 'none';
 
       document.getElementById('msg-modal').classList.add('open');
     }
@@ -4693,6 +4701,22 @@
     document.getElementById('msg-modal').addEventListener('click', e => {
       if (e.target === document.getElementById('msg-modal')) closeMsgModal();
     });
+
+    /* ── Approve volunteer ──────────────────────────── */
+    async function approveVolunteer() {
+      if (!_msgDetailId) return;
+      const m = messages.find(x => x.id === _msgDetailId);
+      if (!m) return;
+      if (!confirm(`Approve ${m.sender_name} as a Volunteer? A welcome email with ID card will be sent.`)) return;
+      try {
+        await apiFetch('POST', `messages/${_msgDetailId}/approve`);
+        m.status = 'approved';
+        m.is_read = true;
+        toast('Volunteer approved — welcome email sent ✓', 'success');
+        closeMsgModal();
+        renderMessages();
+      } catch (e) { toast('Approval failed', 'error'); }
+    }
 
     /* ── Resend payment link ─────────────────────────── */
     async function resendPaymentLink() {

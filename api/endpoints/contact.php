@@ -28,15 +28,17 @@ if (file_exists($_autoload)) {
 
 /* ══════════════════════════════════════════════════════
    FEE + STATUS CONFIG
-   Volunteer  → free → status = 'submitted'  (no payment)
-   Team/Member→ ₹500 → status = 'payment_pending'
-   Partner    → free → status = 'submitted'  (manual follow-up)
+   Volunteer  → free → status = 'pending_approval'  (admin must approve)
+   Team/Member→ ₹500 → status = 'payment_pending'   (pay first)
+   Partner    → free → status = 'submitted'          (manual follow-up)
    General    → free → status = 'submitted'
 ══════════════════════════════════════════════════════ */
 const PAID_ROLES = [
     'team' => 500,   // Member — ₹500
-    // Add more paid roles here in future, e.g. 'premium' => 1000
 ];
+
+// Roles that need admin approval before welcome email fires
+const APPROVAL_ROLES = ['volunteer'];
 
 // Roles that get a payment-link email after submit
 function requiresPayment(string $interest): bool {
@@ -69,9 +71,13 @@ function submitContact(): void {
     $ip       = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
 
     // ── Determine status & fee ───────────────────────────
-    $needsPayment = requiresPayment($interest);
-    $joiningFee   = joiningFeeFor($interest);
-    $status       = $needsPayment ? 'payment_pending' : 'submitted';
+    $needsPayment  = requiresPayment($interest);
+    $joiningFee    = joiningFeeFor($interest);
+    $needsApproval = in_array($interest, APPROVAL_ROLES);
+
+    if ($needsPayment)        $status = 'payment_pending';
+    elseif ($needsApproval)   $status = 'pending_approval';
+    else                      $status = 'submitted';
 
     // ── Generate ticket ──────────────────────────────────
     $ticketId = 'TKT-' . strtoupper(substr(md5(uniqid('', true)), 0, 8));
@@ -100,12 +106,17 @@ function submitContact(): void {
 
     // ── Send emails ──────────────────────────────────────
     if ($needsPayment && !empty($email)) {
+        // Member: send payment link
         sendPaymentLinkEmail($name, $email, $interest, $joiningFee, $ticketId);
+    } elseif ($needsApproval && !empty($email)) {
+        // Volunteer: tell them their application is under review
+        sendPendingApprovalEmail($name, $email, $ticketId);
     } elseif (!empty($email)) {
+        // Partner / General: plain confirmation
         sendConfirmationEmail($name, $email, $interest, $ticketId);
     }
 
-    // Always notify admin
+    // Always notify admin (with Approve button for volunteers)
     sendAdminNotification($name, $email, $phone, $interest, $message, $ticketId, $status, $joiningFee);
 
     ok(['id' => $newId, 'ticket_id' => $ticketId], 'Message received', 201);
@@ -140,7 +151,7 @@ function getMailer(): ?\PHPMailer\PHPMailer\PHPMailer {
 }
 
 /**
- * Email 1 — Free roles (volunteer, partner, general)
+ * Email 1 — Free roles (partner, general)
  * Tells the user: thank you, we'll respond in 24-48h
  */
 function sendConfirmationEmail(
@@ -148,7 +159,6 @@ function sendConfirmationEmail(
     string $interest, string $ticketId
 ): void {
     $interestLabel = [
-        'volunteer' => 'Volunteer',
         'partner'   => 'Partner / Collaborator',
         'general'   => 'General Inquiry',
     ][$interest] ?? ucfirst($interest);
@@ -183,6 +193,133 @@ function sendConfirmationEmail(
         $mail->send();
     } catch (\Exception $e) {
         error_log("Confirmation email failed [{$ticketId}]: " . $e->getMessage());
+    }
+}
+
+/**
+ * Email 2a — Volunteer pending approval
+ * Tells volunteer: application received, admin will review
+ */
+function sendPendingApprovalEmail(
+    string $name, string $email, string $ticketId
+): void {
+    $subject = "Application received — AL Hind Trust ({$ticketId})";
+
+    $html = emailWrapper("
+        <h2 style='color:#0f766e;margin-top:0'>Thank you, {$name}! 🙏</h2>
+        <p>We've received your volunteer application and it is now <strong>under review</strong> by our team.</p>
+        <p>We will notify you by email once your application is approved. This usually takes <strong>2–3 working days</strong>.</p>
+        <table style='width:100%;border-collapse:collapse;margin:16px 0;font-size:14px'>
+            <tr><td style='padding:7px 10px;background:#f0fdf4;color:#64748b;width:130px'>Role</td>
+                <td style='padding:7px 10px;background:#f0fdf4'>Volunteer</td></tr>
+            <tr><td style='padding:7px 10px;background:#fff;color:#64748b'>Status</td>
+                <td style='padding:7px 10px;background:#fff'>⏳ Pending Approval</td></tr>
+            <tr><td style='padding:7px 10px;background:#f0fdf4;color:#64748b'>Ticket&nbsp;ID</td>
+                <td style='padding:7px 10px;background:#f0fdf4;font-family:monospace'>{$ticketId}</td></tr>
+        </table>
+        <p style='font-size:13px;color:#64748b'>
+            If you have urgent queries, contact us at
+            <a href='mailto:alhindtrust@gmail.com' style='color:#0f766e'>alhindtrust@gmail.com</a>
+            or call <a href='tel:+919263190568' style='color:#0f766e'>+91-9263190568</a>.
+        </p>
+    ");
+
+    try {
+        $mail = getMailer();
+        if (!$mail) return;
+        $mail->addAddress($email, $name);
+        $mail->Subject = $subject;
+        $mail->isHTML(true);
+        $mail->Body    = $html;
+        $mail->AltBody = "Thank you {$name}! Your volunteer application is under review. Ticket: {$ticketId}";
+        $mail->send();
+    } catch (\Exception $e) {
+        error_log("Pending approval email failed [{$ticketId}]: " . $e->getMessage());
+    }
+}
+
+/**
+ * Email 2b — Welcome + ID card (sent when admin approves a volunteer)
+ * Triggered by approveVolunteer() below — NOT on form submit
+ */
+function sendWelcomeVolunteerEmail(array $row): void {
+    if (empty($row['sender_email'])) return;
+
+    $name     = $row['sender_name'];
+    $email    = $row['sender_email'];
+    $ticketId = $row['ticket_id'];
+    $subject  = "Welcome to AL Hind Trust — Volunteer Approved! ({$ticketId})";
+
+    // Generate initials for the ID card avatar
+    $parts    = explode(' ', trim($name));
+    $initials = strtoupper(substr($parts[0], 0, 1) . (isset($parts[1]) ? substr($parts[1], 0, 1) : ''));
+
+    $html = emailWrapper("
+        <h2 style='color:#0f766e;margin-top:0'>Welcome, {$name}! 🎉</h2>
+        <p>Your volunteer application has been <strong style='color:#0f766e'>approved</strong>.
+           We're excited to have you on board!</p>
+
+        <!-- Volunteer ID Card -->
+        <div style='border:2px solid #0f766e;border-radius:14px;overflow:hidden;
+                    max-width:380px;margin:24px auto;font-family:Segoe UI,sans-serif'>
+            <!-- Card header -->
+            <div style='background:#0f766e;padding:16px 20px;display:flex;align-items:center;gap:14px'>
+                <div style='width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);
+                            display:flex;align-items:center;justify-content:center;
+                            color:#fff;font-size:20px;font-weight:700;flex-shrink:0'>
+                    {$initials}
+                </div>
+                <div style='color:#fff'>
+                    <div style='font-weight:700;font-size:16px'>{$name}</div>
+                    <div style='font-size:12px;opacity:.8;margin-top:2px'>Volunteer</div>
+                </div>
+            </div>
+            <!-- Card body -->
+            <div style='padding:16px 20px;background:#fff'>
+                <table style='width:100%;border-collapse:collapse;font-size:13px'>
+                    <tr>
+                        <td style='padding:5px 0;color:#64748b;width:110px'>Organisation</td>
+                        <td style='padding:5px 0;font-weight:600;color:#0f766e'>AL Hind Trust</td>
+                    </tr>
+                    <tr>
+                        <td style='padding:5px 0;color:#64748b'>Ticket ID</td>
+                        <td style='padding:5px 0;font-family:monospace;font-size:12px'>{$ticketId}</td>
+                    </tr>
+                    <tr>
+                        <td style='padding:5px 0;color:#64748b'>Email</td>
+                        <td style='padding:5px 0'>{$email}</td>
+                    </tr>
+                    <tr>
+                        <td style='padding:5px 0;color:#64748b'>Valid from</td>
+                        <td style='padding:5px 0'>" . date('d M Y') . "</td>
+                    </tr>
+                </table>
+            </div>
+            <!-- Card footer -->
+            <div style='background:#f0fdf4;padding:10px 20px;text-align:center;
+                        font-size:11px;color:#15803d;border-top:1px solid #dcfce7'>
+                AL Hind Educational & Charitable Trust · Madhepura, Bihar
+            </div>
+        </div>
+
+        <p style='font-size:13px;color:#64748b;text-align:center'>
+            Our team will be in touch with further onboarding details.<br>
+            Questions? <a href='mailto:alhindtrust@gmail.com' style='color:#0f766e'>alhindtrust@gmail.com</a>
+            · <a href='tel:+919263190568' style='color:#0f766e'>+91-9263190568</a>
+        </p>
+    ");
+
+    try {
+        $mail = getMailer();
+        if (!$mail) return;
+        $mail->addAddress($email, $name);
+        $mail->Subject = $subject;
+        $mail->isHTML(true);
+        $mail->Body    = $html;
+        $mail->AltBody = "Congratulations {$name}! Your volunteer application is approved. Ticket: {$ticketId}";
+        $mail->send();
+    } catch (\Exception $e) {
+        error_log("Welcome volunteer email failed [{$ticketId}]: " . $e->getMessage());
     }
 }
 
@@ -254,17 +391,20 @@ function sendAdminNotification(
     string $interest, string $message,
     string $ticketId, string $status, int $fee
 ): void {
-    $statusLabel = $status === 'payment_pending'
-        ? "⏳ Payment Pending (₹{$fee})"
-        : '✅ Submitted';
+    $statusLabel = match($status) {
+        'payment_pending'  => "⏳ Payment Pending (₹{$fee})",
+        'pending_approval' => "🔔 Pending Admin Approval",
+        default            => '✅ Submitted',
+    };
 
     $interestLabel = [
-        'volunteer' => 'Volunteer (Free)',
+        'volunteer' => 'Volunteer',
         'team'      => 'Member (₹500)',
         'partner'   => 'Partner / Collaborator',
         'general'   => 'General Inquiry',
     ][$interest] ?? ucfirst($interest);
 
+    $approveUrl = "https://api.alhindtrust.com/messages/approve?ticket={$ticketId}&secret=ADMIN_SECRET_KEY";
     $subject = "[New Inquiry] {$name} — {$interestLabel} · {$ticketId}";
 
     $html = emailWrapper("
@@ -287,12 +427,18 @@ function sendAdminNotification(
             <div style='font-size:12px;color:#64748b;margin-bottom:6px'>MESSAGE</div>
             <div style='font-size:14px;color:#1e293b'>" . nl2br(htmlspecialchars($message)) . "</div>
         </div>
-        <p style='text-align:center'>
+        <p style='text-align:center;display:flex;gap:10px;justify-content:center;flex-wrap:wrap'>
             <a href='https://admin.alhindtrust.com'
                style='background:#0f766e;color:#fff;padding:10px 24px;border-radius:7px;
                       text-decoration:none;font-weight:700;font-size:14px;display:inline-block'>
                 Open Admin Panel →
-            </a>
+            </a>"
+            . ($status === 'pending_approval' ? "
+            <a href='{$approveUrl}'
+               style='background:#16a34a;color:#fff;padding:10px 24px;border-radius:7px;
+                      text-decoration:none;font-weight:700;font-size:14px;display:inline-block'>
+                ✓ Approve Volunteer
+            </a>" : "") . "
         </p>
     ");
 
@@ -384,6 +530,31 @@ function deleteMessage(string $id): void {
 function clearMessages(): void {
     getDB()->exec("DELETE FROM contact_messages");
     ok(null, 'All messages cleared');
+}
+
+/**
+ * POST /messages/{id}/approve
+ * Admin approves a pending_approval volunteer — sends welcome + ID card email
+ */
+function approveVolunteer(string $id): void {
+    $db   = getDB();
+    $stmt = $db->prepare("SELECT * FROM contact_messages WHERE id = ? LIMIT 1");
+    $stmt->execute([$id]);
+    $row = $stmt->fetch();
+
+    if (!$row)                                  error('Message not found', 404);
+    if ($row['status'] !== 'pending_approval')   error('Not a pending approval record', 400);
+
+    // Update both tables
+    $db->prepare("UPDATE contact_messages SET status='approved', updated_at=NOW() WHERE id=?")
+       ->execute([$id]);
+    $db->prepare("UPDATE ngo_inquiries SET status='approved' WHERE ticket_id=?")
+       ->execute([$row['ticket_id']]);
+
+    // Send welcome + ID card email
+    sendWelcomeVolunteerEmail($row);
+
+    ok(null, 'Volunteer approved and welcome email sent');
 }
 
 /**
