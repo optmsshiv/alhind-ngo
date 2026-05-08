@@ -4750,6 +4750,9 @@
       const btn = document.querySelector(`[data-page="${p}"]`); if (btn) btn.classList.add('active');
       if (window.innerWidth < 900) document.getElementById('sidebar').classList.remove('open');
       window.scrollTo(0, 0);
+      // Fetch fresh data when switching to data tabs
+      if (p === 'messages') loadInbox();
+      if (p === 'donations') loadInbox();
     }
     function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
     function toggleAvMenu() { document.getElementById('av-menu').classList.toggle('open'); }
