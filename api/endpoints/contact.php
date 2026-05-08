@@ -2,6 +2,30 @@
 // endpoints/contact.php
 // Handles all /contact routes: submit, list, view, mark-read, delete
 
+/* ── PHPMailer bootstrap ────────────────────────────────────────
+   Tries Composer autoload first, then manual src/ folder.
+   Your server root: /home/u699609112/domains/alhindtrust.com/public_html/api/
+   This file lives at: /api/endpoints/contact.php
+   So __DIR__ = /api/endpoints/  →  __DIR__.'/..' = /api/
+─────────────────────────────────────────────────────────────── */
+$_autoload = __DIR__ . '/../vendor/autoload.php';
+$_pmBase   = __DIR__ . '/../phpmailer/src/PHPMailer.php';
+$_pmSmtp   = __DIR__ . '/../phpmailer/src/SMTP.php';
+$_pmExcept = __DIR__ . '/../phpmailer/src/Exception.php';
+
+if (file_exists($_autoload)) {
+    require_once $_autoload;                    // Composer install
+} elseif (file_exists($_pmBase)) {
+    require_once $_pmExcept;                    // Manual folder
+    require_once $_pmSmtp;
+    require_once $_pmBase;
+} else {
+    // PHPMailer not found — emails will be silently skipped,
+    // but the form will still save to DB and return success.
+    // Fix: run  composer require phpmailer/phpmailer  in /api/
+    error_log('PHPMailer not found. Run: composer require phpmailer/phpmailer in /api/');
+}
+
 /* ══════════════════════════════════════════════════════
    FEE + STATUS CONFIG
    Volunteer  → free → status = 'submitted'  (no payment)
@@ -95,9 +119,13 @@ function submitContact(): void {
 
 /**
  * Returns a configured PHPMailer instance.
- * Edit the SMTP credentials once here — all emails use this.
+ * Returns null if PHPMailer is not installed — callers must check.
  */
-function getMailer(): \PHPMailer\PHPMailer\PHPMailer {
+function getMailer(): ?\PHPMailer\PHPMailer\PHPMailer {
+    if (!class_exists('\PHPMailer\PHPMailer\PHPMailer')) {
+        error_log('PHPMailer class not found — email skipped.');
+        return null;
+    }
     $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
     $mail->isSMTP();
     $mail->Host       = 'smtp.gmail.com';       // or your cPanel SMTP
@@ -146,6 +174,7 @@ function sendConfirmationEmail(
 
     try {
         $mail = getMailer();
+        if (!$mail) return;   // PHPMailer not installed — skip silently
         $mail->addAddress($email, $name);
         $mail->Subject = $subject;
         $mail->isHTML(true);
@@ -204,6 +233,7 @@ function sendPaymentLinkEmail(
 
     try {
         $mail = getMailer();
+        if (!$mail) return;   // PHPMailer not installed — skip silently
         $mail->addAddress($email, $name);
         $mail->Subject = $subject;
         $mail->isHTML(true);
@@ -268,6 +298,7 @@ function sendAdminNotification(
 
     try {
         $mail = getMailer();
+        if (!$mail) return;   // PHPMailer not installed — skip silently
         $mail->addAddress('alhindtrust@gmail.com', 'AL Hind Trust Admin');
         if (!empty($email)) $mail->addReplyTo($email, $name);
         $mail->Subject = $subject;
