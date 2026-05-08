@@ -142,7 +142,7 @@ function getMailer(): ?\PHPMailer\PHPMailer\PHPMailer {
     $mail->Host       = 'smtp.gmail.com';       // or your cPanel SMTP
     $mail->SMTPAuth   = true;
     $mail->Username   = 'alhindtrust@gmail.com';
-    $mail->Password   = 'YOUR_APP_PASSWORD';     // use Gmail App Password
+    $mail->Password   = 'yyym lxhp pyro alyk';     // use Gmail App Password
     $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port       = 587;
     $mail->CharSet    = 'UTF-8';
