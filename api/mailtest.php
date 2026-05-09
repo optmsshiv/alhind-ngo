@@ -51,8 +51,8 @@ echo "</table>";
 // 2. PHPMailer / Composer CHECK
 // ════════════════════════════════════════════════════════════
 echo "<h2>2. PHPMailer Detection</h2><table style='width:100%;border-collapse:collapse;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden'>";
-$autoload = __DIR__ . '/vendor/autoload.php';
-$pmBase   = __DIR__ . '/phpmailer/src/PHPMailer.php';
+$autoload = __DIR__ . '/../vendor/autoload.php';
+$pmBase   = __DIR__ . '/../phpmailer/src/PHPMailer.php';
 echo row('vendor/autoload.php exists?', file_exists($autoload) ? 'YES' : 'NO', file_exists($autoload) ? 'ok' : 'warn');
 echo row('phpmailer/src/PHPMailer.php?', file_exists($pmBase)  ? 'YES' : 'NO', file_exists($pmBase)  ? 'ok' : 'warn');
 
