@@ -1,24 +1,25 @@
 <?php
-// ============================================================
-//  backend/verify.php — Razorpay payment verification
-//  AL Hind Educational and Charitable Trust
-//  Uses hash_hmac only — NO Razorpay PHP SDK
-//  Called after Razorpay checkout succeeds:
-//    verify.php?ticket=TKT-XXXX&razorpay_payment_id=...
-//              &razorpay_order_id=...&razorpay_signature=...
-// ============================================================
-date_default_timezone_set('Asia/Kolkata');
+/**
+ * verify.php — Razorpay payment verification for Member joining fee
+ * Path: /public_html/backend/verify.php
+ * Called after Razorpay checkout succeeds:
+ *   verify.php?ticket=TKT-XXXX&razorpay_payment_id=...&razorpay_order_id=...&razorpay_signature=...
+ */
 
 // DB: backend/ is inside public_html/, so config/db.php is one level up
 require_once __DIR__ . '/../config/db.php';
+
+// ── Razorpay SDK ─────────────────────────────────────────────
+require_once __DIR__ . '/../razorpay-php/Razorpay.php';
+use Razorpay\Api\Api;
 
 // ── PHPMailer ────────────────────────────────────────────────
 $autoload = __DIR__ . '/../vendor/autoload.php';
 if (file_exists($autoload)) require_once $autoload;
 
-// ── Razorpay credentials ─────────────────────────────────────
-define('RZP_KEY_ID',     'rzp_live_SmY6H2HIaVOr6Q');
-define('RZP_KEY_SECRET', '3VXI0InXLgL9BlO4B19kroDj');
+// ── Config ───────────────────────────────────────────────────
+$keyId     = 'rzp_live_SmY6H2HIaVOr6Q';   // ← your live key
+$keySecret = '3VXI0InXLgL9BlO4B19kroDj'; // ← your live secret
 
 // ════════════════════════════════════════════════════════════
 //  1. VALIDATE INPUTS
@@ -37,7 +38,7 @@ if (!$ticket || !$paymentId || !$orderId || !$signature) {
 //  2. VERIFY RAZORPAY SIGNATURE
 // ════════════════════════════════════════════════════════════
 
-$expectedSig = hash_hmac('sha256', $orderId . '|' . $paymentId, RZP_KEY_SECRET);
+$expectedSig = hash_hmac('sha256', $orderId . '|' . $paymentId, $keySecret);
 
 if (!hash_equals($expectedSig, $signature)) {
     error_log("[AL Hind] Signature mismatch for ticket {$ticket}");
