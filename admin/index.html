@@ -102,16 +102,6 @@
       color: #991b1b;
     }
 
-    .st-pending_approval {
-      background: #e0f2fe;
-      color: #0c4a6e;
-    }
-
-    .st-rejected {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
     /* Ticket mono */
     .tkt-mono {
       font-family: 'Courier New', monospace;
@@ -138,44 +128,6 @@
 
     .btn-resend:hover {
       background: #fde68a;
-    }
-
-    .btn-approve {
-      background: #dcfce7;
-      color: #166534;
-      border: none;
-      border-radius: 7px;
-      padding: .26rem .72rem;
-      font-size: .72rem;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .btn-approve:hover {
-      background: #bbf7d0;
-    }
-
-    .btn-reject {
-      background: #fee2e2;
-      color: #991b1b;
-      border: none;
-      border-radius: 7px;
-      padding: .26rem .72rem;
-      font-size: .72rem;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .btn-reject:hover {
-      background: #fecaca;
     }
 
     /* Message filter pills (reuse don-fpill pattern) */
@@ -1732,35 +1684,107 @@
     }
 
     /* Message detail modal */
-    .msg-detail {
-      line-height: 1.7;
+    /* ── Message detail modal redesign ─────────────── */
+    #msg-modal .modal { max-width: 500px; padding: 0; border-radius: 20px; overflow: hidden; }
+
+    .msg-modal-header {
+      background: linear-gradient(135deg, #0f766e 0%, #0d5c57 100%);
+      padding: 1.4rem 1.6rem 1rem;
+      position: relative;
+    }
+    .msg-modal-avatar {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: rgba(255,255,255,.18);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem; font-weight: 700; color: #fff;
+      margin-bottom: .65rem; flex-shrink: 0;
+    }
+    .msg-modal-name {
+      font-size: 1.1rem; font-weight: 700; color: #fff; margin: 0 0 .18rem;
+    }
+    .msg-modal-meta {
+      font-size: .78rem; color: rgba(255,255,255,.72); display: flex;
+      align-items: center; gap: .55rem; flex-wrap: wrap;
+    }
+    .msg-modal-close {
+      position: absolute; top: 1rem; right: 1rem;
+      background: rgba(255,255,255,.15); border: none; border-radius: 8px;
+      width: 30px; height: 30px; color: #fff; font-size: .9rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .msg-modal-close:hover { background: rgba(255,255,255,.25); }
+
+    .msg-modal-body { padding: 1.2rem 1.6rem; }
+
+    .msg-info-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: .55rem; margin-bottom: 1rem;
+    }
+    .msg-info-card {
+      background: var(--bg); border-radius: 10px;
+      padding: .65rem .85rem; border: 1px solid var(--border);
+    }
+    .msg-info-card.full { grid-column: 1 / -1; }
+    .msg-info-card .mic-label {
+      font-size: .68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .07em; color: var(--muted); margin-bottom: .22rem;
+    }
+    .msg-info-card .mic-val {
+      font-size: .85rem; color: #1e293b; font-weight: 500;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .msg-info-card .mic-val a { color: var(--teal); text-decoration: none; }
+    .msg-info-card .mic-val a:hover { text-decoration: underline; }
+
+    .msg-message-box {
+      background: var(--bg); border-radius: 12px;
+      padding: 1rem 1.1rem; border: 1px solid var(--border);
+      margin-bottom: 1.1rem;
+    }
+    .msg-message-box .mic-label {
+      font-size: .68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .07em; color: var(--muted); margin-bottom: .45rem;
+    }
+    .msg-message-box p {
+      font-size: .875rem; color: #1e293b; line-height: 1.65;
+      margin: 0; white-space: pre-wrap;
     }
 
-    .msg-detail .md-label {
-      font-size: .72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--muted);
-      margin-bottom: .2rem;
+    .msg-modal-actions {
+      display: flex; gap: .55rem; flex-wrap: wrap;
+      padding: .9rem 1.6rem 1.4rem; border-top: 1px solid var(--border);
     }
-
-    .msg-detail .md-val {
-      font-size: .9rem;
-      color: #1e293b;
-      margin-bottom: 1rem;
+    .msg-act-reply {
+      background: var(--teal); color: #fff; border: none; border-radius: 9px;
+      padding: .55rem 1.1rem; font-size: .82rem; font-weight: 700;
+      cursor: pointer; display: inline-flex; align-items: center; gap: .4rem;
+      text-decoration: none; font-family: inherit;
     }
-
-    .msg-detail .md-body {
-      background: var(--bg);
-      border-radius: 10px;
-      padding: 1rem;
-      font-size: .875rem;
-      color: #1e293b;
-      line-height: 1.6;
-      margin-top: .2rem;
-      white-space: pre-wrap;
+    .msg-act-reply:hover { background: #0d6460; }
+    .msg-act-approve {
+      background: #dcfce7; color: #166534; border: none; border-radius: 9px;
+      padding: .55rem 1.1rem; font-size: .82rem; font-weight: 700;
+      cursor: pointer; display: inline-flex; align-items: center; gap: .4rem; font-family: inherit;
     }
+    .msg-act-approve:hover { background: #bbf7d0; }
+    .msg-act-reject {
+      background: #fee2e2; color: #991b1b; border: none; border-radius: 9px;
+      padding: .55rem 1.1rem; font-size: .82rem; font-weight: 700;
+      cursor: pointer; display: inline-flex; align-items: center; gap: .4rem; font-family: inherit;
+    }
+    .msg-act-reject:hover { background: #fecaca; }
+    .msg-act-resend {
+      background: #fef3c7; color: #92400e; border: none; border-radius: 9px;
+      padding: .55rem 1.1rem; font-size: .82rem; font-weight: 700;
+      cursor: pointer; display: inline-flex; align-items: center; gap: .4rem; font-family: inherit;
+    }
+    .msg-act-resend:hover { background: #fde68a; }
+    .msg-act-close {
+      background: var(--bg); color: var(--muted); border: 1px solid var(--border);
+      border-radius: 9px; padding: .55rem 1.1rem; font-size: .82rem; font-weight: 600;
+      cursor: pointer; font-family: inherit; margin-left: auto;
+    }
+    .msg-act-close:hover { background: var(--border); }
 
     /* Gallery action icon buttons */
     .gal-act-btn {
@@ -3074,11 +3098,6 @@
                 style="width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0;display:inline-block"></span>
               Free Roles
             </button>
-            <button class="msg-fpill" data-mf="approval" onclick="msgSetFilter(this)">
-              <span
-                style="width:7px;height:7px;border-radius:50%;background:#0ea5e9;flex-shrink:0;display:inline-block"></span>
-              Needs Approval
-            </button>
             <button class="msg-fpill" data-mf="unread" onclick="msgSetFilter(this)">
               <i class="fa-solid fa-circle" style="font-size:.5rem;color:#dc2626"></i> Unread
             </button>
@@ -3141,26 +3160,33 @@
 
   <!-- MESSAGE DETAIL MODAL -->
   <div class="modal-ov" id="msg-modal">
-    <div class="modal" style="max-width:540px">
-      <div class="mh">
-        <h2><i class="fa-solid fa-envelope-open-text"></i> Message Detail</h2>
-        <button class="mcl" onclick="closeMsgModal()"><i class="fa-solid fa-xmark"></i></button>
+    <div class="modal">
+      <!-- Header — filled by viewMessage() -->
+      <div class="msg-modal-header" id="msg-modal-header">
+        <button class="msg-modal-close" onclick="closeMsgModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="msg-modal-avatar" id="msg-modal-avatar"></div>
+        <div class="msg-modal-name"  id="msg-modal-name"></div>
+        <div class="msg-modal-meta"  id="msg-modal-meta"></div>
       </div>
-      <div class="msg-detail" id="msg-detail-body"></div>
-      <div class="f-actions" style="margin-top:1.5rem" id="msg-modal-actions">
-        <a id="msg-reply-link" href="" class="btn-sub" style="text-decoration:none;display:none">
-          <i class="fa-solid fa-reply"></i> Reply via Email
+      <!-- Info grid + message — filled by viewMessage() -->
+      <div class="msg-modal-body" id="msg-detail-body"></div>
+      <!-- Action buttons -->
+      <div class="msg-modal-actions" id="msg-modal-actions">
+        <a id="msg-reply-link" href="" class="msg-act-reply" style="display:none">
+          <i class="fa-solid fa-reply"></i> Reply
         </a>
-        <button id="msg-resend-btn" class="btn-resend" onclick="resendPaymentLink()" style="display:none">
+        <button id="msg-resend-btn" class="msg-act-resend" onclick="resendPaymentLink()" style="display:none">
           <i class="fa-solid fa-link"></i> Resend Payment Link
         </button>
-        <button id="msg-approve-btn" class="btn-approve" onclick="approveVolunteer()" style="display:none">
-          <i class="fa-solid fa-check"></i> Approve Volunteer
+        <button id="msg-approve-btn" class="msg-act-approve" onclick="approveVolunteer()" style="display:none">
+          <i class="fa-solid fa-check"></i> Approve
         </button>
-        <button id="msg-reject-btn" class="btn-reject" onclick="rejectVolunteer()" style="display:none">
+        <button id="msg-reject-btn" class="msg-act-reject" onclick="rejectVolunteer()" style="display:none">
           <i class="fa-solid fa-xmark"></i> Reject
         </button>
-        <button class="btn-canc" onclick="closeMsgModal()">Close</button>
+        <button class="msg-act-close" onclick="closeMsgModal()">Close</button>
       </div>
     </div>
   </div>
@@ -4567,7 +4593,7 @@
       document.querySelectorAll('.msg-fpill').forEach(b =>
         b.classList.remove('mf-all', 'mf-pending', 'mf-free', 'mf-unread'));
       _msgFilter = btn.dataset.mf;
-      const cls = { all: 'mf-all', pending: 'mf-pending', free: 'mf-free', unread: 'mf-unread', approval: 'mf-approval' }[_msgFilter];
+      const cls = { all: 'mf-all', pending: 'mf-pending', free: 'mf-free', unread: 'mf-unread' }[_msgFilter];
       btn.classList.add(cls);
       renderMessages();
     }
@@ -4610,7 +4636,6 @@
 
       /* apply filter */
       if (_msgFilter === 'pending') rows = rows.filter(m => m.status === 'payment_pending');
-      if (_msgFilter === 'approval') rows = rows.filter(m => m.status === 'pending_approval');
       if (_msgFilter === 'free') rows = rows.filter(m => FREE_ROLES.includes(m.interest_type));
       if (_msgFilter === 'unread') rows = rows.filter(m => !m.is_read);
 
@@ -4665,11 +4690,9 @@
     function msgStBadge(s) {
       const map = {
         submitted: ['st-submitted', '✓ Submitted'],
-        pending_approval: ['st-pending_approval', '🔔 Needs Approval'],
         payment_pending: ['st-payment_pending', '⏳ Pay Pending'],
         approved: ['st-approved', '✅ Approved'],
         payment_failed: ['st-payment_failed', '✗ Pay Failed'],
-        rejected: ['st-rejected', '✗ Rejected'],
       };
       const [cls, lbl] = map[s] || ['st-submitted', s];
       return `<span class="st-badge ${cls}">${lbl}</span>`;
@@ -4697,45 +4720,65 @@
         } catch (e) { }
       }
 
-      const isPending = m.status === 'payment_pending';
-      const FEE_MAP = { team: 500 };
-      const fee = FEE_MAP[m.interest_type] || 0;
+      const isPending    = m.status === 'payment_pending';
+      const isApproval   = m.status === 'pending_approval';
+      const isRejected   = m.status === 'rejected';
+      const FEE_MAP      = { team: 500 };
+      const fee          = FEE_MAP[m.interest_type] || 0;
 
+      /* ── Header — avatar initials + name + meta ── */
+      const nameParts = (m.sender_name || '?').trim().split(' ');
+      const initials  = (nameParts[0][0] + (nameParts[1] ? nameParts[1][0] : '')).toUpperCase();
+      document.getElementById('msg-modal-avatar').textContent = initials;
+      document.getElementById('msg-modal-name').textContent   = m.sender_name || '—';
+      document.getElementById('msg-modal-meta').innerHTML     =
+        `${msgIntBadge(m.interest_type)}
+         ${msgStBadge(m.status || 'submitted')}
+         <span style="opacity:.7;font-size:.74rem">${fmtDateTime(m.created_at)}</span>`;
+
+      /* ── Body — info cards grid + message box ── */
       document.getElementById('msg-detail-body').innerHTML = `
-        <div class="md-label">From</div>
-        <div class="md-val"><strong>${esc(m.sender_name)}</strong></div>
+        <div class="msg-info-grid">
 
-        <div class="md-label">Email</div>
-        <div class="md-val">${m.sender_email
-          ? `<a href="mailto:${esc(m.sender_email)}" style="color:var(--teal)">${esc(m.sender_email)}</a>`
-          : '—'}</div>
+          <div class="msg-info-card">
+            <div class="mic-label"><i class="fa-solid fa-envelope" style="margin-right:4px"></i>Email</div>
+            <div class="mic-val">${m.sender_email
+              ? `<a href="mailto:${esc(m.sender_email)}">${esc(m.sender_email)}</a>`
+              : '<span style="color:var(--muted)">—</span>'}</div>
+          </div>
 
-        <div class="md-label">Phone</div>
-        <div class="md-val">${m.sender_phone
-          ? `<a href="tel:${esc(m.sender_phone)}" style="color:var(--teal)">${esc(m.sender_phone)}</a>`
-          : '—'}</div>
+          <div class="msg-info-card">
+            <div class="mic-label"><i class="fa-solid fa-phone" style="margin-right:4px"></i>Phone</div>
+            <div class="mic-val">${m.sender_phone
+              ? `<a href="tel:${esc(m.sender_phone)}">${esc(m.sender_phone)}</a>`
+              : '<span style="color:var(--muted)">—</span>'}</div>
+          </div>
 
-        <div class="md-label">Type</div>
-        <div class="md-val">${msgIntBadge(m.interest_type)}</div>
+          <div class="msg-info-card">
+            <div class="mic-label"><i class="fa-solid fa-ticket" style="margin-right:4px"></i>Ticket ID</div>
+            <div class="mic-val">${m.ticket_id
+              ? `<span class="tkt-mono">${esc(m.ticket_id)}</span>`
+              : '<span style="color:var(--muted)">—</span>'}</div>
+          </div>
 
-        <div class="md-label">Status</div>
-        <div class="md-val" style="display:flex;align-items:center;gap:.65rem;flex-wrap:wrap">
-          ${msgStBadge(m.status || 'submitted')}
-          ${isPending ? `<span style="font-size:.78rem;color:#b45309">Joining fee: <strong>₹${fee}</strong></span>` : ''}
+          <div class="msg-info-card">
+            <div class="mic-label"><i class="fa-solid fa-indian-rupee-sign" style="margin-right:4px"></i>Fee</div>
+            <div class="mic-val">${isPending
+              ? `<strong style="color:#b45309">₹${fee} pending</strong>`
+              : '<span style="color:var(--muted)">Free</span>'}</div>
+          </div>
+
         </div>
 
-        <div class="md-label">Ticket</div>
-        <div class="md-val">${m.ticket_id
-          ? `<span class="tkt-mono">${esc(m.ticket_id)}</span>`
-          : '—'}</div>
+        <div class="msg-message-box">
+          <div class="mic-label"><i class="fa-solid fa-message" style="margin-right:4px"></i>Message</div>
+          <p>${esc(m.message || '—')}</p>
+        </div>`;
 
-        <div class="md-label">Received</div>
-        <div class="md-val">${fmtDateTime(m.created_at)}</div>
+      /* ── Action buttons visibility ── */
+      const show = (id, visible) =>
+        document.getElementById(id).style.display = visible ? 'inline-flex' : 'none';
 
-        <div class="md-label">Message</div>
-        <div class="md-body">${esc(m.message || '—')}</div>`;
-
-      /* reply link */
       const replyLink = document.getElementById('msg-reply-link');
       if (m.sender_email) {
         replyLink.href = `mailto:${m.sender_email}?subject=Re: Your inquiry to AL Hind Trust (${m.ticket_id || ''})`;
@@ -4743,13 +4786,9 @@
       } else {
         replyLink.style.display = 'none';
       }
-
-      /* resend payment link — only for payment_pending */
-      document.getElementById('msg-resend-btn').style.display = isPending ? 'inline-flex' : 'none';
-      /* approve + reject buttons — only for pending_approval volunteers */
-      const isApproval = m.status === 'pending_approval';
-      document.getElementById('msg-approve-btn').style.display = isApproval ? 'inline-flex' : 'none';
-      document.getElementById('msg-reject-btn').style.display = isApproval ? 'inline-flex' : 'none';
+      show('msg-resend-btn',  isPending);
+      show('msg-approve-btn', isApproval);
+      show('msg-reject-btn',  isApproval);
 
       document.getElementById('msg-modal').classList.add('open');
     }
@@ -4776,23 +4815,6 @@
         closeMsgModal();
         renderMessages();
       } catch (e) { toast('Approval failed', 'error'); }
-    }
-
-    /* ── Reject volunteer ───────────────────────────── */
-    async function rejectVolunteer() {
-      if (!_msgDetailId) return;
-      const m = messages.find(x => x.id === _msgDetailId);
-      if (!m) return;
-      const reason = prompt(`Reason for rejecting ${m.sender_name}'s application (optional):`);
-      if (reason === null) return; // cancelled
-      try {
-        await apiFetch('POST', `messages/${_msgDetailId}/reject`, { reason });
-        m.status = 'rejected';
-        m.is_read = true;
-        toast('Volunteer rejected — notification email sent', 'success');
-        closeMsgModal();
-        renderMessages();
-      } catch (e) { toast('Rejection failed', 'error'); }
     }
 
     /* ── Resend payment link ─────────────────────────── */
