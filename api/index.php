@@ -81,13 +81,13 @@ if ($resource === 'volunteers' && $method === 'POST') {
 }
 
 // ── Payment pages — public (no auth needed) ─────────
-// pay.php is at public_html/pay.php — one level UP from /api/
+// pay.php & verify.php are at public_html/backend/ — two levels from /api/
 if ($resource === 'pay.php' || $resource === 'pay') {
-    require_once dirname(__DIR__) . '/pay.php';
+    require_once dirname(__DIR__) . '/backend/pay.php';
     exit;
 }
 if ($resource === 'verify.php' || $resource === 'verify') {
-    require_once dirname(__DIR__) . '/verify.php';
+    require_once dirname(__DIR__) . '/backend/verify.php';
     exit;
 }
 
