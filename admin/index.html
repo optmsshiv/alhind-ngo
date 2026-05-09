@@ -102,6 +102,16 @@
       color: #991b1b;
     }
 
+    .st-rejected {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .st-pending_approval {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
     /* Ticket mono */
     .tkt-mono {
       font-family: 'Courier New', monospace;
@@ -2897,8 +2907,8 @@
         </div>
         <div class="panel-card">
           <div class="fg2">
-            <div class="fg"><label>Event Title *</label><input type="text" id="ef-title"
-                placeholder="Free Medical Camp"></div>
+            <div class="fg"><label>Event Title *</label><input type="text" id="ef-title" placeholder="Free Medical Camp"
+                oninput="autoFillJoinLink()"></div>
             <div class="fg"><label>Date *</label><input type="date" id="ef-date"></div>
             <div class="fg"><label>Location</label><input type="text" id="ef-location" placeholder="Madhepura, Bihar">
             </div>
@@ -2919,7 +2929,8 @@
             <div class="fg"><label>Map Search Query</label><input type="text" id="ef-map" placeholder="Madhepura,Bihar">
             </div>
             <div class="fg"><label>Join / Register Link</label><input type="text" id="ef-link"
-                placeholder="join.html or https://…"></div>
+                placeholder="Auto-generated after save" oninput="this.dataset.manualEdit='true';this.style.color=''">
+            </div>
             <div class="fg full">
               <label>Event Image</label>
               <div class="img-uz" id="ef-uz" onclick="document.getElementById('ef-img-file').click()">
@@ -4037,6 +4048,14 @@
       document.getElementById('ef-img-file').value = '';
     }
 
+    function autoFillJoinLink() {
+      if (editId) return; // don't overwrite when editing
+      const linkField = document.getElementById('ef-link');
+      if (linkField.dataset.manualEdit === 'true') return; // user typed manually
+      linkField.value = 'Auto-generated after save';
+      linkField.style.color = '#94a3b8';
+    }
+
     async function submitEvent() {
       const title = document.getElementById('ef-title').value.trim();
       const date = document.getElementById('ef-date').value;
@@ -4058,7 +4077,13 @@
           await apiFetch('PUT', `events/${editId}`, payload);
           toast('Event updated ✓', 'success');
         } else {
-          await apiFetch('POST', 'events', payload);
+          const res = await apiFetch('POST', 'events', payload);
+          // Auto-set join link using the new event's real ID
+          const newId = res?.data?.id || res?.id;
+          if (newId) {
+            const autoLink = `https://alhindtrust.com/events/join.html?id=${newId}`;
+            await apiFetch('PUT', `events/${newId}`, { join_link: autoLink });
+          }
           toast('Event added ✓', 'success');
         }
         await loadEvents();
@@ -4085,6 +4110,8 @@
     }
     function resetForm() {
       ['ef-title', 'ef-date', 'ef-location', 'ef-desc', 'ef-map', 'ef-link', 'ef-img-url'].forEach(i => document.getElementById(i).value = '');
+      document.getElementById('ef-link').dataset.manualEdit = 'false';
+      document.getElementById('ef-link').style.color = '';
       document.getElementById('ef-cat').value = '';
       document.getElementById('ef-img-file').value = '';
       document.getElementById('ef-ip-wrap').style.display = 'none';
@@ -4833,6 +4860,8 @@
         payment_pending: ['st-payment_pending', '⏳ Pay Pending'],
         approved: ['st-approved', '✅ Approved'],
         payment_failed: ['st-payment_failed', '✗ Pay Failed'],
+        pending_approval: ['st-pending_approval', '🔔 Pending Approval'],
+        rejected: ['st-rejected', '✗ Rejected'],
       };
       const [cls, lbl] = map[s] || ['st-submitted', s];
       return `<span class="st-badge ${cls}">${lbl}</span>`;
@@ -4955,23 +4984,6 @@
         closeMsgModal();
         renderMessages();
       } catch (e) { toast('Approval failed', 'error'); }
-    }
-
-    /* ── Reject volunteer ───────────────────────────── */
-    async function rejectVolunteer() {
-      if (!_msgDetailId) return;
-      const m = messages.find(x => x.id === _msgDetailId);
-      if (!m) return;
-      const reason = prompt(`Reject ${m.sender_name}'s volunteer application?\n\nOptional: enter a reason (leave blank to skip):`);
-      if (reason === null) return; // cancelled
-      try {
-        await apiFetch('POST', `messages/${_msgDetailId}/reject`, { reason: reason.trim() });
-        m.status = 'rejected';
-        m.is_read = true;
-        toast('Volunteer rejected — notification email sent ✓', 'success');
-        closeMsgModal();
-        renderMessages();
-      } catch (e) { toast('Rejection failed', 'error'); }
     }
 
     /* ── Resend payment link ─────────────────────────── */
