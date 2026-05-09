@@ -18,8 +18,8 @@ $autoload = __DIR__ . '/../vendor/autoload.php';
 if (file_exists($autoload)) require_once $autoload;
 
 // ── Config ───────────────────────────────────────────────────
-$keyId     = 'rzp_live_xxxxx';   // ← your live key
-$keySecret = 'xxxxxxxxxxxxxxxx'; // ← your live secret
+$keyId     = 'rzp_live_SmY6H2HIaVOr6Q';   // ← your live key
+$keySecret = '3VXI0InXLgL9BlO4B19kroDj'; // ← your live secret
 
 // ════════════════════════════════════════════════════════════
 //  1. VALIDATE INPUTS
