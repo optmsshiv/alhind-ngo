@@ -2,29 +2,7 @@
 // endpoints/contact.php
 // Handles all /contact routes: submit, list, view, mark-read, delete
 
-/* ── PHPMailer bootstrap ────────────────────────────────────────
-   Tries Composer autoload first, then manual src/ folder.
-   Your server root: /home/u699609112/domains/alhindtrust.com/public_html/api/
-   This file lives at: /api/endpoints/contact.php
-   So __DIR__ = /api/endpoints/  →  __DIR__.'/..' = /api/
-─────────────────────────────────────────────────────────────── */
-$_autoload = __DIR__ . '/../vendor/autoload.php';
-$_pmBase   = __DIR__ . '/../phpmailer/src/PHPMailer.php';
-$_pmSmtp   = __DIR__ . '/../phpmailer/src/SMTP.php';
-$_pmExcept = __DIR__ . '/../phpmailer/src/Exception.php';
 
-if (file_exists($_autoload)) {
-    require_once $_autoload;                    // Composer install
-} elseif (file_exists($_pmBase)) {
-    require_once $_pmExcept;                    // Manual folder
-    require_once $_pmSmtp;
-    require_once $_pmBase;
-} else {
-    // PHPMailer not found — emails will be silently skipped,
-    // but the form will still save to DB and return success.
-    // Fix: run  composer require phpmailer/phpmailer  in /api/
-    error_log('PHPMailer not found. Run: composer require phpmailer/phpmailer in /api/');
-}
 
 /* ══════════════════════════════════════════════════════
    FEE + STATUS CONFIG
@@ -42,13 +20,11 @@ const APPROVAL_ROLES = ['volunteer'];
 
 // Roles that get a payment-link email after submit
 function requiresPayment(string $interest): bool {
-    global $PAID_ROLES;
-    return isset($PAID_ROLES[$interest]);
+    return isset(PAID_ROLES[$interest]);
 }
 
 function joiningFeeFor(string $interest): int {
-    global $PAID_ROLES;
-    return $PAID_ROLES[$interest] ?? 0;
+    return PAID_ROLES[$interest] ?? 0;
 }
 
 
@@ -124,31 +100,50 @@ function submitContact(): void {
 
 
 /* ══════════════════════════════════════════════════════
-   EMAIL FUNCTIONS
-   Requires PHPMailer. Adjust SMTP settings in getMailer().
+   SHARED MAILER — PHPMailer SMTP
+   mail() does NOT work on this server (hsendmail unconfigured).
+   Ports 587 & 465 to smtp.gmail.com are open — SMTP is the fix.
+   Requires: composer require phpmailer/phpmailer  (in /api/ folder)
 ══════════════════════════════════════════════════════ */
-
-/**
- * Returns a configured PHPMailer instance.
- * Returns null if PHPMailer is not installed — callers must check.
- */
-function getMailer(): ?\PHPMailer\PHPMailer\PHPMailer {
-    if (!class_exists('\PHPMailer\PHPMailer\PHPMailer')) {
-        error_log('PHPMailer class not found — email skipped.');
-        return null;
+function cntSendMail(
+    string $toEmail, string $toName,
+    string $subject, string $htmlBody,
+    string $plainBody, string $replyTo = ''
+): bool {
+    // Load PHPMailer — absolute path confirmed via pathcheck.php
+    $autoload = '/home/u699609112/domains/alhindtrust.com/public_html/vendor/autoload.php';
+    if (!file_exists($autoload)) {
+        error_log('[AL Hind] PHPMailer not found at: ' . $autoload);
+        return false;
     }
-    $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
-    $mail->isSMTP();
-    $mail->Host       = 'smtp.gmail.com';       // or your cPanel SMTP
-    $mail->SMTPAuth   = true;
-    $mail->Username   = 'alhindtrust@gmail.com';
-    $mail->Password   = 'yyym lxhp pyro alyk';     // use Gmail App Password
-    $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port       = 587;
-    $mail->CharSet    = 'UTF-8';
-    $mail->setFrom('alhindtrust@gmail.com', 'AL Hind Trust');
-    return $mail;
+    require_once $autoload;
+
+    try {
+        $mail             = new \PHPMailer\PHPMailer\PHPMailer(true);
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'alhindtrust@gmail.com';
+        $mail->Password   = 'yyym lxhp pyro alyk';   // Gmail App Password
+        $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
+        $mail->CharSet    = 'UTF-8';
+        $mail->setFrom('alhindtrust@gmail.com', 'AL Hind Trust');
+        $mail->addAddress($toEmail, $toName);
+        if ($replyTo) $mail->addReplyTo($replyTo);
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $htmlBody;
+        $mail->AltBody = $plainBody;
+        $mail->send();
+        error_log('[AL Hind] SMTP OK → ' . $toEmail);
+        return true;
+    } catch (\Exception $e) {
+        error_log('[AL Hind] SMTP FAILED → ' . $toEmail . ' | ' . $e->getMessage());
+        return false;
+    }
 }
+
 
 /**
  * Email 1 — Free roles (partner, general)
@@ -182,18 +177,13 @@ function sendConfirmationEmail(
         </p>
     ");
 
-    try {
-        $mail = getMailer();
-        if (!$mail) return;   // PHPMailer not installed — skip silently
-        $mail->addAddress($email, $name);
-        $mail->Subject = $subject;
-        $mail->isHTML(true);
-        $mail->Body    = $html;
-        $mail->AltBody = strip_tags($html);
-        $mail->send();
-    } catch (\Exception $e) {
-        error_log("Confirmation email failed [{$ticketId}]: " . $e->getMessage());
-    }
+    $plain = "Thank you {$name}! Your message has been received.\n"
+           . "Interest : {$interestLabel}\n"
+           . "Ticket   : {$ticketId}\n"
+           . "We'll respond within 24-48 hours.\n\n"
+           . "AL Hind Trust | alhindtrust@gmail.com | +91-9263190568";
+
+    cntSendMail($email, $name, $subject, $html, $plain);
 }
 
 /**
@@ -224,18 +214,13 @@ function sendPendingApprovalEmail(
         </p>
     ");
 
-    try {
-        $mail = getMailer();
-        if (!$mail) return;
-        $mail->addAddress($email, $name);
-        $mail->Subject = $subject;
-        $mail->isHTML(true);
-        $mail->Body    = $html;
-        $mail->AltBody = "Thank you {$name}! Your volunteer application is under review. Ticket: {$ticketId}";
-        $mail->send();
-    } catch (\Exception $e) {
-        error_log("Pending approval email failed [{$ticketId}]: " . $e->getMessage());
-    }
+    $plain = "Dear {$name},\n\n"
+           . "Thank you for applying as a Volunteer with AL Hind Trust.\n"
+           . "Your application is under review. Ticket: {$ticketId}\n"
+           . "We will notify you within 2-3 working days.\n\n"
+           . "AL Hind Trust | alhindtrust@gmail.com | +91-9263190568";
+
+    cntSendMail($email, $name, $subject, $html, $plain);
 }
 
 /**
@@ -309,18 +294,15 @@ function sendWelcomeVolunteerEmail(array $row): void {
         </p>
     ");
 
-    try {
-        $mail = getMailer();
-        if (!$mail) return;
-        $mail->addAddress($email, $name);
-        $mail->Subject = $subject;
-        $mail->isHTML(true);
-        $mail->Body    = $html;
-        $mail->AltBody = "Congratulations {$name}! Your volunteer application is approved. Ticket: {$ticketId}";
-        $mail->send();
-    } catch (\Exception $e) {
-        error_log("Welcome volunteer email failed [{$ticketId}]: " . $e->getMessage());
-    }
+    $plain = "Congratulations {$name}!\n\n"
+           . "Your volunteer application with AL Hind Trust has been approved.\n"
+           . "Ticket   : {$ticketId}\n"
+           . "Role     : Volunteer\n"
+           . "Valid from: " . date('d M Y') . "\n\n"
+           . "Our team will contact you with onboarding details.\n\n"
+           . "AL Hind Trust | alhindtrust@gmail.com | +91-9263190568";
+
+    cntSendMail($email, $name, $subject, $html, $plain);
 }
 
 /**
@@ -368,18 +350,14 @@ function sendPaymentLinkEmail(
         </p>
     ");
 
-    try {
-        $mail = getMailer();
-        if (!$mail) return;   // PHPMailer not installed — skip silently
-        $mail->addAddress($email, $name);
-        $mail->Subject = $subject;
-        $mail->isHTML(true);
-        $mail->Body    = $html;
-        $mail->AltBody = "Complete your joining contribution of ₹{$fee}: {$payUrl}";
-        $mail->send();
-    } catch (\Exception $e) {
-        error_log("Payment link email failed [{$ticketId}]: " . $e->getMessage());
-    }
+    $plain = "Dear {$name},\n\n"
+           . "Please complete your joining contribution of Rs.{$fee} to register as {$interestLabel}.\n"
+           . "Payment link: {$payUrl}\n\n"
+           . "Ticket: {$ticketId}\n"
+           . "Link expires in 72 hours.\n\n"
+           . "AL Hind Trust | alhindtrust@gmail.com | +91-9263190568";
+
+    cntSendMail($email, $name, $subject, $html, $plain);
 }
 
 /**
@@ -442,19 +420,17 @@ function sendAdminNotification(
         </p>
     ");
 
-    try {
-        $mail = getMailer();
-        if (!$mail) return;   // PHPMailer not installed — skip silently
-        $mail->addAddress('alhindtrust@gmail.com', 'AL Hind Trust Admin');
-        if (!empty($email)) $mail->addReplyTo($email, $name);
-        $mail->Subject = $subject;
-        $mail->isHTML(true);
-        $mail->Body    = $html;
-        $mail->AltBody = "New inquiry from {$name} ({$interestLabel}) · Ticket: {$ticketId}";
-        $mail->send();
-    } catch (\Exception $e) {
-        error_log("Admin notification email failed [{$ticketId}]: " . $e->getMessage());
-    }
+    $plain = "New inquiry\n"
+           . "Name    : {$name}\n"
+           . "Email   : " . ($email ?: 'Not provided') . "\n"
+           . "Phone   : {$phone}\n"
+           . "Interest: {$interestLabel}\n"
+           . "Status  : {$statusLabel}\n"
+           . "Ticket  : {$ticketId}\n"
+           . "Message : {$message}";
+
+    $replyTo = $email ? "{$name} <{$email}>" : '';
+    cntSendMail('alhindtrust@gmail.com', 'AL Hind Admin', $subject, $html, $plain, $replyTo);
 }
 
 /**
@@ -495,7 +471,7 @@ function emailWrapper(string $content): string {
 
 
 /* ══════════════════════════════════════════════════════
-   ADMIN READ / MANAGE ROUTES (unchanged from original)
+   ADMIN READ / MANAGE ROUTES
 ══════════════════════════════════════════════════════ */
 
 function getAllMessages(): void {
@@ -555,6 +531,85 @@ function approveVolunteer(string $id): void {
     sendWelcomeVolunteerEmail($row);
 
     ok(null, 'Volunteer approved and welcome email sent');
+}
+
+/**
+ * POST /messages/{id}/reject
+ * Admin rejects a pending_approval volunteer — sends rejection email
+ */
+function rejectVolunteer(string $id): void {
+    $b    = body();
+    $db   = getDB();
+    $stmt = $db->prepare("SELECT * FROM contact_messages WHERE id = ? LIMIT 1");
+    $stmt->execute([$id]);
+    $row  = $stmt->fetch();
+
+    if (!$row)                                   error('Message not found', 404);
+    if ($row['status'] !== 'pending_approval')    error('Not a pending approval record', 400);
+
+    $reason = sanitize($b['reason'] ?? '');
+
+    // Update both tables
+    $db->prepare("UPDATE contact_messages SET status='rejected', updated_at=NOW() WHERE id=?")
+       ->execute([$id]);
+    $db->prepare("UPDATE ngo_inquiries SET status='rejected' WHERE ticket_id=?")
+       ->execute([$row['ticket_id']]);
+
+    // Send rejection email to user
+    if (!empty($row['sender_email'])) {
+        sendRejectionEmail($row, $reason);
+    }
+
+    ok(null, 'Volunteer rejected and notification email sent');
+}
+
+/**
+ * Rejection email — sent when admin rejects a volunteer application
+ */
+function sendRejectionEmail(array $row, string $reason = ''): void {
+    $name     = $row['sender_name'];
+    $email    = $row['sender_email'];
+    $ticketId = $row['ticket_id'];
+    $subject  = "Update on your application — AL Hind Trust ({$ticketId})";
+
+    $reasonBlock = $reason
+        ? "<p style='background:#fff7ed;border-left:3px solid #f97316;padding:10px 14px;
+                     border-radius:0 6px 6px 0;font-size:13px;color:#7c2d12;margin:16px 0'>
+              <strong>Reason:</strong> {$reason}
+           </p>"
+        : "";
+
+    $html = emailWrapper("
+        <h2 style='color:#1e293b;margin-top:0'>Application Update</h2>
+        <p>Dear <strong>{$name}</strong>,</p>
+        <p>Thank you for your interest in volunteering with AL Hind Trust.</p>
+        <p>After reviewing your application, we regret to inform you that we are
+           unable to move forward with your application at this time.</p>
+        {$reasonBlock}
+        <table style='width:100%;border-collapse:collapse;margin:16px 0;font-size:14px'>
+            <tr><td style='padding:7px 10px;background:#f0fdf4;color:#64748b;width:130px'>Role applied</td>
+                <td style='padding:7px 10px;background:#f0fdf4'>Volunteer</td></tr>
+            <tr><td style='padding:7px 10px;color:#64748b'>Ticket&nbsp;ID</td>
+                <td style='padding:7px 10px;font-family:monospace'>{$ticketId}</td></tr>
+        </table>
+        <p>We encourage you to apply again in the future or reach out to us
+           for other ways to contribute to our cause.</p>
+        <p style='font-size:13px;color:#64748b'>
+            Questions? Contact us at
+            <a href='mailto:alhindtrust@gmail.com' style='color:#0f766e'>alhindtrust@gmail.com</a>
+            or call <a href='tel:+919263190568' style='color:#0f766e'>+91-9263190568</a>.
+        </p>
+    ");
+
+    $plain = "Dear {$name},\n\n"
+           . "Thank you for your interest in volunteering with AL Hind Trust.\n"
+           . "After reviewing your application, we are unable to proceed at this time.\n"
+           . ($reason ? "Reason: {$reason}\n" : "")
+           . "Ticket: {$ticketId}\n\n"
+           . "We encourage you to apply again in the future.\n\n"
+           . "AL Hind Trust | alhindtrust@gmail.com | +91-9263190568";
+
+    cntSendMail($email, $name, $subject, $html, $plain);
 }
 
 /**
