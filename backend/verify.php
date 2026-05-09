@@ -45,29 +45,30 @@ if (!hash_equals($expectedSig, $signature)) {
 }
 
 // ════════════════════════════════════════════════════════════
-//  3. FETCH RECORD FROM DB
+//  3. FETCH RECORD FROM DB  (PDO — same as create-order.php)
 // ════════════════════════════════════════════════════════════
 
-// Use PDO (same as API) or mysqli — detect which db.php provides
-// db.php at public_html/config/db.php uses $conn (mysqli)
-// api/config/db.php uses getDB() (PDO)
-// We'll use mysqli here since backend/ uses it directly
+try {
+    $pdo = getDB();
+    $pdo->exec("SET time_zone = '+05:30'");
 
-$stmt = $conn->prepare("
-    SELECT id, name, email, phone, interest, joining_fee, status, member_id
-    FROM ngo_inquiries
-    WHERE ticket_id = ?
-    LIMIT 1
-");
-$stmt->bind_param('s', $ticket);
-$stmt->execute();
-$res = $stmt->get_result();
+    $stmt = $pdo->prepare("
+        SELECT id, name, email, phone, interest, joining_fee, status, member_id
+        FROM ngo_inquiries
+        WHERE ticket_id = ?
+        LIMIT 1
+    ");
+    $stmt->execute([$ticket]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if ($res->num_rows === 0) {
-    showError('Ticket not found. Please contact support.');
+} catch (PDOException $e) {
+    error_log('[AL Hind] verify.php DB fetch failed: ' . $e->getMessage());
+    showError('Database error. Please contact support.');
 }
 
-$row = $res->fetch_assoc();
+if (!$row) {
+    showError('Ticket not found. Please contact support.');
+}
 
 // ── Already processed? Show success page again (idempotent) ──
 if ($row['status'] === 'approved' && !empty($row['member_id'])) {
@@ -82,18 +83,17 @@ if ($row['status'] !== 'payment_pending') {
 //  4. GENERATE MEMBER ID  (MEM-0001, MEM-0002, …)
 // ════════════════════════════════════════════════════════════
 
-// Atomic: lock the row, get next sequence, update
-$conn->begin_transaction();
+// Atomic transaction: get next sequence, update in one go
+$pdo->beginTransaction();
 
 try {
     // Get current max member number
-    $r = $conn->query("SELECT MAX(CAST(SUBSTRING(member_id, 5) AS UNSIGNED)) AS mx FROM ngo_inquiries WHERE member_id IS NOT NULL");
-    $mx  = (int)($r->fetch_assoc()['mx'] ?? 0);
-    $num = $mx + 1;
-    $memberId = 'MEM-' . str_pad($num, 4, '0', STR_PAD_LEFT); // MEM-0001
+    $r  = $pdo->query("SELECT MAX(CAST(SUBSTRING(member_id, 5) AS UNSIGNED)) AS mx FROM ngo_inquiries WHERE member_id IS NOT NULL");
+    $mx = (int)($r->fetch(PDO::FETCH_ASSOC)['mx'] ?? 0);
+    $memberId = 'MEM-' . str_pad($mx + 1, 4, '0', STR_PAD_LEFT); // MEM-0001
 
     // Update record: mark approved, save payment details, assign member ID
-    $up = $conn->prepare("
+    $pdo->prepare("
         UPDATE ngo_inquiries
         SET status              = 'approved',
             member_id           = ?,
@@ -102,23 +102,19 @@ try {
             razorpay_signature  = ?,
             paid_at             = NOW()
         WHERE ticket_id = ?
-    ");
-    $up->bind_param('sssss', $memberId, $paymentId, $orderId, $signature, $ticket);
-    $up->execute();
+    ")->execute([$memberId, $paymentId, $orderId, $signature, $ticket]);
 
     // Also update contact_messages table
-    $cm = $conn->prepare("
+    $pdo->prepare("
         UPDATE contact_messages
         SET status = 'approved', updated_at = NOW()
         WHERE ticket_id = ?
-    ");
-    $cm->bind_param('s', $ticket);
-    $cm->execute();
+    ")->execute([$ticket]);
 
-    $conn->commit();
+    $pdo->commit();
 
 } catch (Exception $e) {
-    $conn->rollback();
+    $pdo->rollBack();
     error_log('[AL Hind] DB error during member approval: ' . $e->getMessage());
     showError('A database error occurred. Your payment was received — please contact support with ticket: ' . htmlspecialchars($ticket));
 }

@@ -3,23 +3,19 @@
 //  backend/pay.php — Member Joining Payment Page
 //  AL Hind Educational and Charitable Trust
 //  Uses cURL only — NO Razorpay PHP SDK
+//  DB via getDB() / PDO  (same as create-order.php)
 // ============================================================
 date_default_timezone_set('Asia/Kolkata');
 error_reporting(E_ALL);
-ini_set('display_errors', 1); // keep off in production; errors go to log
+ini_set('display_errors', 0); // keep off in production
 
-/*
-  File lives at: public_html/backend/pay.php
-  DB config:     public_html/config/db.php  ($conn — mysqli)
-*/
-require __DIR__ . '/../config/db.php';
+require __DIR__ . '/../config/db.php'; // provides getDB()
 
 // ── Razorpay credentials ──────────────────────────────────────
-define('RZP_KEY_ID',     'rzp_live_SmY6H2HIaVOr6Q');
-define('RZP_KEY_SECRET', '3VXI0InXLgL9BlO4B19kroDj');
+if (!defined('RZP_KEY_ID'))     define('RZP_KEY_ID',     'rzp_live_SmY6H2HIaVOr6Q');
+if (!defined('RZP_KEY_SECRET')) define('RZP_KEY_SECRET', '3VXI0InXLgL9BlO4B19kroDj');
 
 // ── cURL helper: create Razorpay order ───────────────────────
-//    Mirrors razorpayCreateOrder() in create-order.php exactly
 function razorpayCreateOrder(string $keyId, string $keySecret, int $amountPaise, string $receipt): array
 {
     $payload = json_encode([
@@ -45,12 +41,9 @@ function razorpayCreateOrder(string $keyId, string $keySecret, int $amountPaise,
     $curlError = curl_error($ch);
     curl_close($ch);
 
-    if ($curlError) {
-        throw new Exception('cURL error: ' . $curlError);
-    }
+    if ($curlError) throw new Exception('cURL error: ' . $curlError);
 
     $result = json_decode($response, true);
-
     if ($httpCode !== 200 || empty($result['id'])) {
         $errMsg = $result['error']['description'] ?? $result['error']['code'] ?? 'Unknown Razorpay error';
         throw new Exception('Razorpay API: ' . $errMsg);
@@ -69,26 +62,30 @@ if (empty($_GET['ticket'])) {
 $ticket = trim($_GET['ticket']);
 
 // ════════════════════════════════════════════════════════════
-//  2. FETCH RECORD FROM DB
+//  2. FETCH RECORD FROM DB  (PDO — same as create-order.php)
 // ════════════════════════════════════════════════════════════
 
-$stmt = $conn->prepare("
-    SELECT id, name, email, phone, interest, joining_fee, status
-    FROM ngo_inquiries
-    WHERE ticket_id = ?
-    LIMIT 1
-");
-if (!$stmt) {
-    die('DB prepare failed: ' . $conn->error);
-}
-$stmt->bind_param('s', $ticket);
-$stmt->execute();
-$res = $stmt->get_result();
+try {
+    $pdo = getDB();
+    $pdo->exec("SET time_zone = '+05:30'");
 
-if ($res->num_rows === 0) {
+    $stmt = $pdo->prepare("
+        SELECT id, name, email, phone, interest, joining_fee, status
+        FROM ngo_inquiries
+        WHERE ticket_id = ?
+        LIMIT 1
+    ");
+    $stmt->execute([$ticket]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+} catch (PDOException $e) {
+    error_log('[AL Hind] pay.php DB fetch failed: ' . $e->getMessage());
+    die('Database error. Please contact support.');
+}
+
+if (!$row) {
     die('Invalid ticket — not found in database.');
 }
-$row = $res->fetch_assoc();
 
 // ════════════════════════════════════════════════════════════
 //  3. STATUS CHECK
@@ -119,10 +116,12 @@ try {
 //  5. STORE ORDER ID IN DB
 // ════════════════════════════════════════════════════════════
 
-$up = $conn->prepare("UPDATE ngo_inquiries SET razorpay_order_id = ? WHERE ticket_id = ?");
-if ($up) {
-    $up->bind_param('ss', $order_id, $ticket);
-    $up->execute();
+try {
+    $up = $pdo->prepare("UPDATE ngo_inquiries SET razorpay_order_id = ? WHERE ticket_id = ?");
+    $up->execute([$order_id, $ticket]);
+} catch (PDOException $e) {
+    error_log('[AL Hind] pay.php order_id save failed: ' . $e->getMessage());
+    // Non-fatal — proceed to show payment page
 }
 
 // ════════════════════════════════════════════════════════════
