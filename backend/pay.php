@@ -6,7 +6,7 @@
 // ============================================================
 date_default_timezone_set('Asia/Kolkata');
 error_reporting(E_ALL);
-ini_set('display_errors', 0); // keep off in production; errors go to log
+ini_set('display_errors', 1); // keep off in production; errors go to log
 
 /*
   File lives at: public_html/backend/pay.php
