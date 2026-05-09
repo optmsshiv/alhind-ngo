@@ -1685,106 +1685,246 @@
 
     /* Message detail modal */
     /* ── Message detail modal redesign ─────────────── */
-    #msg-modal .modal { max-width: 500px; padding: 0; border-radius: 20px; overflow: hidden; }
+    #msg-modal .modal {
+      max-width: 500px;
+      padding: 0;
+      border-radius: 20px;
+      overflow: hidden;
+    }
 
     .msg-modal-header {
       background: linear-gradient(135deg, #0f766e 0%, #0d5c57 100%);
       padding: 1.4rem 1.6rem 1rem;
       position: relative;
     }
-    .msg-modal-avatar {
-      width: 52px; height: 52px; border-radius: 50%;
-      background: rgba(255,255,255,.18);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.25rem; font-weight: 700; color: #fff;
-      margin-bottom: .65rem; flex-shrink: 0;
-    }
-    .msg-modal-name {
-      font-size: 1.1rem; font-weight: 700; color: #fff; margin: 0 0 .18rem;
-    }
-    .msg-modal-meta {
-      font-size: .78rem; color: rgba(255,255,255,.72); display: flex;
-      align-items: center; gap: .55rem; flex-wrap: wrap;
-    }
-    .msg-modal-close {
-      position: absolute; top: 1rem; right: 1rem;
-      background: rgba(255,255,255,.15); border: none; border-radius: 8px;
-      width: 30px; height: 30px; color: #fff; font-size: .9rem;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-    }
-    .msg-modal-close:hover { background: rgba(255,255,255,.25); }
 
-    .msg-modal-body { padding: 1.2rem 1.6rem; }
+    .msg-modal-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: .65rem;
+      flex-shrink: 0;
+    }
+
+    .msg-modal-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 0 0 .18rem;
+    }
+
+    .msg-modal-meta {
+      font-size: .78rem;
+      color: rgba(255, 255, 255, .72);
+      display: flex;
+      align-items: center;
+      gap: .55rem;
+      flex-wrap: wrap;
+    }
+
+    .msg-modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(255, 255, 255, .15);
+      border: none;
+      border-radius: 8px;
+      width: 30px;
+      height: 30px;
+      color: #fff;
+      font-size: .9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .msg-modal-close:hover {
+      background: rgba(255, 255, 255, .25);
+    }
+
+    .msg-modal-body {
+      padding: 1.2rem 1.6rem;
+    }
 
     .msg-info-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: .55rem; margin-bottom: 1rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .55rem;
+      margin-bottom: 1rem;
     }
+
     .msg-info-card {
-      background: var(--bg); border-radius: 10px;
-      padding: .65rem .85rem; border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 10px;
+      padding: .65rem .85rem;
+      border: 1px solid var(--border);
     }
-    .msg-info-card.full { grid-column: 1 / -1; }
+
+    .msg-info-card.full {
+      grid-column: 1 / -1;
+    }
+
     .msg-info-card .mic-label {
-      font-size: .68rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: .07em; color: var(--muted); margin-bottom: .22rem;
+      font-size: .68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      margin-bottom: .22rem;
     }
+
     .msg-info-card .mic-val {
-      font-size: .85rem; color: #1e293b; font-weight: 500;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      font-size: .85rem;
+      color: #1e293b;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .msg-info-card .mic-val a { color: var(--teal); text-decoration: none; }
-    .msg-info-card .mic-val a:hover { text-decoration: underline; }
+
+    .msg-info-card .mic-val a {
+      color: var(--teal);
+      text-decoration: none;
+    }
+
+    .msg-info-card .mic-val a:hover {
+      text-decoration: underline;
+    }
 
     .msg-message-box {
-      background: var(--bg); border-radius: 12px;
-      padding: 1rem 1.1rem; border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+      border: 1px solid var(--border);
       margin-bottom: 1.1rem;
     }
+
     .msg-message-box .mic-label {
-      font-size: .68rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: .07em; color: var(--muted); margin-bottom: .45rem;
+      font-size: .68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      margin-bottom: .45rem;
     }
+
     .msg-message-box p {
-      font-size: .875rem; color: #1e293b; line-height: 1.65;
-      margin: 0; white-space: pre-wrap;
+      font-size: .875rem;
+      color: #1e293b;
+      line-height: 1.65;
+      margin: 0;
+      white-space: pre-wrap;
     }
 
     .msg-modal-actions {
-      display: flex; gap: .55rem; flex-wrap: wrap;
-      padding: .9rem 1.6rem 1.4rem; border-top: 1px solid var(--border);
+      display: flex;
+      gap: .55rem;
+      flex-wrap: wrap;
+      padding: .9rem 1.6rem 1.4rem;
+      border-top: 1px solid var(--border);
     }
+
     .msg-act-reply {
-      background: var(--teal); color: #fff; border: none; border-radius: 9px;
-      padding: .55rem 1.1rem; font-size: .82rem; font-weight: 700;
-      cursor: pointer; display: inline-flex; align-items: center; gap: .4rem;
-      text-decoration: none; font-family: inherit;
+      background: var(--teal);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      padding: .55rem 1.1rem;
+      font-size: .82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      text-decoration: none;
+      font-family: inherit;
     }
-    .msg-act-reply:hover { background: #0d6460; }
+
+    .msg-act-reply:hover {
+      background: #0d6460;
+    }
+
     .msg-act-approve {
-      background: #dcfce7; color: #166534; border: none; border-radius: 9px;
-      padding: .55rem 1.1rem; font-size: .82rem; font-weight: 700;
-      cursor: pointer; display: inline-flex; align-items: center; gap: .4rem; font-family: inherit;
+      background: #dcfce7;
+      color: #166534;
+      border: none;
+      border-radius: 9px;
+      padding: .55rem 1.1rem;
+      font-size: .82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      font-family: inherit;
     }
-    .msg-act-approve:hover { background: #bbf7d0; }
+
+    .msg-act-approve:hover {
+      background: #bbf7d0;
+    }
+
     .msg-act-reject {
-      background: #fee2e2; color: #991b1b; border: none; border-radius: 9px;
-      padding: .55rem 1.1rem; font-size: .82rem; font-weight: 700;
-      cursor: pointer; display: inline-flex; align-items: center; gap: .4rem; font-family: inherit;
+      background: #fee2e2;
+      color: #991b1b;
+      border: none;
+      border-radius: 9px;
+      padding: .55rem 1.1rem;
+      font-size: .82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      font-family: inherit;
     }
-    .msg-act-reject:hover { background: #fecaca; }
+
+    .msg-act-reject:hover {
+      background: #fecaca;
+    }
+
     .msg-act-resend {
-      background: #fef3c7; color: #92400e; border: none; border-radius: 9px;
-      padding: .55rem 1.1rem; font-size: .82rem; font-weight: 700;
-      cursor: pointer; display: inline-flex; align-items: center; gap: .4rem; font-family: inherit;
+      background: #fef3c7;
+      color: #92400e;
+      border: none;
+      border-radius: 9px;
+      padding: .55rem 1.1rem;
+      font-size: .82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      font-family: inherit;
     }
-    .msg-act-resend:hover { background: #fde68a; }
+
+    .msg-act-resend:hover {
+      background: #fde68a;
+    }
+
     .msg-act-close {
-      background: var(--bg); color: var(--muted); border: 1px solid var(--border);
-      border-radius: 9px; padding: .55rem 1.1rem; font-size: .82rem; font-weight: 600;
-      cursor: pointer; font-family: inherit; margin-left: auto;
+      background: var(--bg);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: .55rem 1.1rem;
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      margin-left: auto;
     }
-    .msg-act-close:hover { background: var(--border); }
+
+    .msg-act-close:hover {
+      background: var(--border);
+    }
 
     /* Gallery action icon buttons */
     .gal-act-btn {
@@ -3167,8 +3307,8 @@
           <i class="fa-solid fa-xmark"></i>
         </button>
         <div class="msg-modal-avatar" id="msg-modal-avatar"></div>
-        <div class="msg-modal-name"  id="msg-modal-name"></div>
-        <div class="msg-modal-meta"  id="msg-modal-meta"></div>
+        <div class="msg-modal-name" id="msg-modal-name"></div>
+        <div class="msg-modal-meta" id="msg-modal-meta"></div>
       </div>
       <!-- Info grid + message — filled by viewMessage() -->
       <div class="msg-modal-body" id="msg-detail-body"></div>
@@ -4720,18 +4860,18 @@
         } catch (e) { }
       }
 
-      const isPending    = m.status === 'payment_pending';
-      const isApproval   = m.status === 'pending_approval';
-      const isRejected   = m.status === 'rejected';
-      const FEE_MAP      = { team: 500 };
-      const fee          = FEE_MAP[m.interest_type] || 0;
+      const isPending = m.status === 'payment_pending';
+      const isApproval = m.status === 'pending_approval';
+      const isRejected = m.status === 'rejected';
+      const FEE_MAP = { team: 500 };
+      const fee = FEE_MAP[m.interest_type] || 0;
 
       /* ── Header — avatar initials + name + meta ── */
       const nameParts = (m.sender_name || '?').trim().split(' ');
-      const initials  = (nameParts[0][0] + (nameParts[1] ? nameParts[1][0] : '')).toUpperCase();
+      const initials = (nameParts[0][0] + (nameParts[1] ? nameParts[1][0] : '')).toUpperCase();
       document.getElementById('msg-modal-avatar').textContent = initials;
-      document.getElementById('msg-modal-name').textContent   = m.sender_name || '—';
-      document.getElementById('msg-modal-meta').innerHTML     =
+      document.getElementById('msg-modal-name').textContent = m.sender_name || '—';
+      document.getElementById('msg-modal-meta').innerHTML =
         `${msgIntBadge(m.interest_type)}
          ${msgStBadge(m.status || 'submitted')}
          <span style="opacity:.7;font-size:.74rem">${fmtDateTime(m.created_at)}</span>`;
@@ -4743,29 +4883,29 @@
           <div class="msg-info-card">
             <div class="mic-label"><i class="fa-solid fa-envelope" style="margin-right:4px"></i>Email</div>
             <div class="mic-val">${m.sender_email
-              ? `<a href="mailto:${esc(m.sender_email)}">${esc(m.sender_email)}</a>`
-              : '<span style="color:var(--muted)">—</span>'}</div>
+          ? `<a href="mailto:${esc(m.sender_email)}">${esc(m.sender_email)}</a>`
+          : '<span style="color:var(--muted)">—</span>'}</div>
           </div>
 
           <div class="msg-info-card">
             <div class="mic-label"><i class="fa-solid fa-phone" style="margin-right:4px"></i>Phone</div>
             <div class="mic-val">${m.sender_phone
-              ? `<a href="tel:${esc(m.sender_phone)}">${esc(m.sender_phone)}</a>`
-              : '<span style="color:var(--muted)">—</span>'}</div>
+          ? `<a href="tel:${esc(m.sender_phone)}">${esc(m.sender_phone)}</a>`
+          : '<span style="color:var(--muted)">—</span>'}</div>
           </div>
 
           <div class="msg-info-card">
             <div class="mic-label"><i class="fa-solid fa-ticket" style="margin-right:4px"></i>Ticket ID</div>
             <div class="mic-val">${m.ticket_id
-              ? `<span class="tkt-mono">${esc(m.ticket_id)}</span>`
-              : '<span style="color:var(--muted)">—</span>'}</div>
+          ? `<span class="tkt-mono">${esc(m.ticket_id)}</span>`
+          : '<span style="color:var(--muted)">—</span>'}</div>
           </div>
 
           <div class="msg-info-card">
             <div class="mic-label"><i class="fa-solid fa-indian-rupee-sign" style="margin-right:4px"></i>Fee</div>
             <div class="mic-val">${isPending
-              ? `<strong style="color:#b45309">₹${fee} pending</strong>`
-              : '<span style="color:var(--muted)">Free</span>'}</div>
+          ? `<strong style="color:#b45309">₹${fee} pending</strong>`
+          : '<span style="color:var(--muted)">Free</span>'}</div>
           </div>
 
         </div>
@@ -4786,9 +4926,9 @@
       } else {
         replyLink.style.display = 'none';
       }
-      show('msg-resend-btn',  isPending);
+      show('msg-resend-btn', isPending);
       show('msg-approve-btn', isApproval);
-      show('msg-reject-btn',  isApproval);
+      show('msg-reject-btn', isApproval);
 
       document.getElementById('msg-modal').classList.add('open');
     }
@@ -4815,6 +4955,23 @@
         closeMsgModal();
         renderMessages();
       } catch (e) { toast('Approval failed', 'error'); }
+    }
+
+    /* ── Reject volunteer ───────────────────────────── */
+    async function rejectVolunteer() {
+      if (!_msgDetailId) return;
+      const m = messages.find(x => x.id === _msgDetailId);
+      if (!m) return;
+      const reason = prompt(`Reject ${m.sender_name}'s volunteer application?\n\nOptional: enter a reason (leave blank to skip):`);
+      if (reason === null) return; // cancelled
+      try {
+        await apiFetch('POST', `messages/${_msgDetailId}/reject`, { reason: reason.trim() });
+        m.status = 'rejected';
+        m.is_read = true;
+        toast('Volunteer rejected — notification email sent ✓', 'success');
+        closeMsgModal();
+        renderMessages();
+      } catch (e) { toast('Rejection failed', 'error'); }
     }
 
     /* ── Resend payment link ─────────────────────────── */
