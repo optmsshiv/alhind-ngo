@@ -110,10 +110,10 @@ function cntSendMail(
     string $subject, string $htmlBody,
     string $plainBody, string $replyTo = ''
 ): bool {
-    // Load PHPMailer (Composer autoload)
-    $autoload = __DIR__ . '/../vendor/autoload.php';
+    // Load PHPMailer — vendor is at site root /vendor/autoload.php
+    $autoload = $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
     if (!file_exists($autoload)) {
-        error_log('[AL Hind] PHPMailer not found. Run: composer require phpmailer/phpmailer');
+        error_log('[AL Hind] PHPMailer not found at: ' . $autoload);
         return false;
     }
     require_once $autoload;
