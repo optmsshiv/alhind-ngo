@@ -5110,29 +5110,35 @@
     /* ══════════════════════════════════════
        UTILS
     ══════════════════════════════════════ */
-      function fmtDate(iso) {
-        if (!iso) return '';
-        return new Date(iso + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-      }
-      function fmtDateTime(iso) {
-        if (!iso) return '—';
-        // MySQL stores datetime in IST — append offset so JS parses it correctly
-        const normalized = iso.trim().replace(' ', 'T') + '+05:30';
-        const d = new Date(normalized);
-        return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) + ' ' +
-          d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
-      }
-      function esc(s) {
-        return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      }
-      let ttmr;
-      function toast(msg, type = 'success') {
-        const el = document.getElementById('toast');
-        el.innerHTML = (type === 'success' ? '<i class="fa-solid fa-circle-check"></i> ' : '<i class="fa-solid fa-circle-xmark"></i> ') + msg;
-        el.className = `show ${type}`;
-        clearTimeout(ttmr);
-        ttmr = setTimeout(() => el.className = '', 3000);
-      }
+        function fmtDate(iso) {
+          if (!iso) return '';
+          return new Date(iso + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+        function fmtDateTime(iso) {
+          if (!iso) return '—';
+          // MySQL stores in UTC — convert to IST (UTC+5:30)
+          const utc = new Date(iso.trim().replace(' ', 'T') + 'Z');
+          const ist = new Date(utc.getTime() + (5.5 * 60 * 60 * 1000));
+          const day = ist.getUTCDate();
+          const mon = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][ist.getUTCMonth()];
+          const yr = ist.getUTCFullYear();
+          let hr = ist.getUTCHours();
+          const min = String(ist.getUTCMinutes()).padStart(2, '0');
+          const ampm = hr >= 12 ? 'pm' : 'am';
+          hr = hr % 12 || 12;
+          return `${day} ${mon} ${yr} ${hr}:${min} ${ampm}`;
+        }
+        function esc(s) {
+          return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+        let ttmr;
+        function toast(msg, type = 'success') {
+          const el = document.getElementById('toast');
+          el.innerHTML = (type === 'success' ? '<i class="fa-solid fa-circle-check"></i> ' : '<i class="fa-solid fa-circle-xmark"></i> ') + msg;
+          el.className = `show ${type}`;
+          clearTimeout(ttmr);
+          ttmr = setTimeout(() => el.className = '', 3000);
+        }
 
     /* Auto-refresh every 60s */
     setInterval(() => {
