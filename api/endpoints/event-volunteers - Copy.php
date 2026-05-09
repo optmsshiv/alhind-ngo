@@ -19,38 +19,46 @@ function evtSendMail(
     string $subject, string $htmlBody,
     string $plainBody, string $replyTo = ''
 ): bool {
-    // Load PHPMailer — absolute path confirmed via pathcheck.php
-    $autoload = '/home/u699609112/domains/alhindtrust.com/public_html/vendor/autoload.php';
-    if (!file_exists($autoload)) {
-        error_log('[AL Hind] PHPMailer not found at: ' . $autoload);
-        return false;
-    }
-    require_once $autoload;
+    $from     = 'noreply@alhindtrust.com'; // ← use your domain email
+    $fromName = 'AL Hind Trust';
 
+    $headers  = "MIME-Version: 1.0\r\n";
+    $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+    $headers .= "From: {$fromName} <{$from}>\r\n";
+    $headers .= $replyTo ? "Reply-To: {$replyTo}\r\n" : "Reply-To: alhindtrust@gmail.com\r\n";
+    $headers .= "X-Mailer: PHP/" . phpversion();
+
+    $ok = mail($toEmail, $subject, $htmlBody, $headers);
+    if (!$ok) error_log("[AL Hind] mail() failed → {$toEmail}");
+    return $ok;
+
+    /* ── SMTP OPTION — uncomment when ready ──────────────────
+    use PHPMailer\PHPMailer\PHPMailer;
+    use PHPMailer\PHPMailer\Exception;
     try {
-        $mail             = new \PHPMailer\PHPMailer\PHPMailer(true);
+        $mail             = new PHPMailer(true);
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
         $mail->Username   = 'alhindtrust@gmail.com';
-        $mail->Password   = 'yyym lxhp pyro alyk';   // Gmail App Password
-        $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Password   = 'yyym lxhp pyro alyk';   // Gmail app password
+        $mail->SMTPSecure = 'tls';
         $mail->Port       = 587;
         $mail->CharSet    = 'UTF-8';
         $mail->setFrom('alhindtrust@gmail.com', 'AL Hind Trust');
-        $mail->addAddress($toEmail, $toName);
         if ($replyTo) $mail->addReplyTo($replyTo);
+        $mail->addAddress($toEmail, $toName);
         $mail->isHTML(true);
         $mail->Subject = $subject;
         $mail->Body    = $htmlBody;
         $mail->AltBody = $plainBody;
         $mail->send();
-        error_log('[AL Hind] SMTP OK → ' . $toEmail);
         return true;
-    } catch (\Exception $e) {
-        error_log('[AL Hind] SMTP FAILED → ' . $toEmail . ' | ' . $e->getMessage());
+    } catch (Exception $e) {
+        error_log('[AL Hind] SMTP failed: ' . $e->getMessage());
         return false;
     }
+    ──────────────────────────────────────────────────────── */
 }
 
 /* ── Ticket number generator ─────────────────────────────────── */
