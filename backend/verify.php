@@ -17,11 +17,9 @@ $autoload = __DIR__ . '/../vendor/autoload.php';
 if (file_exists($autoload)) require_once $autoload;
 
 // ── Razorpay credentials ─────────────────────────────────────
-// define('RZP_KEY_ID',     'rzp_live_SmY6H2HIaVOr6Q');
-// define('RZP_KEY_SECRET', '3VXI0InXLgL9BlO4B19kroDj');
+define('RZP_KEY_ID',     'rzp_live_SmY6H2HIaVOr6Q');
+define('RZP_KEY_SECRET', '3VXI0InXLgL9BlO4B19kroDj');
 
-define('RZP_KEY_ID',     'rzp_test_SnKA1cM9qun4jI');
-define('RZP_KEY_SECRET', 'rv1mU7vdQtKQ7uUbGeMyUMe6');
 // ════════════════════════════════════════════════════════════
 //  1. VALIDATE INPUTS
 // ════════════════════════════════════════════════════════════
@@ -144,6 +142,7 @@ showSuccess($row['name'], $memberId, $row['email'], false);
 function sendMemberWelcomeEmail(array $row, string $memberId, string $ticketId): void {
     $name  = $row['name'];
     $email = $row['email'];
+    $phone = $row['phone'] ?? '';
     $fee   = (int)$row['joining_fee'];
 
     if (empty($email)) return;
@@ -155,6 +154,7 @@ function sendMemberWelcomeEmail(array $row, string $memberId, string $ticketId):
     $initials = strtoupper(substr($parts[0], 0, 1) . (isset($parts[1]) ? substr($parts[1], 0, 1) : ''));
     $joinDate = date('d M Y');
     $joinYear = date('Y');
+    $role     = ucfirst($row['interest'] ?? 'Member');
 
     $html = emailWrap("
         <h2 style='color:#0f766e;margin-top:0'>Welcome to AL Hind Trust, {$name}! 🎉</h2>
@@ -163,65 +163,83 @@ function sendMemberWelcomeEmail(array $row, string $memberId, string $ticketId):
         <p>Your membership details and ID card are below. Please save this email for your records.</p>
 
         <!-- ══ MEMBER ID CARD ══ -->
-        <div style='border:2px solid #0f766e;border-radius:16px;overflow:hidden;
-                    max-width:400px;margin:28px auto;font-family:Segoe UI,sans-serif;
-                    box-shadow:0 4px 16px rgba(15,118,110,.15)'>
+        <table width='100%' cellpadding='0' cellspacing='0' style='max-width:420px;margin:28px auto;border:1.5px solid #0f766e;border-radius:14px;overflow:hidden;font-family:Segoe UI,Arial,sans-serif'>
 
             <!-- Card header -->
-            <div style='background:linear-gradient(135deg,#0f766e,#0a4e48);
-                        padding:20px 24px;display:flex;align-items:center;gap:16px'>
-                <div style='width:60px;height:60px;border-radius:50%;
-                            background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);
-                            display:flex;align-items:center;justify-content:center;
-                            color:#fff;font-size:22px;font-weight:800;flex-shrink:0;
-                            font-family:Segoe UI,sans-serif'>
-                    {$initials}
-                </div>
-                <div style='color:#fff'>
-                    <div style='font-weight:800;font-size:17px;letter-spacing:.3px'>{$name}</div>
-                    <div style='font-size:12px;opacity:.8;margin-top:3px'>Life Member · AL Hind Trust</div>
-                </div>
-                <div style='margin-left:auto;text-align:right;color:#fff'>
-                    <div style='font-size:11px;opacity:.7'>Member ID</div>
-                    <div style='font-size:18px;font-weight:800;font-family:monospace;
-                                letter-spacing:1px;color:#a7f3d0'>{$memberId}</div>
-                </div>
-            </div>
+            <tr>
+                <td style='background:#0f766e;padding:20px 24px'>
+                    <table width='100%' cellpadding='0' cellspacing='0'>
+                        <tr>
+                            <!-- Amber initials circle -->
+                            <td width='68' valign='middle'>
+                                <div style='width:60px;height:60px;border-radius:50%;
+                                            background:#EF9F27;border:2.5px solid #FAC775;
+                                            text-align:center;line-height:60px;
+                                            font-size:22px;font-weight:700;
+                                            color:#412402;font-family:Segoe UI,Arial,sans-serif'>
+                                    {$initials}
+                                </div>
+                            </td>
+                            <!-- Name + subtitle + ID badge -->
+                            <td valign='middle' style='padding-left:14px'>
+                                <div style='color:#ffffff;font-size:17px;font-weight:600;letter-spacing:0.2px'>{$name}</div>
+                                <div style='color:rgba(255,255,255,0.75);font-size:12px;margin-top:3px'>Life Member &middot; AL Hind Trust</div>
+                                <!-- Amber ID badge -->
+                                <div style='margin-top:8px;display:inline-block;background:#EF9F27;
+                                            padding:3px 10px;border-radius:6px'>
+                                    <span style='color:#412402;font-size:11px;font-weight:700'>ID</span>
+                                    <span style='color:#BA7517;font-size:11px;margin:0 4px'>|</span>
+                                    <span style='color:#412402;font-size:12px;font-weight:600;
+                                                letter-spacing:1px;font-family:Courier New,monospace'>{$memberId}</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
 
             <!-- Card body -->
-            <div style='padding:18px 24px;background:#fff'>
-                <table style='width:100%;border-collapse:collapse;font-size:13px'>
-                    <tr>
-                        <td style='padding:6px 0;color:#64748b;width:120px'>Organisation</td>
-                        <td style='padding:6px 0;font-weight:700;color:#0f766e'>AL Hind Educational &amp; Charitable Trust</td>
-                    </tr>
-                    <tr>
-                        <td style='padding:6px 0;color:#64748b;border-top:1px solid #f1f5f9'>Ticket ID</td>
-                        <td style='padding:6px 0;font-family:monospace;font-size:12px;border-top:1px solid #f1f5f9'>{$ticketId}</td>
-                    </tr>
-                    <tr>
-                        <td style='padding:6px 0;color:#64748b;border-top:1px solid #f1f5f9'>Email</td>
-                        <td style='padding:6px 0;border-top:1px solid #f1f5f9'>{$email}</td>
-                    </tr>
-                    <tr>
-                        <td style='padding:6px 0;color:#64748b;border-top:1px solid #f1f5f9'>Member Since</td>
-                        <td style='padding:6px 0;font-weight:600;border-top:1px solid #f1f5f9'>{$joinDate}</td>
-                    </tr>
-                    <tr>
-                        <td style='padding:6px 0;color:#64748b;border-top:1px solid #f1f5f9'>Contribution</td>
-                        <td style='padding:6px 0;border-top:1px solid #f1f5f9'>₹{$fee} (one-time joining)</td>
-                    </tr>
-                </table>
-            </div>
+            <tr>
+                <td style='background:#ffffff;padding:16px 24px'>
+                    <table width='100%' cellpadding='0' cellspacing='0' style='font-size:13px'>
+                        <tr>
+                            <td style='padding:9px 0;color:#64748b;width:38%'>Organisation</td>
+                            <td style='padding:9px 0;font-weight:600;color:#1e293b'>AL Hind Educational &amp; Charitable Trust</td>
+                        </tr>
+                        <tr>
+                            <td style='padding:9px 0;color:#64748b;border-top:1px solid #f1f5f9'>Role</td>
+                            <td style='padding:9px 0;font-weight:600;color:#1e293b;border-top:1px solid #f1f5f9'>{$role}</td>
+                        </tr>
+                        <tr>
+                            <td style='padding:9px 0;color:#64748b;border-top:1px solid #f1f5f9'>Phone</td>
+                            <td style='padding:9px 0;font-weight:600;color:#1e293b;border-top:1px solid #f1f5f9'>{$phone}</td>
+                        </tr>
+                        <tr>
+                            <td style='padding:9px 0;color:#64748b;border-top:1px solid #f1f5f9'>Member Since</td>
+                            <td style='padding:9px 0;font-weight:600;color:#1e293b;border-top:1px solid #f1f5f9'>{$joinDate}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
 
             <!-- Card footer -->
-            <div style='background:#f0fdf4;border-top:1px solid #dcfce7;
-                        padding:10px 24px;display:flex;justify-content:space-between;
-                        align-items:center;font-size:11px;color:#15803d'>
-                <span>alhindtrust.com</span>
-                <span>Madhepura, Bihar · {$joinYear}</span>
-            </div>
-        </div>
+            <tr>
+                <td style='background:#f8fafc;border-top:1px solid #e2e8f0;padding:10px 24px'>
+                    <table width='100%' cellpadding='0' cellspacing='0'>
+                        <tr>
+                            <td style='font-size:12px;color:#64748b'>alhindtrust.com &middot; Madhepura, Bihar</td>
+                            <td align='right'>
+                                <span style='background:#dcfce7;color:#15803d;font-size:11px;
+                                             font-weight:600;padding:3px 10px;border-radius:6px'>
+                                    &#10003; Valid Life Member
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+        </table>
 
         <!-- ══ JOINING LETTER ══ -->
         <div style='border:1px solid #e2e8f0;border-radius:10px;padding:24px;
@@ -266,9 +284,8 @@ function sendMemberWelcomeEmail(array $row, string $memberId, string $ticketId):
     $plain = "Welcome to AL Hind Trust, {$name}!\n\n"
            . "Your membership has been confirmed.\n\n"
            . "Member ID   : {$memberId}\n"
-           . "Ticket ID   : {$ticketId}\n"
            . "Member Since: {$joinDate}\n"
-           . "Contribution: Rs.{$fee}\n\n"
+           . "Phone       : {$phone}\n\n"
            . "Please quote your Member ID ({$memberId}) in all future correspondence.\n\n"
            . "AL Hind Trust | alhindtrust@gmail.com | +91-9263190568\n"
            . "Kohinoor Complex, College Chowk, Madhepura – 852113, Bihar";
