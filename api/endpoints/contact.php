@@ -20,13 +20,11 @@ const APPROVAL_ROLES = ['volunteer'];
 
 // Roles that get a payment-link email after submit
 function requiresPayment(string $interest): bool {
-    global $PAID_ROLES;
-    return isset($PAID_ROLES[$interest]);
+    return isset(PAID_ROLES[$interest]);
 }
 
 function joiningFeeFor(string $interest): int {
-    global $PAID_ROLES;
-    return $PAID_ROLES[$interest] ?? 0;
+    return PAID_ROLES[$interest] ?? 0;
 }
 
 
@@ -119,46 +117,58 @@ function cntSendMail(
     string $subject, string $htmlBody,
     string $plainBody, string $replyTo = ''
 ): bool {
-    $from     = 'noreply@alhindtrust.com';
-    $fromName = 'AL Hind Trust';
+    // ── Auto-load PHPMailer (Composer or manual) ─────────
+    $autoload = __DIR__ . '/../vendor/autoload.php';
+    $pmBase   = __DIR__ . '/../phpmailer/src/PHPMailer.php';
+    $pmSmtp   = __DIR__ . '/../phpmailer/src/SMTP.php';
+    $pmExcept = __DIR__ . '/../phpmailer/src/Exception.php';
 
+    if (file_exists($autoload)) {
+        require_once $autoload;
+    } elseif (file_exists($pmBase)) {
+        require_once $pmExcept;
+        require_once $pmSmtp;
+        require_once $pmBase;
+    }
+
+    // ── Send via SMTP if PHPMailer available ─────────────
+    if (class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+        try {
+            $mail             = new \PHPMailer\PHPMailer\PHPMailer(true);
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'alhindtrust@gmail.com';
+            $mail->Password   = 'yyym lxhp pyro alyk';
+            $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = 587;
+            $mail->CharSet    = 'UTF-8';
+            $mail->setFrom('alhindtrust@gmail.com', 'AL Hind Trust');
+            if ($replyTo) $mail->addReplyTo($replyTo);
+            $mail->addAddress($toEmail, $toName);
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body    = $htmlBody;
+            $mail->AltBody = $plainBody;
+            $mail->send();
+            error_log('[AL Hind] SMTP OK → ' . $toEmail);
+            return true;
+        } catch (\Exception $e) {
+            error_log('[AL Hind] SMTP FAILED → ' . $toEmail . ' | ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    // ── Fallback: PHP mail() ─────────────────────────────
+    error_log('[AL Hind] PHPMailer not found, using mail() → ' . $toEmail);
     $headers  = "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-    $headers .= "From: {$fromName} <{$from}>\r\n";
+    $headers .= "From: AL Hind Trust <alhindtrust@gmail.com>\r\n";
     $headers .= $replyTo ? "Reply-To: {$replyTo}\r\n" : "Reply-To: alhindtrust@gmail.com\r\n";
     $headers .= "X-Mailer: PHP/" . phpversion();
-
-    $ok = mail($toEmail, $subject, $htmlBody, $headers);
-    if (!$ok) error_log("[AL Hind] mail() failed → {$toEmail}");
+    $ok = @mail($toEmail, $subject, $htmlBody, $headers);
+    error_log('[AL Hind] mail() → ' . $toEmail . ' | ' . ($ok ? 'OK' : 'FAILED'));
     return $ok;
-
-    /* ── SMTP OPTION — uncomment when ready ──────────────────
-    use PHPMailer\PHPMailer\PHPMailer;
-    use PHPMailer\PHPMailer\Exception;
-    try {
-        $mail             = new PHPMailer(true);
-        $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = 'alhindtrust@gmail.com';
-        $mail->Password   = 'yyym lxhp pyro alyk';   // Gmail app password
-        $mail->SMTPSecure = 'tls';
-        $mail->Port       = 587;
-        $mail->CharSet    = 'UTF-8';
-        $mail->setFrom('alhindtrust@gmail.com', 'AL Hind Trust');
-        if ($replyTo) $mail->addReplyTo($replyTo);
-        $mail->addAddress($toEmail, $toName);
-        $mail->isHTML(true);
-        $mail->Subject = $subject;
-        $mail->Body    = $htmlBody;
-        $mail->AltBody = $plainBody;
-        $mail->send();
-        return true;
-    } catch (Exception $e) {
-        error_log('[AL Hind] SMTP failed: ' . $e->getMessage());
-        return false;
-    }
-    ──────────────────────────────────────────────────────── */
 }
 
 /**
