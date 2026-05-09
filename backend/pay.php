@@ -12,8 +12,11 @@ ini_set('display_errors', 0); // keep off in production
 require __DIR__ . '/../config/db.php'; // provides getDB()
 
 // ── Razorpay credentials ──────────────────────────────────────
-if (!defined('RZP_KEY_ID'))     define('RZP_KEY_ID',     'rzp_live_SmY6H2HIaVOr6Q');
-if (!defined('RZP_KEY_SECRET')) define('RZP_KEY_SECRET', '3VXI0InXLgL9BlO4B19kroDj');
+// if (!defined('RZP_KEY_ID'))     define('RZP_KEY_ID',     'rzp_live_SmY6H2HIaVOr6Q');
+// if (!defined('RZP_KEY_SECRET')) define('RZP_KEY_SECRET', '3VXI0InXLgL9BlO4B19kroDj');
+
+if (!defined('RZP_KEY_ID'))     define('RZP_KEY_ID',     'rzp_test_SnKA1cM9qun4jI');
+if (!defined('RZP_KEY_SECRET')) define('RZP_KEY_SECRET', 'rv1mU7vdQtKQ7uUbGeMyUMe6');
 
 // ── cURL helper: create Razorpay order ───────────────────────
 function razorpayCreateOrder(string $keyId, string $keySecret, int $amountPaise, string $receipt): array
