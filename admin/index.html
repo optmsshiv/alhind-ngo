@@ -4848,8 +4848,8 @@
           <td><span class="msg-preview">${esc((m.message || '—').length > 50 ? m.message.substring(0, 50) + '…' : (m.message || '—'))}</span></td>
           <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">${fmtDateTime(m.created_at)}</td>
           <td><div class="tbl-acts">
-            <button class="btn-view" onclick="viewMessage(${m.id})">
-              <i class="fa-solid fa-eye"></i> View
+            <button class="btn-view" onclick="viewMessage(${m.id})" title="View">
+              <i class="fa-solid fa-eye"></i>
             </button>
             <button class="btn-rm" onclick="deleteMessage(${m.id})">
               <i class="fa-solid fa-trash-can"></i>
