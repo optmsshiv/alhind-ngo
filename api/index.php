@@ -80,15 +80,14 @@ if ($resource === 'volunteers' && $method === 'POST') {
     exit;
 }
 
-// ── Payment pages — public (opened by user from email link) ─
-// pay.php & verify.php are accessed directly by users from email
-// They must NOT require auth — add them here before requireAuth()
+// ── Payment pages — public (no auth needed) ─────────
+// pay.php is at public_html/pay.php — one level UP from /api/
 if ($resource === 'pay.php' || $resource === 'pay') {
-    require_once __DIR__ . '/api/pay.php';
+    require_once dirname(__DIR__) . '/pay.php';
     exit;
 }
 if ($resource === 'verify.php' || $resource === 'verify') {
-    require_once __DIR__ . '/verify.php';
+    require_once dirname(__DIR__) . '/verify.php';
     exit;
 }
 
