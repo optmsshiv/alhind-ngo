@@ -100,26 +100,48 @@ function submitContact(): void {
 
 
 /* ══════════════════════════════════════════════════════
-   SHARED MAILER
-   Uses PHP mail() directly — same as event-volunteers.php.
-   Reliable on cPanel/shared hosting without SMTP config.
-   To upgrade to SMTP: replace the mail() block with
-   a PHPMailer SMTP call (see event-volunteers.php comments).
+   SHARED MAILER — PHPMailer SMTP
+   mail() does NOT work on this server (hsendmail unconfigured).
+   Ports 587 & 465 to smtp.gmail.com are open — SMTP is the fix.
+   Requires: composer require phpmailer/phpmailer  (in /api/ folder)
 ══════════════════════════════════════════════════════ */
 function cntSendMail(
     string $toEmail, string $toName,
     string $subject, string $htmlBody,
     string $plainBody, string $replyTo = ''
 ): bool {
-    $headers  = "MIME-Version: 1.0\r\n";
-    $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-    $headers .= "From: AL Hind Trust <alhindtrust@gmail.com>\r\n";
-    $headers .= $replyTo ? "Reply-To: {$replyTo}\r\n" : "Reply-To: alhindtrust@gmail.com\r\n";
-    $headers .= "X-Mailer: PHP/" . phpversion();
+    // Load PHPMailer (Composer autoload)
+    $autoload = __DIR__ . '/../vendor/autoload.php';
+    if (!file_exists($autoload)) {
+        error_log('[AL Hind] PHPMailer not found. Run: composer require phpmailer/phpmailer');
+        return false;
+    }
+    require_once $autoload;
 
-    $ok = @mail($toEmail, $subject, $htmlBody, $headers);
-    error_log('[AL Hind] mail() → ' . $toEmail . ' | ' . ($ok ? 'OK' : 'FAILED'));
-    return $ok;
+    try {
+        $mail             = new \PHPMailer\PHPMailer\PHPMailer(true);
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'alhindtrust@gmail.com';
+        $mail->Password   = 'yyym lxhp pyro alyk';   // Gmail App Password
+        $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
+        $mail->CharSet    = 'UTF-8';
+        $mail->setFrom('alhindtrust@gmail.com', 'AL Hind Trust');
+        $mail->addAddress($toEmail, $toName);
+        if ($replyTo) $mail->addReplyTo($replyTo);
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $htmlBody;
+        $mail->AltBody = $plainBody;
+        $mail->send();
+        error_log('[AL Hind] SMTP OK → ' . $toEmail);
+        return true;
+    } catch (\Exception $e) {
+        error_log('[AL Hind] SMTP FAILED → ' . $toEmail . ' | ' . $e->getMessage());
+        return false;
+    }
 }
 
 
