@@ -132,7 +132,7 @@ function cntSendMail(
     }
 
     // ── Send via SMTP if PHPMailer available ─────────────
-    if (class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
+    if (class_exists('PHPMailer\PHPMailer\PHPMailer')) {
         try {
             $mail             = new \PHPMailer\PHPMailer\PHPMailer(true);
             $mail->isSMTP();
