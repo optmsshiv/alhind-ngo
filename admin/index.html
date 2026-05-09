@@ -4895,8 +4895,16 @@
       const isPending = m.status === 'payment_pending';
       const isApproval = m.status === 'pending_approval';
       const isRejected = m.status === 'rejected';
-      const FEE_MAP = { team: 500 };
-      const fee = FEE_MAP[m.interest_type] || 0;
+      const isApproved = m.status === 'approved';
+      const fee = parseInt(m.joining_fee) || 0;
+
+      const feeDisplay = fee === 0
+        ? `<span style="color:var(--muted)">Free</span>`
+        : isPending
+          ? `<strong style="color:#b45309">₹${fee} pending</strong>`
+          : isApproved
+            ? `<strong style="color:#15803d">₹${fee} paid</strong>`
+            : `<span>₹${fee}</span>`;
 
       /* ── Header — avatar initials + name + meta ── */
       const nameParts = (m.sender_name || '?').trim().split(' ');
@@ -4935,9 +4943,7 @@
 
           <div class="msg-info-card">
             <div class="mic-label"><i class="fa-solid fa-indian-rupee-sign" style="margin-right:4px"></i>Fee</div>
-            <div class="mic-val">${isPending
-          ? `<strong style="color:#b45309">₹${fee} pending</strong>`
-          : '<span style="color:var(--muted)">Free</span>'}</div>
+            <div class="mic-val">${feeDisplay}</div>
           </div>
 
         </div>

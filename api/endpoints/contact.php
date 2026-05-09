@@ -475,8 +475,13 @@ function emailWrapper(string $content): string {
 ══════════════════════════════════════════════════════ */
 
 function getAllMessages(): void {
-    $db     = getDB();
-    $stmt   = $db->query("SELECT * FROM contact_messages ORDER BY created_at DESC");
+    $db   = getDB();
+    $stmt = $db->query("
+        SELECT cm.*, ni.joining_fee, ni.member_id
+        FROM contact_messages cm
+        LEFT JOIN ngo_inquiries ni ON ni.ticket_id = cm.ticket_id
+        ORDER BY cm.created_at DESC
+    ");
     $rows   = $stmt->fetchAll();
     $unread = $db->query("SELECT COUNT(*) FROM contact_messages WHERE is_read = 0")->fetchColumn();
     ok(['messages' => $rows, 'unread_count' => (int)$unread, 'count' => count($rows)]);

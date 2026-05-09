@@ -317,7 +317,7 @@ function sendPaymentLinkEmail(
         'team' => 'Member',
     ][$interest] ?? ucfirst($interest);
 
-    $payUrl  = "https://api.alhindtrust.com/pay.php?ticket={$ticketId}";
+    $payUrl  = "https://alhindtrust.com/backend/pay.php?ticket={$ticketId}";
     $subject = "Complete your joining contribution — AL Hind Trust ({$ticketId})";
 
     $html = emailWrapper("
