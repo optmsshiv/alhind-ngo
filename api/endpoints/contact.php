@@ -551,6 +551,94 @@ function approveVolunteer(string $id): void {
 }
 
 /**
+ * POST /messages/{id}/reject
+ * Admin rejects a pending_approval volunteer — sends rejection email
+ */
+function rejectVolunteer(string $id): void {
+    $b    = body();
+    $db   = getDB();
+    $stmt = $db->prepare("SELECT * FROM contact_messages WHERE id = ? LIMIT 1");
+    $stmt->execute([$id]);
+    $row  = $stmt->fetch();
+
+    if (!$row)                                   error('Message not found', 404);
+    if ($row['status'] !== 'pending_approval')    error('Not a pending approval record', 400);
+
+    $reason = sanitize($b['reason'] ?? '');
+
+    // Update both tables
+    $db->prepare("UPDATE contact_messages SET status='rejected', updated_at=NOW() WHERE id=?")
+       ->execute([$id]);
+    $db->prepare("UPDATE ngo_inquiries SET status='rejected' WHERE ticket_id=?")
+       ->execute([$row['ticket_id']]);
+
+    // Send rejection email to user
+    if (!empty($row['sender_email'])) {
+        sendRejectionEmail($row, $reason);
+    }
+
+    ok(null, 'Volunteer rejected and notification email sent');
+}
+
+/**
+ * Rejection email — sent when admin rejects a volunteer application
+ */
+function sendRejectionEmail(array $row, string $reason = ''): void {
+    $name     = $row['sender_name'];
+    $email    = $row['sender_email'];
+    $ticketId = $row['ticket_id'];
+    $subject  = "Update on your application — AL Hind Trust ({$ticketId})";
+
+    $reasonBlock = $reason
+        ? "<p style='background:#fff7ed;border-left:3px solid #f97316;padding:10px 14px;
+                     border-radius:0 6px 6px 0;font-size:13px;color:#7c2d12;margin:16px 0'>
+              <strong>Reason:</strong> {$reason}
+           </p>"
+        : "";
+
+    $html = emailWrapper("
+        <h2 style='color:#1e293b;margin-top:0'>Application Update</h2>
+        <p>Dear <strong>{$name}</strong>,</p>
+        <p>Thank you for your interest in volunteering with AL Hind Trust.</p>
+        <p>After reviewing your application, we regret to inform you that we are
+           unable to move forward with your application at this time.</p>
+        {$reasonBlock}
+        <table style='width:100%;border-collapse:collapse;margin:16px 0;font-size:14px'>
+            <tr><td style='padding:7px 10px;background:#f0fdf4;color:#64748b;width:130px'>Role applied</td>
+                <td style='padding:7px 10px;background:#f0fdf4'>Volunteer</td></tr>
+            <tr><td style='padding:7px 10px;color:#64748b'>Ticket&nbsp;ID</td>
+                <td style='padding:7px 10px;font-family:monospace'>{$ticketId}</td></tr>
+        </table>
+        <p>We encourage you to apply again in the future or reach out to us
+           for other ways to contribute to our cause.</p>
+        <p style='font-size:13px;color:#64748b'>
+            Questions? Contact us at
+            <a href='mailto:alhindtrust@gmail.com' style='color:#0f766e'>alhindtrust@gmail.com</a>
+            or call <a href='tel:+919263190568' style='color:#0f766e'>+91-9263190568</a>.
+        </p>
+    ");
+
+    $plain = "Dear {$name},
+
+"
+           . "Thank you for your interest in volunteering with AL Hind Trust.
+"
+           . "After reviewing your application, we are unable to proceed at this time.
+"
+           . ($reason ? "Reason: {$reason}
+" : "")
+           . "Ticket: {$ticketId}
+
+"
+           . "We encourage you to apply again in the future.
+
+"
+           . "AL Hind Trust | alhindtrust@gmail.com | +91-9263190568";
+
+    cntSendMail($email, $name, $subject, $html, $plain);
+}
+
+/**
  * POST /messages/{id}/resend-payment
  * Admin manually re-sends the payment link email to a payment_pending inquiry
  */

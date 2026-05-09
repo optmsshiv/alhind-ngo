@@ -102,6 +102,16 @@
       color: #991b1b;
     }
 
+    .st-pending_approval {
+      background: #e0f2fe;
+      color: #0c4a6e;
+    }
+
+    .st-rejected {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
     /* Ticket mono */
     .tkt-mono {
       font-family: 'Courier New', monospace;
@@ -128,6 +138,44 @@
 
     .btn-resend:hover {
       background: #fde68a;
+    }
+
+    .btn-approve {
+      background: #dcfce7;
+      color: #166534;
+      border: none;
+      border-radius: 7px;
+      padding: .26rem .72rem;
+      font-size: .72rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-approve:hover {
+      background: #bbf7d0;
+    }
+
+    .btn-reject {
+      background: #fee2e2;
+      color: #991b1b;
+      border: none;
+      border-radius: 7px;
+      padding: .26rem .72rem;
+      font-size: .72rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-reject:hover {
+      background: #fecaca;
     }
 
     /* Message filter pills (reuse don-fpill pattern) */
@@ -3026,6 +3074,11 @@
                 style="width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0;display:inline-block"></span>
               Free Roles
             </button>
+            <button class="msg-fpill" data-mf="approval" onclick="msgSetFilter(this)">
+              <span
+                style="width:7px;height:7px;border-radius:50%;background:#0ea5e9;flex-shrink:0;display:inline-block"></span>
+              Needs Approval
+            </button>
             <button class="msg-fpill" data-mf="unread" onclick="msgSetFilter(this)">
               <i class="fa-solid fa-circle" style="font-size:.5rem;color:#dc2626"></i> Unread
             </button>
@@ -3103,6 +3156,9 @@
         </button>
         <button id="msg-approve-btn" class="btn-approve" onclick="approveVolunteer()" style="display:none">
           <i class="fa-solid fa-check"></i> Approve Volunteer
+        </button>
+        <button id="msg-reject-btn" class="btn-reject" onclick="rejectVolunteer()" style="display:none">
+          <i class="fa-solid fa-xmark"></i> Reject
         </button>
         <button class="btn-canc" onclick="closeMsgModal()">Close</button>
       </div>
@@ -4511,7 +4567,7 @@
       document.querySelectorAll('.msg-fpill').forEach(b =>
         b.classList.remove('mf-all', 'mf-pending', 'mf-free', 'mf-unread'));
       _msgFilter = btn.dataset.mf;
-      const cls = { all: 'mf-all', pending: 'mf-pending', free: 'mf-free', unread: 'mf-unread' }[_msgFilter];
+      const cls = { all: 'mf-all', pending: 'mf-pending', free: 'mf-free', unread: 'mf-unread', approval: 'mf-approval' }[_msgFilter];
       btn.classList.add(cls);
       renderMessages();
     }
@@ -4554,6 +4610,7 @@
 
       /* apply filter */
       if (_msgFilter === 'pending') rows = rows.filter(m => m.status === 'payment_pending');
+      if (_msgFilter === 'approval') rows = rows.filter(m => m.status === 'pending_approval');
       if (_msgFilter === 'free') rows = rows.filter(m => FREE_ROLES.includes(m.interest_type));
       if (_msgFilter === 'unread') rows = rows.filter(m => !m.is_read);
 
@@ -4608,9 +4665,11 @@
     function msgStBadge(s) {
       const map = {
         submitted: ['st-submitted', '✓ Submitted'],
+        pending_approval: ['st-pending_approval', '🔔 Needs Approval'],
         payment_pending: ['st-payment_pending', '⏳ Pay Pending'],
         approved: ['st-approved', '✅ Approved'],
         payment_failed: ['st-payment_failed', '✗ Pay Failed'],
+        rejected: ['st-rejected', '✗ Rejected'],
       };
       const [cls, lbl] = map[s] || ['st-submitted', s];
       return `<span class="st-badge ${cls}">${lbl}</span>`;
@@ -4687,9 +4746,10 @@
 
       /* resend payment link — only for payment_pending */
       document.getElementById('msg-resend-btn').style.display = isPending ? 'inline-flex' : 'none';
-      /* approve button — only for pending_approval volunteers */
+      /* approve + reject buttons — only for pending_approval volunteers */
       const isApproval = m.status === 'pending_approval';
       document.getElementById('msg-approve-btn').style.display = isApproval ? 'inline-flex' : 'none';
+      document.getElementById('msg-reject-btn').style.display = isApproval ? 'inline-flex' : 'none';
 
       document.getElementById('msg-modal').classList.add('open');
     }
@@ -4716,6 +4776,23 @@
         closeMsgModal();
         renderMessages();
       } catch (e) { toast('Approval failed', 'error'); }
+    }
+
+    /* ── Reject volunteer ───────────────────────────── */
+    async function rejectVolunteer() {
+      if (!_msgDetailId) return;
+      const m = messages.find(x => x.id === _msgDetailId);
+      if (!m) return;
+      const reason = prompt(`Reason for rejecting ${m.sender_name}'s application (optional):`);
+      if (reason === null) return; // cancelled
+      try {
+        await apiFetch('POST', `messages/${_msgDetailId}/reject`, { reason });
+        m.status = 'rejected';
+        m.is_read = true;
+        toast('Volunteer rejected — notification email sent', 'success');
+        closeMsgModal();
+        renderMessages();
+      } catch (e) { toast('Rejection failed', 'error'); }
     }
 
     /* ── Resend payment link ─────────────────────────── */
