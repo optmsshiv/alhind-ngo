@@ -100,76 +100,28 @@ function submitContact(): void {
 
 
 /* ══════════════════════════════════════════════════════
-   EMAIL FUNCTIONS
+   SHARED MAILER
+   Uses PHP mail() directly — same as event-volunteers.php.
+   Reliable on cPanel/shared hosting without SMTP config.
+   To upgrade to SMTP: replace the mail() block with
+   a PHPMailer SMTP call (see event-volunteers.php comments).
 ══════════════════════════════════════════════════════ */
-
-/* ════════════════════════════════════════════════════════════
-   SHARED MAILER  — same pattern as event-volunteers.php
-   ─────────────────────────────────────────────────────────
-   Currently: PHP mail() — works on most cPanel shared hosting
-   To switch to SMTP (recommended):
-     1. composer require phpmailer/phpmailer  in /api/
-     2. Uncomment the SMTP block below
-     3. Comment out the mail() lines
-════════════════════════════════════════════════════════════ */
 function cntSendMail(
     string $toEmail, string $toName,
     string $subject, string $htmlBody,
     string $plainBody, string $replyTo = ''
 ): bool {
-    // ── Auto-load PHPMailer (Composer or manual) ─────────
-    $autoload = __DIR__ . '/../vendor/autoload.php';
-    $pmBase   = __DIR__ . '/../phpmailer/src/PHPMailer.php';
-    $pmSmtp   = __DIR__ . '/../phpmailer/src/SMTP.php';
-    $pmExcept = __DIR__ . '/../phpmailer/src/Exception.php';
-
-    if (file_exists($autoload)) {
-        require_once $autoload;
-    } elseif (file_exists($pmBase)) {
-        require_once $pmExcept;
-        require_once $pmSmtp;
-        require_once $pmBase;
-    }
-
-    // ── Send via SMTP if PHPMailer available ─────────────
-    if (class_exists('PHPMailer\PHPMailer\PHPMailer')) {
-        try {
-            $mail             = new \PHPMailer\PHPMailer\PHPMailer(true);
-            $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com';
-            $mail->SMTPAuth   = true;
-            $mail->Username   = 'alhindtrust@gmail.com';
-            $mail->Password   = 'yyym lxhp pyro alyk';
-            $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = 587;
-            $mail->CharSet    = 'UTF-8';
-            $mail->setFrom('alhindtrust@gmail.com', 'AL Hind Trust');
-            if ($replyTo) $mail->addReplyTo($replyTo);
-            $mail->addAddress($toEmail, $toName);
-            $mail->isHTML(true);
-            $mail->Subject = $subject;
-            $mail->Body    = $htmlBody;
-            $mail->AltBody = $plainBody;
-            $mail->send();
-            error_log('[AL Hind] SMTP OK → ' . $toEmail);
-            return true;
-        } catch (\Exception $e) {
-            error_log('[AL Hind] SMTP FAILED → ' . $toEmail . ' | ' . $e->getMessage());
-            return false;
-        }
-    }
-
-    // ── Fallback: PHP mail() ─────────────────────────────
-    error_log('[AL Hind] PHPMailer not found, using mail() → ' . $toEmail);
     $headers  = "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
     $headers .= "From: AL Hind Trust <alhindtrust@gmail.com>\r\n";
     $headers .= $replyTo ? "Reply-To: {$replyTo}\r\n" : "Reply-To: alhindtrust@gmail.com\r\n";
     $headers .= "X-Mailer: PHP/" . phpversion();
+
     $ok = @mail($toEmail, $subject, $htmlBody, $headers);
     error_log('[AL Hind] mail() → ' . $toEmail . ' | ' . ($ok ? 'OK' : 'FAILED'));
     return $ok;
 }
+
 
 /**
  * Email 1 — Free roles (partner, general)
@@ -461,7 +413,6 @@ function sendAdminNotification(
 
 /**
  * Shared HTML email wrapper — consistent branded template
- * Used by all cntSendMail() callers below
  */
 function emailWrapper(string $content): string {
     return "
@@ -498,7 +449,7 @@ function emailWrapper(string $content): string {
 
 
 /* ══════════════════════════════════════════════════════
-   ADMIN READ / MANAGE ROUTES (unchanged from original)
+   ADMIN READ / MANAGE ROUTES
 ══════════════════════════════════════════════════════ */
 
 function getAllMessages(): void {
@@ -628,21 +579,12 @@ function sendRejectionEmail(array $row, string $reason = ''): void {
         </p>
     ");
 
-    $plain = "Dear {$name},
-
-"
-           . "Thank you for your interest in volunteering with AL Hind Trust.
-"
-           . "After reviewing your application, we are unable to proceed at this time.
-"
-           . ($reason ? "Reason: {$reason}
-" : "")
-           . "Ticket: {$ticketId}
-
-"
-           . "We encourage you to apply again in the future.
-
-"
+    $plain = "Dear {$name},\n\n"
+           . "Thank you for your interest in volunteering with AL Hind Trust.\n"
+           . "After reviewing your application, we are unable to proceed at this time.\n"
+           . ($reason ? "Reason: {$reason}\n" : "")
+           . "Ticket: {$ticketId}\n\n"
+           . "We encourage you to apply again in the future.\n\n"
            . "AL Hind Trust | alhindtrust@gmail.com | +91-9263190568";
 
     cntSendMail($email, $name, $subject, $html, $plain);
