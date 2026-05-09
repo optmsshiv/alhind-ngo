@@ -91,23 +91,11 @@
     .st-payment_pending {
       background: #fef3c7;
       color: #92400e;
-      white-space: nowrap;
     }
 
     .st-approved {
       background: #dcfce7;
       color: #166534;
-    }
-
-    .st-rejected {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .st-pending_approval {
-      background: #e0f2fe;
-      color: #0369a1;
-      white-space: nowrap;
     }
 
     .st-payment_failed {
@@ -4845,7 +4833,7 @@
           <td>${msgIntBadge(m.interest_type)}</td>
           <td>${msgStBadge(m.status || 'submitted')}</td>
           <td>${m.ticket_id ? `<span class="tkt-mono">${esc(m.ticket_id)}</span>` : '<span style="color:var(--muted)">—</span>'}</td>
-          <td><span class="msg-preview">${esc((m.message || '—').length > 50 ? m.message.substring(0, 50) + '…' : (m.message || '—'))}</span></td>
+          <td><span class="msg-preview">${esc(m.message || '—')}</span></td>
           <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">${fmtDateTime(m.created_at)}</td>
           <td><div class="tbl-acts">
             <button class="btn-view" onclick="viewMessage(${m.id})">
@@ -4871,12 +4859,12 @@
     }
     function msgStBadge(s) {
       const map = {
-        submitted: ['st-submitted', 'Submitted'],
-        payment_pending: ['st-payment_pending', 'Pay Pending'],
-        approved: ['st-approved', 'Approved'],
-        payment_failed: ['st-payment_failed', 'Pay Failed'],
-        pending_approval: ['st-pending_approval', 'Pending Approval'],
-        rejected: ['st-rejected', 'Rejected'],
+        submitted: ['st-submitted', '✓ Submitted'],
+        payment_pending: ['st-payment_pending', '⏳ Pay Pending'],
+        approved: ['st-approved', '✅ Approved'],
+        payment_failed: ['st-payment_failed', '✗ Pay Failed'],
+        pending_approval: ['st-pending_approval', '🔔 Pending Approval'],
+        rejected: ['st-rejected', '✗ Rejected'],
       };
       const [cls, lbl] = map[s] || ['st-submitted', s];
       return `<span class="st-badge ${cls}">${lbl}</span>`;
@@ -5007,22 +4995,22 @@
       } catch (e) { toast('Approval failed', 'error'); }
     }
 
-    /* ── Reject volunteer ───────────────────────────── */
-    async function rejectVolunteer() {
-      if (!_msgDetailId) return;
-      const m = messages.find(x => x.id === _msgDetailId);
-      if (!m) return;
-      const reason = prompt(`Reject ${m.sender_name}'s volunteer application?\n\nOptional reason (leave blank to skip):`);
-      if (reason === null) return; // user cancelled
-      try {
-        await apiFetch('POST', `messages/${_msgDetailId}/reject`, { reason: reason.trim() });
-        m.status = 'rejected';
-        m.is_read = true;
-        toast('Volunteer rejected — notification email sent ✓', 'success');
-        closeMsgModal();
-        renderMessages();
-      } catch (e) { toast('Rejection failed', 'error'); }
-    }
+        /* ── Reject volunteer ───────────────────────────── */
+          async function rejectVolunteer() {
+            if (!_msgDetailId) return;
+            const m = messages.find(x => x.id === _msgDetailId);
+            if (!m) return;
+            const reason = prompt(`Reject ${m.sender_name}'s volunteer application?\n\nOptional reason (leave blank to skip):`);
+            if (reason === null) return; // user cancelled
+            try {
+              await apiFetch('POST', `messages/${_msgDetailId}/reject`, { reason: reason.trim() });
+              m.status = 'rejected';
+              m.is_read = true;
+              toast('Volunteer rejected — notification email sent ✓', 'success');
+              closeMsgModal();
+              renderMessages();
+            } catch (e) { toast('Rejection failed', 'error'); }
+          }
 
     /* ── Resend payment link ─────────────────────────── */
     async function resendPaymentLink() {
