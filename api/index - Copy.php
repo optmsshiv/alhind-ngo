@@ -122,7 +122,8 @@ switch ($resource) {
         if ($method === 'GET')                                          getAllMessages();
         elseif ($method === 'PATCH'  && $id && !$action)               markMessageRead($id);
         elseif ($method === 'PATCH'  && !$id)                          markAllRead();
-        elseif ($method === 'POST'   && $id && $action === 'approve')  approveVolunteer($id);
+        elseif ($method === 'POST'   && $id && $action === 'approve')        approveVolunteer($id);
+        elseif ($method === 'POST'   && $id && $action === 'reject')         rejectVolunteer($id);
         elseif ($method === 'POST'   && $id && $action === 'resend-payment') resendPaymentLink($id);
         elseif ($method === 'DELETE' && $id)                           deleteMessage($id);
         elseif ($method === 'DELETE' && !$id)                          clearMessages();
