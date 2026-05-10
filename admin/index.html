@@ -207,7 +207,7 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      background: linear-gradient(135deg, #0f766e 0%, #0a4e48 50%, #0f172a 100%);
+      background: linear-gradient(145deg, #0a4e48 0%, #0f172a 100%);
       position: relative;
       overflow: hidden;
     }
@@ -215,171 +215,237 @@
     #login-screen::before {
       content: "";
       position: absolute;
-      inset: 0;
-      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fff' fill-opacity='.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: rgba(15,118,110,.15);
+      top: -160px; left: -120px;
+      pointer-events: none;
+    }
+
+    #login-screen::after {
+      content: "";
+      position: absolute;
+      width: 350px; height: 350px;
+      border-radius: 50%;
+      background: rgba(15,118,110,.1);
+      bottom: -100px; right: -80px;
+      pointer-events: none;
     }
 
     .login-wrap {
-      position: relative;
-      z-index: 1;
+      position: relative; z-index: 1;
       display: flex;
-      width: 100%;
-      max-width: 880px;
+      width: 100%; max-width: 860px;
       border-radius: 24px;
       overflow: hidden;
-      box-shadow: 0 40px 80px rgba(0, 0, 0, .4);
+      box-shadow: 0 40px 80px rgba(0,0,0,.45);
+      margin: 1rem;
     }
 
+    /* ── Left panel ── */
     .login-left {
       flex: 1;
-      background: rgba(255, 255, 255, .07);
+      background: rgba(255,255,255,.06);
       backdrop-filter: blur(12px);
-      padding: 3rem 2.5rem;
+      border-right: 1px solid rgba(255,255,255,.1);
+      padding: 2.75rem 2.25rem;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      border-right: 1px solid rgba(255, 255, 255, .1);
+      justify-content: space-between;
       color: #fff;
     }
 
-    .ll-icon {
-      font-size: 3rem;
-      margin-bottom: 1.5rem;
-      display: block
-    }
-
-    .login-left h1 {
-      font-size: 1.75rem;
-      font-weight: 800;
-      margin-bottom: .5rem;
-      line-height: 1.2
-    }
-
-    .login-left p {
-      font-size: .9rem;
-      opacity: .7;
-      margin-bottom: 2rem
-    }
-
-    .feat-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: .7rem
-    }
-
-    .feat-list li {
+    .ll-logo-row {
       display: flex;
       align-items: center;
-      gap: .7rem;
-      font-size: .875rem;
-      opacity: .85
+      gap: .85rem;
+      margin-bottom: 2.25rem;
     }
 
-    .feat-list li::before {
-      content: "✓";
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, .15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: .7rem;
+    .ll-logo-img {
+      width: 54px; height: 54px;
+      border-radius: 14px;
+      object-fit: cover;
+      border: 2px solid rgba(255,255,255,.2);
       flex-shrink: 0;
     }
 
+    .ll-logo-fallback {
+      width: 54px; height: 54px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.1);
+      border: 2px solid rgba(255,255,255,.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .65rem; font-weight: 700; color: #ccfbf1;
+      letter-spacing: .03em; text-align: center; line-height: 1.3;
+      flex-shrink: 0;
+    }
+
+    .ll-logo-text .ll-name { font-size: 1rem; font-weight: 700; color: #fff; line-height: 1.2; }
+    .ll-logo-text .ll-sub  { font-size: .72rem; color: rgba(255,255,255,.5); margin-top: 2px; }
+
+    .ll-body h2 {
+      font-size: 1.5rem; font-weight: 800;
+      line-height: 1.3; margin-bottom: .6rem;
+    }
+
+    .ll-body p {
+      font-size: .83rem; color: rgba(255,255,255,.58);
+      line-height: 1.75; margin-bottom: 1.6rem;
+    }
+
+    .feat-list { list-style: none; display: flex; flex-direction: column; gap: .55rem; }
+
+    .feat-list li {
+      display: flex; align-items: center; gap: .65rem;
+      font-size: .8rem; color: rgba(255,255,255,.8);
+    }
+
+    .feat-list li i { color: #34d399; font-size: .9rem; width: 16px; }
+
+    .ll-foot {
+      font-size: .7rem; color: rgba(255,255,255,.3);
+      margin-top: 2rem; line-height: 1.6;
+    }
+
+    /* ── Right panel ── */
     .login-right {
-      width: 380px;
+      width: 370px;
       background: #fff;
-      padding: 3rem 2.5rem;
+      padding: 2.75rem 2.25rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
     }
 
+    .lr-logo-wrap {
+      display: flex; align-items: center; gap: .75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .lr-logo-img {
+      width: 46px; height: 46px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 1.5px solid #99f6e4;
+    }
+
+    .lr-logo-fallback {
+      width: 46px; height: 46px;
+      border-radius: 12px;
+      background: #f0fdf9;
+      border: 1.5px solid #99f6e4;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .6rem; font-weight: 700; color: #0f766e;
+      letter-spacing: .03em; text-align: center; line-height: 1.3;
+    }
+
+    .lr-title-wrap .lr-title { font-size: .92rem; font-weight: 700; color: #0f172a; line-height: 1.2; }
+    .lr-title-wrap .lr-sub2  { font-size: .72rem; color: #94a3b8; margin-top: 2px; }
+
     .login-right h2 {
-      font-size: 1.35rem;
-      font-weight: 800;
-      margin-bottom: .3rem
+      font-size: 1.3rem; font-weight: 800;
+      color: #0f172a; margin-bottom: .25rem;
     }
 
     .lr-sub {
-      color: var(--muted);
-      font-size: .875rem;
-      margin-bottom: 2rem
+      color: #64748b; font-size: .82rem;
+      margin-bottom: 1.75rem;
     }
 
     .f-lbl {
-      display: block;
-      font-size: .78rem;
-      font-weight: 700;
-      color: #374151;
+      display: flex; align-items: center; gap: .4rem;
+      font-size: .72rem; font-weight: 700; color: #374151;
+      letter-spacing: .05em; text-transform: uppercase;
       margin-bottom: .4rem;
-      letter-spacing: .02em;
-      text-transform: uppercase
     }
+
+    .f-lbl i { color: var(--teal); font-size: .8rem; }
+
+    .pw-wrap { position: relative; margin-bottom: 1.25rem; }
 
     .f-inp {
       width: 100%;
-      padding: .75rem 1rem;
-      border: 1.5px solid var(--border);
+      padding: .7rem 2.75rem .7rem 1rem;
+      border: 1.5px solid #e2e8f0;
       border-radius: 10px;
-      font-size: .95rem;
+      font-size: .9rem;
       font-family: inherit;
-      margin-bottom: 1.25rem;
+      background: #f8fafc;
+      color: #0f172a;
       transition: border-color .2s, box-shadow .2s;
     }
 
     .f-inp:focus {
       outline: none;
       border-color: var(--teal);
-      box-shadow: 0 0 0 3px rgba(15, 118, 110, .12)
+      box-shadow: 0 0 0 3px rgba(15,118,110,.1);
+      background: #fff;
     }
+
+    .pw-toggle {
+      position: absolute; right: .75rem; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: #94a3b8; padding: 0; display: flex; align-items: center;
+      font-size: .95rem;
+    }
+
+    .pw-toggle:hover { color: var(--teal); }
 
     .btn-login {
       width: 100%;
-      padding: .85rem;
+      padding: .8rem 1rem;
       background: var(--teal);
-      color: #fff;
-      border: none;
+      color: #fff; border: none;
       border-radius: 10px;
-      font-size: .95rem;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-      box-shadow: 0 4px 14px rgba(15, 118, 110, .35);
+      font-size: .9rem; font-weight: 700;
+      font-family: inherit; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
+      box-shadow: 0 4px 14px rgba(15,118,110,.3);
       transition: background .2s, transform .1s;
     }
 
-    .btn-login:hover {
-      background: var(--teal-dark)
+    .btn-login:hover   { background: var(--teal-dark); }
+    .btn-login:active  { transform: scale(.98); }
+    .btn-login:disabled { opacity: .65; cursor: not-allowed; }
+
+    .forgot-link {
+      text-align: center; margin-top: 1rem;
+      font-size: .78rem;
     }
 
-    .btn-login:active {
-      transform: scale(.98)
+    .forgot-link a {
+      color: var(--teal); text-decoration: none; font-weight: 500;
     }
+
+    .forgot-link a:hover { text-decoration: underline; }
 
     .l-err {
-      color: var(--danger);
-      font-size: .82rem;
-      margin-top: .7rem;
-      min-height: 1.1rem
+      color: var(--danger); font-size: .8rem;
+      margin-top: .6rem; min-height: 1rem;
+      display: flex; align-items: center; gap: .35rem;
     }
 
+    .l-success {
+      color: #166534; font-size: .8rem;
+      background: #dcfce7; border-radius: 8px;
+      padding: .6rem .9rem; margin-top: .75rem;
+      display: none; align-items: center; gap: .4rem;
+    }
+
+    .secure-note {
+      display: flex; align-items: center; justify-content: center;
+      gap: .4rem; font-size: .7rem; color: #94a3b8; margin-top: 1.1rem;
+    }
+
+    /* Forgot password view */
+    #forgot-view { display: none; }
+
     @media(max-width:680px) {
-      .login-left {
-        display: none
-      }
-
-      .login-right {
-        width: 100%;
-        border-radius: 24px
-      }
-
-      .login-wrap {
-        max-width: 400px
-      }
+      .login-left { display: none; }
+      .login-right { width: 100%; padding: 2rem 1.5rem; border-radius: 24px; }
+      .login-wrap { max-width: 420px; border-radius: 24px; }
     }
 
     /* ── SHELL ──────────────────────────── */
@@ -2585,25 +2651,104 @@
   <!-- LOGIN -->
   <div id="login-screen">
     <div class="login-wrap">
+
+      <!-- LEFT PANEL -->
       <div class="login-left">
-        <span class="ll-icon">🕌</span>
-        <h1>AL Hind Trust<br>Admin Portal</h1>
-        <p>Manage gallery, events &amp; content from one central dashboard.</p>
-        <ul class="feat-list">
-          <li>Manage events &amp; programs</li>
-          <li>Upload &amp; organise gallery images</li>
-          <li>Drag-and-drop reordering</li>
-          <li>Real-time dashboard overview</li>
-        </ul>
+        <div>
+          <div class="ll-logo-row">
+            <img src="/assets/logo.jpeg" alt="AL Hind Trust" class="ll-logo-img"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="ll-logo-fallback" style="display:none">AL<br>HIND</div>
+            <div class="ll-logo-text">
+              <div class="ll-name">AL Hind Trust</div>
+              <div class="ll-sub">Admin Portal</div>
+            </div>
+          </div>
+          <div class="ll-body">
+            <h2>Manage your NGO<br>with ease</h2>
+            <p>One secure dashboard to manage events, gallery, registrations, donations and messages.</p>
+            <ul class="feat-list">
+              <li><i class="fa-solid fa-calendar-days"></i> Events &amp; volunteer management</li>
+              <li><i class="fa-solid fa-images"></i> Gallery upload with categories</li>
+              <li><i class="fa-solid fa-users"></i> Registration tracking &amp; CSV export</li>
+              <li><i class="fa-solid fa-hand-holding-dollar"></i> Donations &amp; contact messages</li>
+              <li><i class="fa-solid fa-shield-halved"></i> JWT secured authentication</li>
+            </ul>
+          </div>
+        </div>
+        <div class="ll-foot">
+          © 2026 AL Hind Educational &amp; Charitable Trust<br>Madhepura, Bihar
+        </div>
       </div>
+
+      <!-- RIGHT PANEL -->
       <div class="login-right">
-        <h2>Welcome back 👋</h2>
-        <p class="lr-sub">Sign in to your admin panel</p>
-        <label class="f-lbl" for="pwd-input">Password</label>
-        <input type="password" id="pwd-input" class="f-inp" placeholder="Enter admin password"
-          autocomplete="current-password">
-        <button class="btn-login" onclick="doLogin()">Sign In →</button>
-        <p class="l-err" id="l-err"></p>
+
+        <div class="lr-logo-wrap">
+          <img src="/assets/logo.jpeg" alt="AL Hind Trust" class="lr-logo-img"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="lr-logo-fallback" style="display:none">AL<br>HIND</div>
+          <div class="lr-title-wrap">
+            <div class="lr-title">AL Hind Trust</div>
+            <div class="lr-sub2">Admin Panel</div>
+          </div>
+        </div>
+
+        <!-- LOGIN VIEW -->
+        <div id="login-view">
+          <h2>Welcome back</h2>
+          <p class="lr-sub">Sign in to your admin account</p>
+
+          <label class="f-lbl" for="pwd-input">
+            <i class="fa-solid fa-lock"></i> Password
+          </label>
+          <div class="pw-wrap">
+            <input type="password" id="pwd-input" class="f-inp"
+              placeholder="Enter your password" autocomplete="current-password">
+            <button class="pw-toggle" type="button" onclick="togglePwd()" title="Show/hide password">
+              <i class="fa-solid fa-eye" id="pwd-eye-icon"></i>
+            </button>
+          </div>
+
+          <button class="btn-login" id="login-btn" onclick="doLogin()">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign in to Dashboard
+          </button>
+
+          <p class="l-err" id="l-err"></p>
+
+          <div class="forgot-link">
+            <a href="#" onclick="showForgot(event)">Forgot password?</a>
+          </div>
+
+          <div class="secure-note">
+            <i class="fa-solid fa-shield-halved"></i>
+            Secured with JWT authentication
+          </div>
+        </div>
+
+        <!-- FORGOT PASSWORD VIEW -->
+        <div id="forgot-view">
+          <h2>Reset Password</h2>
+          <p class="lr-sub">A temporary password will be sent to <strong>alhindtrust@gmail.com</strong></p>
+
+          <button class="btn-login" id="forgot-btn" onclick="doForgot()">
+            <i class="fa-solid fa-paper-plane"></i> Send Temporary Password
+          </button>
+
+          <div class="l-success" id="forgot-success">
+            <i class="fa-solid fa-circle-check"></i>
+            Temporary password sent! Check alhindtrust@gmail.com
+          </div>
+
+          <p class="l-err" id="forgot-err"></p>
+
+          <div class="forgot-link" style="margin-top:.75rem">
+            <a href="#" onclick="showLogin(event)">
+              <i class="fa-solid fa-arrow-left"></i> Back to Sign In
+            </a>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -3576,26 +3721,69 @@
     /* ══════════════════════════════════════
        AUTH
     ══════════════════════════════════════ */
+    function togglePwd() {
+      const inp = document.getElementById('pwd-input');
+      const ico = document.getElementById('pwd-eye-icon');
+      if (inp.type === 'password') { inp.type = 'text'; ico.className = 'fa-solid fa-eye-slash'; }
+      else { inp.type = 'password'; ico.className = 'fa-solid fa-eye'; }
+    }
+
+    function showForgot(e) {
+      e.preventDefault();
+      document.getElementById('login-view').style.display  = 'none';
+      document.getElementById('forgot-view').style.display = 'block';
+      document.getElementById('forgot-err').textContent    = '';
+      document.getElementById('forgot-success').style.display = 'none';
+    }
+
+    function showLogin(e) {
+      e.preventDefault();
+      document.getElementById('forgot-view').style.display = 'none';
+      document.getElementById('login-view').style.display  = 'block';
+      document.getElementById('l-err').textContent         = '';
+    }
+
     async function doLogin() {
       const pwd = document.getElementById('pwd-input').value.trim();
       const err = document.getElementById('l-err');
-      if (!pwd) { err.textContent = 'Enter your password'; return; }
-      const btn = document.querySelector('.btn-login');
-      btn.textContent = 'Signing in…'; btn.disabled = true;
+      err.innerHTML = '';
+      if (!pwd) { err.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Enter your password'; return; }
+      const btn = document.getElementById('login-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Signing in…';
       try {
-        // Try API login first
         const res = await apiFetch('POST', 'auth', { username: 'admin', password: pwd });
         jwtToken = res.data.token;
         sessionStorage.setItem('alhind_token', jwtToken);
         sessionStorage.setItem('alhind_admin', '1');
         showAdmin();
       } catch (e) {
-        err.textContent = 'Incorrect password — please try again.';
+        err.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Incorrect password — please try again.';
         document.getElementById('pwd-input').value = '';
       } finally {
-        btn.textContent = 'Sign In →'; btn.disabled = false;
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign in to Dashboard';
       }
     }
+
+    async function doForgot() {
+      const btn = document.getElementById('forgot-btn');
+      const err = document.getElementById('forgot-err');
+      const suc = document.getElementById('forgot-success');
+      err.textContent = ''; suc.style.display = 'none';
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…';
+      try {
+        await apiFetch('POST', 'forgot-password', {});
+        suc.style.display = 'flex';
+        btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Email Sent';
+      } catch (e) {
+        err.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> ' + (e.message || 'Failed to send. Try again.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Temporary Password';
+      }
+    }
+
     document.getElementById('pwd-input').addEventListener('keydown', e => {
       if (e.key === 'Enter') doLogin();
       document.getElementById('l-err').textContent = '';

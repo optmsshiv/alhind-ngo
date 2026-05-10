@@ -41,12 +41,6 @@ if ($resource === 'auth' && $method === 'POST') {
     exit;
 }
 
-if ($resource === 'forgot-password' && $method === 'POST') {
-    require_once __DIR__ . '/endpoints/auth.php';
-    forgotPassword();
-    exit;
-}
-
 // Public GET routes — used by the main site
 if ($method === 'GET') {
     if ($resource === 'events') {
@@ -76,6 +70,24 @@ if ($resource === 'donate' && $method === 'PATCH' && $id) {
     // Razorpay webhook / payment confirmation
     require_once __DIR__ . '/endpoints/donate.php';
     confirmDonation($id);
+    exit;
+}
+
+// Event volunteer registration — public (called from join page)
+if ($resource === 'volunteers' && $method === 'POST') {
+    require_once __DIR__ . '/endpoints/event-volunteers.php';
+    registerVolunteer();
+    exit;
+}
+
+// ── Payment pages — public (no auth needed) ─────────
+// pay.php & verify.php are at public_html/backend/ — two levels from /api/
+if ($resource === 'pay.php' || $resource === 'pay') {
+    require_once dirname(__DIR__) . '/backend/pay.php';
+    exit;
+}
+if ($resource === 'verify.php' || $resource === 'verify') {
+    require_once dirname(__DIR__) . '/backend/verify.php';
     exit;
 }
 
@@ -118,11 +130,14 @@ switch ($resource) {
     // ── Messages ─────────────────────────────────────────────
     case 'messages':
         require_once __DIR__ . '/endpoints/contact.php';
-        if ($method === 'GET')               getAllMessages();
-        elseif ($method === 'PATCH' && $id)  markMessageRead($id);
-        elseif ($method === 'PATCH' && !$id) markAllRead();
-        elseif ($method === 'DELETE' && $id) deleteMessage($id);
-        elseif ($method === 'DELETE' && !$id) clearMessages();
+        if ($method === 'GET')                                          getAllMessages();
+        elseif ($method === 'PATCH'  && $id && !$action)               markMessageRead($id);
+        elseif ($method === 'PATCH'  && !$id)                          markAllRead();
+        elseif ($method === 'POST'   && $id && $action === 'approve')        approveVolunteer($id);
+        elseif ($method === 'POST'   && $id && $action === 'reject')         rejectVolunteer($id);
+        elseif ($method === 'POST'   && $id && $action === 'resend-payment') resendPaymentLink($id);
+        elseif ($method === 'DELETE' && $id)                           deleteMessage($id);
+        elseif ($method === 'DELETE' && !$id)                          clearMessages();
         else notFound();
         break;
 
@@ -130,6 +145,13 @@ switch ($resource) {
     case 'dashboard':
         require_once __DIR__ . '/endpoints/dashboard.php';
         getDashboardStats();
+        break;
+
+    // ── Event Volunteers (admin view) ───────────────────────
+    case 'volunteers':
+        require_once __DIR__ . '/endpoints/event-volunteers.php';
+        if ($method === 'GET' && $id) getEventVolunteers($id);
+        else notFound();
         break;
 
     // ── Categories ───────────────────────────────────────────
