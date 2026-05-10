@@ -42,8 +42,11 @@ try {
 }
 
 // ── Razorpay Keys ─────────────────────────────────────────────
-$rzpKeyId     = 'rzp_live_SmY6H2HIaVOr6Q';
-$rzpKeySecret = '3VXI0InXLgL9BlO4B19kroDj';
+// $rzpKeyId     = 'rzp_live_SmY6H2HIaVOr6Q';
+// $rzpKeySecret = '3VXI0InXLgL9BlO4B19kroDj';
+
+ $rzpKeyId     = 'rzp_test_SnKA1cM9qun4jI';
+ $rzpKeySecret = 'rv1mU7vdQtKQ7uUbGeMyUMe6';
 
 // ── Read input ────────────────────────────────────────────────
 $raw  = file_get_contents('php://input');
