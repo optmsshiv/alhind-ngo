@@ -89,11 +89,8 @@ function razorpayCreateOrder($keyId, $keySecret, $amountPaise, $name, $email) {
 }
 
 // ── Razorpay Keys ─────────────────────────────────────────────
-// define('RZP_KEY_ID',     'rzp_live_SmY6H2HIaVOr6Q');
-// define('RZP_KEY_SECRET', '3VXI0InXLgL9BlO4B19kroDj');
-
- define('RZP_KEY_ID',     'rzp_test_SnKA1cM9qun4jI');
- define('RZP_KEY_SECRET', 'rv1mU7vdQtKQ7uUbGeMyUMe6');
+define('RZP_KEY_ID',     'rzp_live_SmY6H2HIaVOr6Q');
+define('RZP_KEY_SECRET', '3VXI0InXLgL9BlO4B19kroDj');
 
 // ── Call Razorpay ─────────────────────────────────────────────
 try {
