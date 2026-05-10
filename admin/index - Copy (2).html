@@ -6,7 +6,6 @@
   <title>Admin Panel — AL Hind Trust</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -4368,24 +4367,13 @@
     });
     async function delEvt(id) {
       const e = events.find(x => x.id === id);
-      const result = await Swal.fire({
-        title: 'Delete Event?',
-        html: e ? `Delete <strong>${esc(e.title)}</strong>? This cannot be undone.` : 'Delete this event? This cannot be undone.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: '<i class="fa-solid fa-trash-can"></i> Delete',
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: '#dc2626',
-        cancelButtonColor: '#94a3b8',
-        reverseButtons: true,
-      });
-      if (!result.isConfirmed) return;
+      if (!confirm(`Delete "${e?.title}"?`)) return;
       try {
         await apiFetch('DELETE', `events/${id}`);
+        toast('Event deleted', 'success');
         await loadEvents();
         await loadDashboard();
-        Swal.fire({ icon: 'success', title: 'Deleted', text: 'Event removed.', confirmButtonColor: '#0f766e', timer: 2000, timerProgressBar: true });
-      } catch (e) { Swal.fire({ icon: 'error', title: 'Failed', text: e.message || 'Could not delete.', confirmButtonColor: '#dc2626' }); }
+      } catch (e) { toast('Failed: ' + e.message, 'error'); }
     }
 
     /* ══════════════════════════════════════
@@ -4689,44 +4677,22 @@
       } catch (e) { toast('Failed to save', 'error'); }
     }
     async function delGal(id) {
-      const result = await Swal.fire({
-        title: 'Delete Image?',
-        text: 'This image will be permanently removed from the gallery.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: '<i class="fa-solid fa-trash-can"></i> Delete',
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: '#dc2626',
-        cancelButtonColor: '#94a3b8',
-        reverseButtons: true,
-      });
-      if (!result.isConfirmed) return;
+      if (!confirm('Delete this image?')) return;
       try {
         await apiFetch('DELETE', `gallery/${id}`);
+        toast('Image deleted', 'success');
         await loadGallery();
         await loadDashboard();
-        Swal.fire({ icon: 'success', title: 'Deleted', text: 'Image removed from gallery.', confirmButtonColor: '#0f766e', timer: 2000, timerProgressBar: true });
-      } catch (e) { Swal.fire({ icon: 'error', title: 'Failed', text: e.message || 'Could not delete.', confirmButtonColor: '#dc2626' }); }
+      } catch (e) { toast('Failed: ' + e.message, 'error'); }
     }
     async function clearAllGal() {
-      const result = await Swal.fire({
-        title: 'Clear Entire Gallery?',
-        html: `This will permanently delete <strong>all ${gallery.length} images</strong>. This cannot be undone.`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: '<i class="fa-solid fa-trash-can"></i> Clear All',
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: '#dc2626',
-        cancelButtonColor: '#94a3b8',
-        reverseButtons: true,
-      });
-      if (!result.isConfirmed) return;
+      if (!confirm('Delete ALL gallery images? This cannot be undone.')) return;
       try {
         for (const img of gallery) await apiFetch('DELETE', `gallery/${img.id}`);
+        toast('Gallery cleared', 'success');
         await loadGallery();
         await loadDashboard();
-        Swal.fire({ icon: 'success', title: 'Cleared', text: 'All gallery images removed.', confirmButtonColor: '#0f766e', timer: 2000, timerProgressBar: true });
-      } catch (e) { Swal.fire({ icon: 'error', title: 'Failed', text: e.message || 'Could not clear gallery.', confirmButtonColor: '#dc2626' }); }
+      } catch (e) { toast('Failed', 'error'); }
     }
     const gdz = document.getElementById('gal-dz');
     gdz.addEventListener('dragover', e => { e.preventDefault(); gdz.classList.add('drag-over'); });
@@ -4971,45 +4937,22 @@
     }
 
     async function deleteDonation(id) {
-      const d = donations.find(x => x.id === id);
-      const result = await Swal.fire({
-        title: 'Remove Donation?',
-        html: d ? `Remove donation record from <strong>${esc(d.donor_name)}</strong>?` : 'Remove this donation record?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: '<i class="fa-solid fa-trash-can"></i> Remove',
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: '#dc2626',
-        cancelButtonColor: '#94a3b8',
-        reverseButtons: true,
-      });
-      if (!result.isConfirmed) return;
+      if (!confirm('Remove this donation record?')) return;
       try {
         await apiFetch('DELETE', `donations/${id}`);
+        toast('Deleted', 'success');
         await loadInbox();
         await loadDashboard();
-        Swal.fire({ icon: 'success', title: 'Removed', text: 'Donation record deleted.', confirmButtonColor: '#0f766e', timer: 2000, timerProgressBar: true });
-      } catch (e) { Swal.fire({ icon: 'error', title: 'Failed', text: e.message || 'Could not delete.', confirmButtonColor: '#dc2626' }); }
+      } catch (e) { toast('Failed', 'error'); }
     }
     async function clearDonations() {
-      const result = await Swal.fire({
-        title: 'Clear All Donations?',
-        html: `This will permanently delete <strong>all ${donations.length} donation records</strong>. This cannot be undone.`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: '<i class="fa-solid fa-trash-can"></i> Clear All',
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: '#dc2626',
-        cancelButtonColor: '#94a3b8',
-        reverseButtons: true,
-      });
-      if (!result.isConfirmed) return;
+      if (!confirm('Clear ALL donation records?')) return;
       try {
         await apiFetch('DELETE', 'donations');
+        toast('Cleared', 'success');
         await loadInbox();
         await loadDashboard();
-        Swal.fire({ icon: 'success', title: 'Cleared', text: 'All donation records removed.', confirmButtonColor: '#0f766e', timer: 2000, timerProgressBar: true });
-      } catch (e) { Swal.fire({ icon: 'error', title: 'Failed', text: e.message || 'Could not clear.', confirmButtonColor: '#dc2626' }); }
+      } catch (e) { toast('Failed', 'error'); }
     }
 
     /* ── Messages state ──────────────────────────────── */
@@ -5242,45 +5185,15 @@
       if (!_msgDetailId) return;
       const m = messages.find(x => x.id === _msgDetailId);
       if (!m) return;
-
-      const result = await Swal.fire({
-        title: 'Approve Volunteer?',
-        html: `Approving <strong>${esc(m.sender_name)}</strong>.<br>A welcome email with ID card will be sent.`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: '<i class="fa-solid fa-check"></i> Yes, Approve',
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: '#0f766e',
-        cancelButtonColor: '#94a3b8',
-        reverseButtons: true,
-      });
-      if (!result.isConfirmed) return;
-
-      Swal.fire({
-        title: 'Processing…',
-        html: 'Approving volunteer and sending welcome email…',
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        didOpen: () => Swal.showLoading(),
-      });
-
+      if (!confirm(`Approve ${m.sender_name} as a Volunteer? A welcome email with ID card will be sent.`)) return;
       try {
         await apiFetch('POST', `messages/${_msgDetailId}/approve`);
         m.status = 'approved';
         m.is_read = true;
+        toast('Volunteer approved — welcome email sent ✓', 'success');
         closeMsgModal();
         renderMessages();
-        Swal.fire({
-          icon: 'success',
-          title: 'Approved!',
-          text: 'Volunteer approved and welcome email sent.',
-          confirmButtonColor: '#0f766e',
-          timer: 3000,
-          timerProgressBar: true,
-        });
-      } catch (e) {
-        Swal.fire({ icon: 'error', title: 'Failed', text: e.message || 'Approval failed. Please try again.', confirmButtonColor: '#dc2626' });
-      }
+      } catch (e) { toast('Approval failed', 'error'); }
     }
 
     /* ── Reject volunteer ───────────────────────────── */
@@ -5288,49 +5201,16 @@
       if (!_msgDetailId) return;
       const m = messages.find(x => x.id === _msgDetailId);
       if (!m) return;
-
-      const result = await Swal.fire({
-        title: 'Reject Application?',
-        html: `Rejecting <strong>${esc(m.sender_name)}</strong>'s volunteer application.<br><span style="font-size:.85rem;color:#64748b">A rejection email will be sent to the applicant.</span>`,
-        icon: 'warning',
-        input: 'textarea',
-        inputLabel: 'Reason (optional — included in email to applicant)',
-        inputPlaceholder: 'e.g. Applications closed for this quarter…',
-        inputAttributes: { rows: 3, style: 'font-size:13px;resize:vertical' },
-        showCancelButton: true,
-        confirmButtonText: '<i class="fa-solid fa-xmark"></i> Reject & Notify',
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: '#dc2626',
-        cancelButtonColor: '#94a3b8',
-        reverseButtons: true,
-      });
-      if (!result.isConfirmed) return;
-
-      Swal.fire({
-        title: 'Processing…',
-        html: 'Sending rejection notification…',
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        didOpen: () => Swal.showLoading(),
-      });
-
+      const reason = prompt(`Reject ${m.sender_name}'s volunteer application?\n\nOptional reason (leave blank to skip):`);
+      if (reason === null) return; // user cancelled
       try {
-        await apiFetch('POST', `messages/${_msgDetailId}/reject`, { reason: (result.value || '').trim() });
+        await apiFetch('POST', `messages/${_msgDetailId}/reject`, { reason: reason.trim() });
         m.status = 'rejected';
         m.is_read = true;
+        toast('Volunteer rejected — notification email sent ✓', 'success');
         closeMsgModal();
         renderMessages();
-        Swal.fire({
-          icon: 'success',
-          title: 'Rejected',
-          text: 'Application rejected and notification email sent.',
-          confirmButtonColor: '#0f766e',
-          timer: 3000,
-          timerProgressBar: true,
-        });
-      } catch (e) {
-        Swal.fire({ icon: 'error', title: 'Failed', text: e.message || 'Rejection failed. Please try again.', confirmButtonColor: '#dc2626' });
-      }
+      } catch (e) { toast('Rejection failed', 'error'); }
     }
 
     /* ── Resend payment link ─────────────────────────── */
@@ -5338,70 +5218,28 @@
       if (!_msgDetailId) return;
       const m = messages.find(x => x.id === _msgDetailId);
       if (!m || !m.ticket_id) return;
-
-      Swal.fire({
-        title: 'Resending…',
-        html: `Sending payment link to <strong>${esc(m.sender_email || 'applicant')}</strong>…`,
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        didOpen: () => Swal.showLoading(),
-      });
-
       try {
         await apiFetch('POST', `messages/${_msgDetailId}/resend-payment`);
-        Swal.fire({
-          icon: 'success',
-          title: 'Sent!',
-          text: 'Payment link resent successfully.',
-          confirmButtonColor: '#0f766e',
-          timer: 2500,
-          timerProgressBar: true,
-        });
-      } catch (e) {
-        Swal.fire({ icon: 'error', title: 'Failed', text: e.message || 'Could not resend. Try again.', confirmButtonColor: '#dc2626' });
-      }
+        toast('Payment link resent ✓', 'success');
+      } catch (e) { toast('Failed to resend', 'error'); }
     }
 
     /* ── Delete / clear / markAllRead ───────────────── */
     async function deleteMessage(id) {
-      const m = messages.find(x => x.id === id);
-      const result = await Swal.fire({
-        title: 'Delete Message?',
-        html: m ? `Delete message from <strong>${esc(m.sender_name)}</strong>? This cannot be undone.` : 'Delete this message? This cannot be undone.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: '<i class="fa-solid fa-trash-can"></i> Delete',
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: '#dc2626',
-        cancelButtonColor: '#94a3b8',
-        reverseButtons: true,
-      });
-      if (!result.isConfirmed) return;
+      if (!confirm('Delete this message?')) return;
       try {
         await apiFetch('DELETE', `messages/${id}`);
-        closeMsgModal();
+        toast('Deleted', 'success');
         await loadInbox();
-        Swal.fire({ icon: 'success', title: 'Deleted', text: 'Message removed.', confirmButtonColor: '#0f766e', timer: 2000, timerProgressBar: true });
-      } catch (e) { Swal.fire({ icon: 'error', title: 'Failed', text: e.message || 'Could not delete.', confirmButtonColor: '#dc2626' }); }
+      } catch (e) { toast('Failed', 'error'); }
     }
     async function clearMessages() {
-      const result = await Swal.fire({
-        title: 'Clear All Messages?',
-        html: `This will permanently delete <strong>all ${messages.length} messages</strong>. This cannot be undone.`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: '<i class="fa-solid fa-trash-can"></i> Clear All',
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: '#dc2626',
-        cancelButtonColor: '#94a3b8',
-        reverseButtons: true,
-      });
-      if (!result.isConfirmed) return;
+      if (!confirm('Clear ALL messages?')) return;
       try {
         await apiFetch('DELETE', 'messages');
+        toast('Cleared', 'success');
         await loadInbox();
-        Swal.fire({ icon: 'success', title: 'Cleared', text: 'All messages deleted.', confirmButtonColor: '#0f766e', timer: 2000, timerProgressBar: true });
-      } catch (e) { Swal.fire({ icon: 'error', title: 'Failed', text: e.message || 'Could not clear.', confirmButtonColor: '#dc2626' }); }
+      } catch (e) { toast('Failed', 'error'); }
     }
     async function markAllRead() {
       try {
