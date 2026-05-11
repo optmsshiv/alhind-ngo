@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blog | AL Hind Educational and Charitable Trust</title>
+  <meta name="description" content="Latest news, stories and updates from AL Hind Educational and Charitable Trust — health camps, education programs and community welfare.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/blog.css">
+  <link rel="stylesheet" href="/css/pageload_animation.css">
+  <!-- Meta Pixel -->
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init','1235764274660948');fbq('track','PageView');
+  </script>
+</head>
+<body>
+
+  <div id="header"></div>
+
+  <!-- HERO -->
+  <section class="bl-hero">
+    <div class="bl-hero-inner">
+      <span class="bl-eyebrow"><i class="fa-solid fa-newspaper"></i> Our Blog</span>
+      <h1 class="bl-hero-title">Stories, Updates &amp; Insights</h1>
+      <p class="bl-hero-sub">Health camps, education programs, community welfare stories and more from AL Hind Trust.</p>
+    </div>
+  </section>
+
+  <!-- FILTERS -->
+  <div class="bl-filters">
+    <div class="bl-filters-inner">
+      <button class="bl-filter-btn active" data-cat="">All</button>
+      <button class="bl-filter-btn" data-cat="Health Camps"><i class="fa-solid fa-stethoscope"></i> Health Camps</button>
+      <button class="bl-filter-btn" data-cat="Education"><i class="fa-solid fa-graduation-cap"></i> Education</button>
+      <button class="bl-filter-btn" data-cat="Community Stories"><i class="fa-solid fa-people-group"></i> Community Stories</button>
+      <button class="bl-filter-btn" data-cat="Events Recap"><i class="fa-solid fa-calendar-days"></i> Events Recap</button>
+    </div>
+  </div>
+
+  <!-- POSTS GRID -->
+  <main class="bl-main">
+    <div class="bl-container">
+      <!-- Loading -->
+      <div class="bl-loading" id="bl-loading">
+        <div class="bl-spinner"></div>
+        <p>Loading posts…</p>
+      </div>
+      <!-- Empty -->
+      <div class="bl-empty" id="bl-empty" style="display:none">
+        <i class="fa-solid fa-newspaper"></i>
+        <h3>No posts found</h3>
+        <p>Check back soon for updates.</p>
+      </div>
+      <!-- Grid -->
+      <div class="bl-grid" id="bl-grid" style="display:none"></div>
+    </div>
+  </main>
+
+  <div id="footer"></div>
+
+  <script src="/js/include.js"></script>
+  <script src="/js/main.js" defer></script>
+  <script src="/js/header-animate.js" defer></script>
+  <script src="/js/blog.js" defer></script>
+
+</body>
+</html>

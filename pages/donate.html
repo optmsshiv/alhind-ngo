@@ -7,26 +7,238 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/style.css">
     <style>
+        /* ── PRESET BUTTONS ── */
         .donation-presets button.active-preset {
             background: #0f766e;
             color: #fff;
             outline: 3px solid #0f766e;
         }
 
+        .donation-presets button small {
+            display: block;
+            font-size: .72rem;
+            opacity: .75;
+            margin-top: 2px;
+            font-weight: 400;
+        }
+
+        /* ── STICKY DONATE — fixed width, flex ── */
         #stickyDonate {
             display: none;
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 5;
+            left: 50;
+            right: 3;
+            width: 28%;
+            box-sizing: border-box;
             background: #0f766e;
             color: #fff;
             padding: .75rem 1.5rem;
+            flex-direction: row;
             justify-content: space-between;
             align-items: center;
             z-index: 999;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, .18);
         }
 
+        #stickyDonate.visible {
+            display: flex;
+        }
+
+        #stickyDonate span {
+            font-size: .95rem;
+            font-weight: 600;
+        }
+
+        #stickyDonate button {
+            background: #fff;
+            color: #0f766e;
+            border: none;
+            border-radius: 99px;
+            padding: .5rem 1.4rem;
+            font-size: .88rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background .2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        #stickyDonate button:hover {
+            background: #e6faf7;
+        }
+
+        /* ── NEW FORM FIELDS ── */
+        .form-section-label {
+            font-size: .72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: #94a3b8;
+            margin: 1.2rem 0 .6rem;
+        }
+
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: .75rem;
+        }
+
+        @media (max-width: 480px) {
+            .form-row-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .field-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: .28rem;
+            margin-bottom: .75rem;
+        }
+
+        .field-wrap label {
+            font-size: .8rem;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .field-wrap .field-hint {
+            font-size: .72rem;
+            color: #94a3b8;
+            margin-top: .18rem;
+            font-style: italic;
+        }
+
+        #donationForm input[type=text],
+        #donationForm input[type=email],
+        #donationForm input[type=tel],
+        #donationForm input[type=number],
+        #donationForm select,
+        #donationForm textarea {
+            width: 100%;
+            padding: .6rem .85rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: .9rem;
+            font-family: inherit;
+            color: #1e293b;
+            background: #fff;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+            box-sizing: border-box;
+        }
+
+        #donationForm input:focus,
+        #donationForm select:focus,
+        #donationForm textarea:focus {
+            border-color: #0f766e;
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, .1);
+        }
+
+        #donationForm textarea {
+            resize: none;
+            min-height: 72px;
+            line-height: 1.5;
+        }
+
+        #donationForm select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right .85rem center;
+        }
+
+        .form-divider {
+            height: 1px;
+            background: #f1f5f9;
+            margin: 1.1rem 0;
+        }
+
+        /* Anonymous toggle */
+        .anon-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: .85rem 0;
+            border-top: 1px solid #f1f5f9;
+            margin-top: .25rem;
+        }
+
+        .anon-row-label strong {
+            display: block;
+            font-size: .88rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .anon-row-label span {
+            font-size: .76rem;
+            color: #94a3b8;
+        }
+
+        .toggle-switch {
+            width: 38px;
+            height: 22px;
+            border-radius: 99px;
+            background: #cbd5e1;
+            position: relative;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background .2s;
+            border: none;
+            outline: none;
+        }
+
+        .toggle-switch.on {
+            background: #0f766e;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #fff;
+            top: 3px;
+            left: 3px;
+            transition: left .2s;
+        }
+
+        .toggle-switch.on::after {
+            left: 19px;
+        }
+
+        /* Donate button live amount */
+        .btn-donate-main {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        /* Payment methods strip */
+        .pay-methods-strip {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            flex-wrap: wrap;
+            margin-top: .85rem;
+            padding-top: .85rem;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .pay-methods-strip span {
+            font-size: .76rem;
+            color: #94a3b8;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: .22rem .6rem;
+            font-weight: 600;
+        }
+
+        /* ── SUCCESS POPUP ── */
         .success-overlay {
             display: none;
             position: fixed;
@@ -156,7 +368,7 @@
                 </div>
             </div>
 
-            <div class="donation-grid">
+            <div class="donation-grid" style="align-items:start;">
 
                 <!-- LEFT: FORM -->
                 <div class="donation-box reveal-left">
@@ -165,27 +377,100 @@
 
                     <!-- PRESET AMOUNTS -->
                     <div class="donation-presets">
-                        <button data-amount="500">₹500<br><small></small></button>
-                        <button data-amount="1000" class="popular">₹1000<br><small></small><span>Most
+                        <button data-amount="500">₹500<br><small>Notebooks</small></button>
+                        <button data-amount="1000" class="popular">₹1,000<br><small>Scholarship</small><span>Most
                                 Popular</span></button>
-                        <button data-amount="2500">₹2500<br><small></small></button>
-                        <button data-amount="5000">₹5000<br><small></small></button>
+                        <button data-amount="2500">₹2,500<br><small>Programs</small></button>
+                        <button data-amount="5000">₹5,000<br><small>Full month</small></button>
                     </div>
-
 
                     <!-- FORM -->
                     <form id="donationForm">
-                        <input type="text" id="donorName" placeholder="Full Name" required>
-                        <input type="email" id="donorEmail" placeholder="Email Address" required>
-                        <input type="number" id="donationAmount" placeholder="Enter Amount (INR)" required>
 
-                        <button type="submit" class="btn-donate-main">
-                            Donate Securely
+                        <!-- Amount -->
+                        <div class="field-wrap">
+                            <label for="donationAmount">Amount (INR) <span style="color:#e24b4a">*</span></label>
+                            <input type="number" id="donationAmount" placeholder="Enter custom amount" required min="1">
+                        </div>
+
+                        <div class="form-divider"></div>
+                        <div class="form-section-label">Your details</div>
+
+                        <!-- Name + Phone -->
+                        <div class="form-row-2">
+                            <div class="field-wrap">
+                                <label for="donorName">Full name <span style="color:#e24b4a">*</span></label>
+                                <input type="text" id="donorName" placeholder="Mohammad Aslam" required>
+                            </div>
+                            <div class="field-wrap">
+                                <label for="donorPhone">Phone number <span style="color:#e24b4a">*</span></label>
+                                <input type="tel" id="donorPhone" placeholder="+91 98765 43210" required>
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="field-wrap">
+                            <label for="donorEmail">Email address <span style="color:#e24b4a">*</span></label>
+                            <input type="email" id="donorEmail" placeholder="you@example.com" required>
+                        </div>
+
+                        <!-- PAN -->
+                        <div class="field-wrap">
+                            <label for="donorPAN">PAN number <span
+                                    style="font-size:.75rem;font-weight:400;color:#94a3b8">(optional — required for 80G
+                                    certificate)</span></label>
+                            <input type="text" id="donorPAN" placeholder="ABCDE1234F" maxlength="10"
+                                style="text-transform:uppercase">
+                            <div class="field-hint">Leave blank if you don't need a tax exemption certificate.</div>
+                        </div>
+
+                        <div class="form-divider"></div>
+                        <div class="form-section-label">More info (optional)</div>
+
+                        <!-- Purpose -->
+                        <div class="field-wrap">
+                            <label for="donorPurpose">Donation purpose</label>
+                            <select id="donorPurpose">
+                                <option value="">— Select a cause —</option>
+                                <option value="general">General Fund</option>
+                                <option value="education">Education Support</option>
+                                <option value="community">Community Programs</option>
+                                <option value="emergency">Emergency Relief</option>
+                            </select>
+                        </div>
+
+                        <!-- Message -->
+                        <div class="field-wrap">
+                            <label for="donorMessage">Message / dedication</label>
+                            <textarea id="donorMessage"
+                                placeholder="e.g. In memory of my father, or a message of support…"></textarea>
+                        </div>
+
+                        <!-- Anonymous toggle -->
+                        <div class="anon-row">
+                            <div class="anon-row-label">
+                                <strong>Donate anonymously</strong>
+                                <span>Your name won't appear publicly</span>
+                            </div>
+                            <button type="button" class="toggle-switch" id="anonToggle" onclick="toggleAnon()"
+                                aria-checked="false" role="switch"></button>
+                        </div>
+
+                        <button type="submit" class="btn-donate-main" id="donateBtnMain">
+                            🔒 Donate ₹<span id="donate-btn-amt">—</span> Securely
                         </button>
 
                     </form>
 
-                    <div class="trust-badge">
+                    <!-- Payment methods -->
+                    <div class="pay-methods-strip">
+                        <span>Razorpay</span>
+                        <span>UPI</span>
+                        <span>Cards</span>
+                        <span>Net Banking</span>
+                    </div>
+
+                    <div class="trust-badge" style="margin-top:1rem">
                         ✔ Government-registered NGO (NITI Aayog – DARPAN)<br>
                         <small>DARPAN ID: BR/2025/0937487</small>
                     </div>
@@ -194,33 +479,19 @@
                         💚 Even a small donation creates real impact. Thank you for standing with us.
                     </p>
 
-
-                    <p class="payment-note">
-                        Secure payments via Razorpay • UPI • Cards • Net Banking
-                    </p>
-
                     <p class="tax-note">
                         ✔ Donations are eligible for tax exemption under Section 80G (if applicable)
                     </p>
 
-                    <div class="donation-flow reveal">
-                        <h3>What Happens After You Donate?</h3>
-                        <ol>
-                            <li>Payment is securely processed</li>
-                            <li>Funds are allocated to programs</li>
-                            <li>You receive confirmation & updates</li>
-                        </ol>
-                    </div>
                 </div>
 
-                <!-- RIGHT: TRUST / QR -->
-                <div class="donation-trust reveal-right">
+                <!-- RIGHT: TRUST / QR — sticky -->
+                <div class="donation-trust reveal-right" style="position:sticky;top:1.5rem;align-self:start;">
 
                     <div class="qr-card">
                         <img src="/assets/upi-qr.jpeg" alt="UPI QR Donation">
                         <p class="qr-note">Scan to donate via UPI</p>
                     </div>
-
 
                     <div class="trust-badges reveal">
                         <img src="/assets/sbi-logo-hd.png" alt="SBI">
@@ -228,7 +499,6 @@
                         <img src="/assets/razorpay-logo-hd.png" alt="Razorpay">
                         <img src="/assets/secure-payment.png" alt="Secure Payments">
                     </div>
-
 
                     <div class="bank-strip">
                         <h4>Direct Bank Transfer</h4>
@@ -239,6 +509,36 @@
                         </ul>
                     </div>
 
+                    <!-- Moved from left column -->
+                    <div class="donation-flow reveal" style="margin-top:1.25rem;">
+                        <h3>What Happens After You Donate?</h3>
+                        <ol>
+                            <li>Payment is securely processed</li>
+                            <li>Funds are allocated to programs</li>
+                            <li>You receive confirmation &amp; updates</li>
+                        </ol>
+                    </div>
+
+                    <!-- Mini impact reassurance -->
+                    <div
+                        style="margin-top:1.25rem;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:1rem 1.1rem;">
+                        <p style="font-size:.82rem;color:#166534;font-weight:600;margin-bottom:.5rem;">🌟 Your impact so
+                            far</p>
+                        <div style="display:flex;justify-content:space-between;text-align:center;">
+                            <div>
+                                <div style="font-size:1.2rem;font-weight:800;color:#0f766e;">250+</div>
+                                <div style="font-size:.7rem;color:#64748b;">Students</div>
+                            </div>
+                            <div>
+                                <div style="font-size:1.2rem;font-weight:800;color:#0f766e;">35</div>
+                                <div style="font-size:.7rem;color:#64748b;">Programs</div>
+                            </div>
+                            <div>
+                                <div style="font-size:1.2rem;font-weight:800;color:#0f766e;">12 yrs</div>
+                                <div style="font-size:.7rem;color:#64748b;">Service</div>
+                            </div>
+                        </div>
+                    </div>
 
                     <p class="trust-note">
                         Registered NGO • Transparent Use of Funds
@@ -289,8 +589,11 @@
 
 
     <div class="sticky-donate" id="stickyDonate">
-        <span>Support our mission</span>
-        <button onclick="scrollToDonate()">Donate Now</button>
+        <div style="display:flex;flex-direction:column;gap:.15rem">
+            <span style="font-weight:700;font-size:.95rem">Support our mission</span>
+            <span style="font-size:.78rem;opacity:.85">Your donation makes a real difference</span>
+        </div>
+        <button onclick="scrollToDonate()">Donate Now →</button>
     </div>
 
 
@@ -317,6 +620,63 @@
     <script src="/js/animation.js"></script>
     <script src="/js/impact_no.js"></script>
     <script src="/js/main.js"></script>
+
+    <script>
+        /* ── Live donate button amount ── */
+        const amtInput = document.getElementById('donationAmount');
+        const btnAmt = document.getElementById('donate-btn-amt');
+
+        function updateBtnAmt() {
+            const v = parseInt(amtInput && amtInput.value) || 0;
+            if (btnAmt) btnAmt.textContent = v ? v.toLocaleString('en-IN') : '—';
+        }
+
+        if (amtInput) {
+            amtInput.addEventListener('input', updateBtnAmt);
+            updateBtnAmt();
+        }
+
+        /* ── Preset click → fill amount + update button ── */
+        document.querySelectorAll('.donation-presets button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (amtInput) { amtInput.value = btn.dataset.amount; updateBtnAmt(); }
+            });
+        });
+
+        /* ── Anonymous toggle ── */
+        function toggleAnon() {
+            const tog = document.getElementById('anonToggle');
+            if (!tog) return;
+            const isOn = tog.classList.toggle('on');
+            tog.setAttribute('aria-checked', isOn);
+        }
+
+        /* ── PAN auto uppercase ── */
+        const panField = document.getElementById('donorPAN');
+        if (panField) {
+            panField.addEventListener('input', () => {
+                const pos = panField.selectionStart;
+                panField.value = panField.value.toUpperCase();
+                panField.setSelectionRange(pos, pos);
+            });
+        }
+
+        /* ── Sticky donate: show after scrolling past donation section ── */
+        const stickyBar = document.getElementById('stickyDonate');
+        const donationSection = document.querySelector('.donation-section');
+
+        function handleStickyScroll() {
+            if (!stickyBar || !donationSection) return;
+            if (donationSection.getBoundingClientRect().bottom < 0) {
+                stickyBar.classList.add('visible');
+            } else {
+                stickyBar.classList.remove('visible');
+            }
+        }
+
+        window.addEventListener('scroll', handleStickyScroll, { passive: true });
+        handleStickyScroll();
+    </script>
 </body>
 
 </html>

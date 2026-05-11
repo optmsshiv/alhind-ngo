@@ -2020,6 +2020,25 @@
     }
 
     /* Gallery action icon buttons */
+    .blog-tb-btn {
+      padding: .3rem .5rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--card);
+      cursor: pointer;
+      font-size: .8rem;
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: .2rem;
+      transition: background .15s;
+    }
+    .blog-tb-btn:hover { background: var(--bg); }
+    #bf-content:empty:before {
+      content: attr(placeholder);
+      color: #94a3b8;
+      pointer-events: none;
+    }
     .gal-act-btn {
       width: 28px;
       height: 28px;
@@ -2804,6 +2823,10 @@
           <span class="ni-icon"><i class="fa-solid fa-images"></i></span>Gallery
           <span class="ni-badge" id="sb-gc">0</span>
         </button>
+        <button class="nav-item" onclick="goTo('blog')" data-page="blog">
+          <span class="ni-icon"><i class="fa-solid fa-newspaper"></i></span>Blog
+          <span class="ni-badge" id="sb-blog-count">0</span>
+        </button>
       </div>
       <div class="sb-section">
         <div class="sb-sec-lbl">Inbox</div>
@@ -2823,6 +2846,9 @@
         </button>
         <button class="nav-item" onclick="goTo('upload')" data-page="upload">
           <span class="ni-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>Upload Images
+        </button>
+        <button class="nav-item" onclick="goTo('add-blog')" data-page="add-blog">
+          <span class="ni-icon"><i class="fa-solid fa-pen-nib"></i></span>Write Post
         </button>
       </div>
       <div class="sb-foot">
@@ -3455,6 +3481,164 @@
         </div>
       </div><!-- end #page-messages -->
 
+      <!-- ══════════════════════════════════════
+           BLOG — All Posts
+      ══════════════════════════════════════ -->
+      <div class="tab-panel" id="page-blog">
+        <div class="pg-header">
+          <h1><i class="fa-solid fa-newspaper"></i> Blog Posts</h1>
+          <p>Manage all blog articles and news updates.</p>
+        </div>
+        <div class="panel-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem">
+            <div style="font-size:.85rem;color:var(--muted)">
+              <strong id="blog-count">0</strong> posts
+            </div>
+            <div style="display:flex;gap:.6rem;align-items:center">
+              <select id="blog-filter-cat" onchange="filterBlogPosts()"
+                style="padding:.4rem .8rem;border:1.5px solid var(--border);border-radius:8px;font-size:.8rem;background:var(--bg);font-family:inherit">
+                <option value="">All Categories</option>
+                <option>Health Camps</option>
+                <option>Education</option>
+                <option>Community Stories</option>
+                <option>Events Recap</option>
+              </select>
+              <button class="btn-sub" style="padding:.42rem .95rem;font-size:.8rem" onclick="goTo('add-blog')">
+                <i class="fa-solid fa-pen-nib"></i> Write Post
+              </button>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table style="width:100%;border-collapse:collapse;font-size:.83rem">
+              <thead>
+                <tr>
+                  <th style="padding:.65rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:1px solid var(--border);width:72px">Cover</th>
+                  <th style="padding:.65rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:1px solid var(--border)">Title</th>
+                  <th style="padding:.65rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:1px solid var(--border);width:110px">Category</th>
+                  <th style="padding:.65rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:1px solid var(--border);width:90px">Status</th>
+                  <th style="padding:.65rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:1px solid var(--border);width:70px">Views</th>
+                  <th style="padding:.65rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:1px solid var(--border);width:100px">Date</th>
+                  <th style="padding:.65rem .9rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:1px solid var(--border);width:110px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="blog-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           BLOG — Write / Edit Post
+      ══════════════════════════════════════ -->
+      <div class="tab-panel" id="page-add-blog">
+        <div class="pg-header">
+          <h1 id="blog-form-title"><i class="fa-solid fa-pen-nib"></i> Write New Post</h1>
+          <p>Create and publish a blog post to your website.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 340px;gap:1.5rem;align-items:start">
+
+          <!-- Main content -->
+          <div style="display:flex;flex-direction:column;gap:1.25rem">
+            <div class="panel-card">
+              <div class="fg">
+                <label class="f-lbl">Post Title <span style="color:var(--danger)">*</span></label>
+                <input type="text" id="bf-title" class="f-inp" placeholder="e.g. Free Medical Camp Held in Madhepura">
+              </div>
+              <div class="fg" style="margin-top:1rem">
+                <label class="f-lbl">Excerpt / Summary</label>
+                <textarea id="bf-excerpt" class="f-inp" rows="3"
+                  placeholder="Brief summary shown on blog listing page…" style="resize:vertical"></textarea>
+              </div>
+            </div>
+
+            <div class="panel-card">
+              <label class="f-lbl" style="margin-bottom:.75rem">Content <span style="color:var(--danger)">*</span></label>
+              <!-- Toolbar -->
+              <div style="display:flex;gap:.4rem;flex-wrap:wrap;padding:.6rem;background:var(--bg);border:1.5px solid var(--border);border-radius:10px 10px 0 0;border-bottom:none">
+                <button type="button" onclick="blogCmd('bold')"         title="Bold"          class="blog-tb-btn"><i class="fa-solid fa-bold"></i></button>
+                <button type="button" onclick="blogCmd('italic')"       title="Italic"        class="blog-tb-btn"><i class="fa-solid fa-italic"></i></button>
+                <button type="button" onclick="blogCmd('underline')"    title="Underline"     class="blog-tb-btn"><i class="fa-solid fa-underline"></i></button>
+                <div style="width:1px;background:var(--border);margin:0 .2rem"></div>
+                <button type="button" onclick="blogFmt('h2')"           title="Heading 2"     class="blog-tb-btn"><i class="fa-solid fa-heading"></i>2</button>
+                <button type="button" onclick="blogFmt('h3')"           title="Heading 3"     class="blog-tb-btn"><i class="fa-solid fa-heading"></i>3</button>
+                <div style="width:1px;background:var(--border);margin:0 .2rem"></div>
+                <button type="button" onclick="blogCmd('insertUnorderedList')" title="Bullet list" class="blog-tb-btn"><i class="fa-solid fa-list-ul"></i></button>
+                <button type="button" onclick="blogCmd('insertOrderedList')"   title="Numbered list" class="blog-tb-btn"><i class="fa-solid fa-list-ol"></i></button>
+                <div style="width:1px;background:var(--border);margin:0 .2rem"></div>
+                <button type="button" onclick="blogLink()"              title="Insert link"   class="blog-tb-btn"><i class="fa-solid fa-link"></i></button>
+                <button type="button" onclick="blogCmd('removeFormat')" title="Clear format"  class="blog-tb-btn"><i class="fa-solid fa-eraser"></i></button>
+              </div>
+              <div id="bf-content"
+                contenteditable="true"
+                style="min-height:320px;padding:1rem;border:1.5px solid var(--border);border-radius:0 0 10px 10px;font-size:.9rem;line-height:1.8;outline:none;background:#fff;font-family:inherit"
+                placeholder="Write your blog post here…"></div>
+            </div>
+          </div>
+
+          <!-- Sidebar -->
+          <div style="display:flex;flex-direction:column;gap:1.25rem">
+
+            <!-- Publish -->
+            <div class="panel-card">
+              <p class="f-lbl" style="margin-bottom:1rem">Publish</p>
+              <label style="display:flex;align-items:center;gap:.6rem;cursor:pointer;margin-bottom:1rem">
+                <input type="checkbox" id="bf-publish" style="width:15px;height:15px;accent-color:var(--teal)">
+                <span style="font-size:.875rem;color:#1e293b">Publish immediately</span>
+              </label>
+              <div style="display:flex;gap:.6rem">
+                <button class="btn-sub" onclick="saveBlogPost()" style="flex:1" id="bf-submit">
+                  <i class="fa-solid fa-floppy-disk"></i> Save Post
+                </button>
+                <button class="btn-canc" onclick="resetBlogForm();goTo('blog')">Cancel</button>
+              </div>
+              <div id="blog-form-err" style="color:var(--danger);font-size:.78rem;margin-top:.5rem;min-height:1rem"></div>
+            </div>
+
+            <!-- Cover Image -->
+            <div class="panel-card">
+              <p class="f-lbl" style="margin-bottom:.75rem">Cover Image</p>
+              <div class="drop-zone" id="bf-dz" onclick="document.getElementById('bf-img-file').click()"
+                style="min-height:120px;padding:1.5rem 1rem">
+                <span class="dzi"><i class="fa-solid fa-image"></i></span>
+                <p style="font-size:.8rem;color:var(--muted)">Click to upload cover image</p>
+                <input type="file" id="bf-img-file" accept="image/*" onchange="handleBlogImg(this)" style="display:none">
+              </div>
+              <div id="bf-img-preview" style="display:none;margin-top:.75rem;position:relative">
+                <img id="bf-img-preview-img" style="width:100%;border-radius:8px;max-height:160px;object-fit:cover">
+                <button onclick="clearBlogImg()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;color:#fff;font-size:.75rem;display:flex;align-items:center;justify-content:center">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+              <input type="hidden" id="bf-img-b64">
+            </div>
+
+            <!-- Meta -->
+            <div class="panel-card">
+              <p class="f-lbl" style="margin-bottom:1rem">Post Details</p>
+              <div class="fg" style="margin-bottom:.85rem">
+                <label class="f-lbl">Category</label>
+                <select id="bf-category" class="f-inp">
+                  <option value="">— Select —</option>
+                  <option>Health Camps</option>
+                  <option>Education</option>
+                  <option>Community Stories</option>
+                  <option>Events Recap</option>
+                </select>
+              </div>
+              <div class="fg" style="margin-bottom:.85rem">
+                <label class="f-lbl">Tags <span style="font-weight:400;text-transform:none;font-size:.72rem;color:var(--muted)">(comma separated)</span></label>
+                <input type="text" id="bf-tags" class="f-inp" placeholder="e.g. health, camp, Bihar">
+              </div>
+              <div class="fg">
+                <label class="f-lbl">Author</label>
+                <input type="text" id="bf-author" class="f-inp" value="AL Hind Trust">
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
 
     </main>
   </div>
@@ -3812,7 +3996,7 @@
     async function loadAll() {
       showPageLoader(true);
       try {
-        await Promise.all([loadDashboard(), loadEvents(), loadGallery(), loadInbox()]);
+        await Promise.all([loadDashboard(), loadEvents(), loadGallery(), loadInbox(), loadBlog()]);
       } catch (e) {
         toast('Some data failed to load', 'error');
       } finally {
@@ -5445,7 +5629,206 @@
       // Fetch fresh data when switching to data tabs
       if (p === 'messages') loadInbox();
       if (p === 'donations') loadInbox();
+      if (p === 'blog') loadBlog();
     }
+    /* ══════════════════════════════════════
+       BLOG
+    ══════════════════════════════════════ */
+    let blogPosts = [];
+    let blogEditId = null;
+    let blogImgB64 = '';
+
+    async function loadBlog() {
+      try {
+        const res = await apiFetch('GET', 'blog');
+        blogPosts = res.data || [];
+        renderBlogTable(blogPosts);
+        document.getElementById('sb-blog-count').textContent = blogPosts.length;
+        document.getElementById('blog-count').textContent = blogPosts.length;
+      } catch (e) { toast('Failed to load blog posts', 'error'); }
+    }
+
+    function renderBlogTable(posts) {
+      const tb = document.getElementById('blog-tbody');
+      if (!posts.length) {
+        tb.innerHTML = `<tr class="empty-r"><td colspan="7" style="padding:2rem;text-align:center;color:var(--muted)">No blog posts yet. <a href="#" onclick="goTo('add-blog')" style="color:var(--teal)">Write your first post →</a></td></tr>`;
+        return;
+      }
+      tb.innerHTML = posts.map((p, i) => {
+        const isPub = p.is_published == 1;
+        const date  = p.published_at || p.created_at || '';
+        const dateStr = date ? new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+        return `<tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:.65rem .9rem">
+            ${p.cover_image
+              ? `<img src="${esc(p.cover_image)}" style="width:56px;height:42px;object-fit:cover;border-radius:7px;display:block;border:0.5px solid var(--border)">`
+              : `<div style="width:56px;height:42px;border-radius:7px;background:var(--bg);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.85rem"><i class="fa-solid fa-image"></i></div>`}
+          </td>
+          <td style="padding:.65rem .9rem">
+            <div style="font-weight:600;font-size:.85rem;color:#1e293b;max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.title)}</div>
+            ${p.excerpt ? `<div style="font-size:.75rem;color:var(--muted);margin-top:2px;max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.excerpt)}</div>` : ''}
+          </td>
+          <td style="padding:.65rem .9rem">${p.category ? `<span class="cat-tag">${esc(p.category)}</span>` : '<span style="color:var(--muted)">—</span>'}</td>
+          <td style="padding:.65rem .9rem">
+            <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:.72rem;font-weight:600;background:${isPub ? '#dcfce7' : 'var(--bg)'};color:${isPub ? '#166534' : 'var(--muted)'}">
+              <span style="width:6px;height:6px;border-radius:50%;background:${isPub ? '#22c55e' : '#94a3b8'};display:inline-block"></span>
+              ${isPub ? 'Published' : 'Draft'}
+            </span>
+          </td>
+          <td style="padding:.65rem .9rem;color:var(--muted);font-size:.8rem">${p.views || 0}</td>
+          <td style="padding:.65rem .9rem;color:var(--muted);font-size:.78rem;white-space:nowrap">${dateStr}</td>
+          <td style="padding:.65rem .9rem">
+            <div style="display:flex;gap:.3rem">
+              <button class="gal-act-btn" onclick="editBlogPost(${p.id})" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button class="gal-act-btn" onclick="toggleBlogPublish(${p.id},${isPub ? 0 : 1})" title="${isPub ? 'Unpublish' : 'Publish'}" style="color:${isPub ? 'var(--teal)' : 'var(--muted)'}">
+                <i class="fa-solid fa-${isPub ? 'eye' : 'eye-slash'}"></i>
+              </button>
+              <button class="gal-act-btn" onclick="window.open('https://alhindtrust.com/blog/post.html?slug=${esc(p.slug)}','_blank')" title="View on site"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+              <button class="gal-act-btn gal-act-del" onclick="deleteBlogPost(${p.id})" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function filterBlogPosts() {
+      const cat = document.getElementById('blog-filter-cat').value;
+      const filtered = cat ? blogPosts.filter(p => p.category === cat) : blogPosts;
+      renderBlogTable(filtered);
+    }
+
+    async function editBlogPost(id) {
+      try {
+        const res = await apiFetch('GET', `blog/${id}`);
+        const p   = res.data;
+        blogEditId = id;
+        document.getElementById('blog-form-title').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Edit Post';
+        document.getElementById('bf-title').value     = p.title || '';
+        document.getElementById('bf-excerpt').value   = p.excerpt || '';
+        document.getElementById('bf-content').innerHTML = p.content || '';
+        document.getElementById('bf-category').value  = p.category || '';
+        document.getElementById('bf-tags').value      = p.tags || '';
+        document.getElementById('bf-author').value    = p.author || 'AL Hind Trust';
+        document.getElementById('bf-publish').checked = p.is_published == 1;
+        if (p.cover_image) {
+          document.getElementById('bf-img-preview-img').src = p.cover_image;
+          document.getElementById('bf-img-preview').style.display = 'block';
+        } else {
+          clearBlogImg();
+        }
+        blogImgB64 = '';
+        goTo('add-blog');
+      } catch (e) { toast('Failed to load post', 'error'); }
+    }
+
+    async function saveBlogPost() {
+      const title   = document.getElementById('bf-title').value.trim();
+      const content = document.getElementById('bf-content').innerHTML.trim();
+      const err     = document.getElementById('blog-form-err');
+      err.textContent = '';
+      if (!title)   { err.textContent = 'Title is required'; return; }
+      if (!content || content === '<br>') { err.textContent = 'Content is required'; return; }
+
+      const btn = document.getElementById('bf-submit');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
+
+      const payload = {
+        title,
+        content,
+        excerpt:      document.getElementById('bf-excerpt').value.trim(),
+        category:     document.getElementById('bf-category').value,
+        tags:         document.getElementById('bf-tags').value.trim(),
+        author:       document.getElementById('bf-author').value.trim() || 'AL Hind Trust',
+        is_published: document.getElementById('bf-publish').checked ? 1 : 0,
+      };
+      if (blogImgB64) payload.cover_image = blogImgB64;
+
+      try {
+        if (blogEditId) {
+          await apiFetch('PUT', `blog/${blogEditId}`, payload);
+          toast('Post updated ✓', 'success');
+        } else {
+          await apiFetch('POST', 'blog', payload);
+          toast('Post created ✓', 'success');
+        }
+        await loadBlog();
+        resetBlogForm();
+        goTo('blog');
+      } catch (e) {
+        err.textContent = e.message || 'Failed to save post';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Post';
+      }
+    }
+
+    async function toggleBlogPublish(id, val) {
+      try {
+        await apiFetch('PUT', `blog/${id}`, { is_published: val });
+        const post = blogPosts.find(p => p.id === id);
+        if (post) post.is_published = val;
+        renderBlogTable(blogPosts);
+        toast(val ? 'Post published ✓' : 'Post unpublished', 'success');
+      } catch (e) { toast('Failed to update', 'error'); }
+    }
+
+    async function deleteBlogPost(id) {
+      if (!confirm('Delete this blog post? This cannot be undone.')) return;
+      try {
+        await apiFetch('DELETE', `blog/${id}`);
+        blogPosts = blogPosts.filter(p => p.id !== id);
+        renderBlogTable(blogPosts);
+        document.getElementById('sb-blog-count').textContent = blogPosts.length;
+        document.getElementById('blog-count').textContent = blogPosts.length;
+        toast('Post deleted', 'success');
+      } catch (e) { toast('Failed to delete', 'error'); }
+    }
+
+    function handleBlogImg(input) {
+      const file = input.files[0]; if (!file) return;
+      const r = new FileReader();
+      r.onload = e => {
+        blogImgB64 = e.target.result;
+        document.getElementById('bf-img-preview-img').src = blogImgB64;
+        document.getElementById('bf-img-preview').style.display = 'block';
+      };
+      r.readAsDataURL(file);
+    }
+
+    function clearBlogImg() {
+      blogImgB64 = '';
+      document.getElementById('bf-img-preview').style.display = 'none';
+      document.getElementById('bf-img-preview-img').src = '';
+      document.getElementById('bf-img-file').value = '';
+    }
+
+    function resetBlogForm() {
+      blogEditId = null; blogImgB64 = '';
+      document.getElementById('blog-form-title').innerHTML = '<i class="fa-solid fa-pen-nib"></i> Write New Post';
+      document.getElementById('bf-title').value   = '';
+      document.getElementById('bf-excerpt').value = '';
+      document.getElementById('bf-content').innerHTML = '';
+      document.getElementById('bf-category').value = '';
+      document.getElementById('bf-tags').value    = '';
+      document.getElementById('bf-author').value  = 'AL Hind Trust';
+      document.getElementById('bf-publish').checked = false;
+      document.getElementById('blog-form-err').textContent = '';
+      clearBlogImg();
+    }
+
+    /* Rich text editor helpers */
+    function blogCmd(cmd) { document.getElementById('bf-content').focus(); document.execCommand(cmd, false, null); }
+    function blogFmt(tag) {
+      document.getElementById('bf-content').focus();
+      document.execCommand('formatBlock', false, tag);
+    }
+    function blogLink() {
+      const url = prompt('Enter URL:'); if (!url) return;
+      document.getElementById('bf-content').focus();
+      document.execCommand('createLink', false, url);
+    }
+
     function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
     function toggleAvMenu() { document.getElementById('av-menu').classList.toggle('open'); }
     document.addEventListener('click', e => {

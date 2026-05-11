@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blog Post | AL Hind Trust</title>
+  <meta name="description" content="Read the latest updates from AL Hind Educational and Charitable Trust.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/blog.css">
+  <link rel="stylesheet" href="/css/pageload_animation.css">
+  <!-- Meta Pixel -->
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init','1235764274660948');fbq('track','PageView');
+  </script>
+</head>
+<body>
+
+  <div id="header"></div>
+
+  <!-- Loading -->
+  <div class="bl-post-loading" id="bl-post-loading">
+    <div class="bl-spinner"></div>
+    <p>Loading post…</p>
+  </div>
+
+  <!-- Error -->
+  <div class="bl-post-error" id="bl-post-error" style="display:none">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <h2>Post Not Found</h2>
+    <p>This post may have been removed or the link is invalid.</p>
+    <a href="/blog.html" class="bl-back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Blog</a>
+  </div>
+
+  <!-- Post Content -->
+  <article id="bl-post-wrap" style="display:none">
+
+    <!-- Breadcrumb -->
+    <nav class="bl-breadcrumb">
+      <div class="bl-container">
+        <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+        <i class="fa-solid fa-chevron-right bl-sep"></i>
+        <a href="/blog.html">Blog</a>
+        <i class="fa-solid fa-chevron-right bl-sep"></i>
+        <span id="bl-post-bc-title">Post</span>
+      </div>
+    </nav>
+
+    <!-- Cover Image -->
+    <div class="bl-post-cover" id="bl-post-cover" style="display:none">
+      <img id="bl-post-cover-img" src="" alt="">
+    </div>
+
+    <!-- Post Header -->
+    <header class="bl-post-header">
+      <div class="bl-container bl-post-header-inner">
+        <span class="bl-post-cat" id="bl-post-cat" style="display:none"></span>
+        <h1 class="bl-post-title" id="bl-post-title">Loading…</h1>
+        <div class="bl-post-meta">
+          <span><i class="fa-solid fa-user"></i> <span id="bl-post-author"></span></span>
+          <span><i class="fa-solid fa-calendar"></i> <span id="bl-post-date"></span></span>
+          <span><i class="fa-solid fa-eye"></i> <span id="bl-post-views"></span> views</span>
+        </div>
+        <!-- Share -->
+        <div class="bl-share">
+          <span class="bl-share-lbl">Share:</span>
+          <button class="bl-share-btn" onclick="sharePost('whatsapp')" title="Share on WhatsApp">
+            <i class="fa-brands fa-whatsapp"></i>
+          </button>
+          <button class="bl-share-btn" onclick="sharePost('facebook')" title="Share on Facebook">
+            <i class="fa-brands fa-facebook"></i>
+          </button>
+          <button class="bl-share-btn" onclick="sharePost('twitter')" title="Share on X">
+            <i class="fa-brands fa-x-twitter"></i>
+          </button>
+          <button class="bl-share-btn" onclick="sharePost('copy')" title="Copy link">
+            <i class="fa-solid fa-link"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Post Body -->
+    <div class="bl-container bl-post-layout">
+      <div class="bl-post-content" id="bl-post-content"></div>
+
+      <!-- Sidebar -->
+      <aside class="bl-post-sidebar">
+        <!-- Tags -->
+        <div class="bl-sidebar-card" id="bl-tags-wrap" style="display:none">
+          <h4><i class="fa-solid fa-tags"></i> Tags</h4>
+          <div class="bl-tags" id="bl-post-tags"></div>
+        </div>
+        <!-- Back to blog -->
+        <div class="bl-sidebar-card">
+          <h4><i class="fa-solid fa-newspaper"></i> More Posts</h4>
+          <a href="/blog.html" class="bl-back-btn" style="margin-top:.5rem">
+            <i class="fa-solid fa-arrow-left"></i> Back to Blog
+          </a>
+        </div>
+        <!-- Share card -->
+        <div class="bl-sidebar-card">
+          <h4><i class="fa-solid fa-share-nodes"></i> Share this Post</h4>
+          <div class="bl-share" style="margin-top:.75rem;justify-content:flex-start">
+            <button class="bl-share-btn" onclick="sharePost('whatsapp')"><i class="fa-brands fa-whatsapp"></i></button>
+            <button class="bl-share-btn" onclick="sharePost('facebook')"><i class="fa-brands fa-facebook"></i></button>
+            <button class="bl-share-btn" onclick="sharePost('twitter')"><i class="fa-brands fa-x-twitter"></i></button>
+            <button class="bl-share-btn" onclick="sharePost('copy')"><i class="fa-solid fa-link"></i></button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+  </article>
+
+  <div id="footer"></div>
+
+  <script src="/js/include.js"></script>
+  <script src="/js/main.js" defer></script>
+  <script src="/js/header-animate.js" defer></script>
+  <script src="/js/post.js" defer></script>
+
+</body>
+</html>

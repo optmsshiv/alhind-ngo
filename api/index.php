@@ -41,12 +41,6 @@ if ($resource === 'auth' && $method === 'POST') {
     exit;
 }
 
-if ($resource === 'forgot-password' && $method === 'POST') {
-    require_once __DIR__ . '/endpoints/auth.php';
-    forgotPassword();
-    exit;
-}
-
 // Public GET routes — used by the main site
 if ($method === 'GET') {
     if ($resource === 'events') {
@@ -59,6 +53,14 @@ if ($method === 'GET') {
         getPublicGallery();
         exit;
     }
+}
+
+// Blog — public GET (used by blog listing + single post pages)
+if ($resource === 'blog' && $method === 'GET') {
+    require_once __DIR__ . '/endpoints/blog.php';
+    if ($id) getPublicPost($id);
+    else     getPublicPosts();
+    exit;
 }
 
 // Contact & Donate POST — public (called from main site forms)
@@ -79,17 +81,21 @@ if ($resource === 'donate' && $method === 'PATCH' && $id) {
     exit;
 }
 
-// Event volunteer registration — public (called from join page)
-if ($resource === 'volunteers' && $method === 'POST') {
-    require_once __DIR__ . '/endpoints/event-volunteers.php';
-    registerVolunteer();
-    exit;
-}
-
 // ── Protected routes — require JWT ───────────────────────────
 requireAuth();
 
 switch ($resource) {
+
+    // ── Blog ────────────────────────────────────────────────
+    case 'blog':
+        require_once __DIR__ . '/endpoints/blog.php';
+        if      ($method === 'GET'    && !$id)   getAllPosts();
+        elseif  ($method === 'GET'    && $id)    getPost($id);
+        elseif  ($method === 'POST')             createPost();
+        elseif  ($method === 'PUT'    && $id)    updatePost($id);
+        elseif  ($method === 'DELETE' && $id)    deletePost($id);
+        else notFound();
+        break;
 
     // ── Events ──────────────────────────────────────────────
     case 'events':
@@ -125,14 +131,11 @@ switch ($resource) {
     // ── Messages ─────────────────────────────────────────────
     case 'messages':
         require_once __DIR__ . '/endpoints/contact.php';
-        if ($method === 'GET')                                               getAllMessages();
-        elseif ($method === 'PATCH'  && $id && !$action)                    markMessageRead($id);
-        elseif ($method === 'PATCH'  && !$id)                               markAllRead();
-        elseif ($method === 'POST'   && $id && $action === 'approve')        approveVolunteer($id);
-        elseif ($method === 'POST'   && $id && $action === 'reject')         rejectVolunteer($id);
-        elseif ($method === 'POST'   && $id && $action === 'resend-payment') resendPaymentLink($id);
-        elseif ($method === 'DELETE' && $id)                                deleteMessage($id);
-        elseif ($method === 'DELETE' && !$id)                               clearMessages();
+        if ($method === 'GET')               getAllMessages();
+        elseif ($method === 'PATCH' && $id)  markMessageRead($id);
+        elseif ($method === 'PATCH' && !$id) markAllRead();
+        elseif ($method === 'DELETE' && $id) deleteMessage($id);
+        elseif ($method === 'DELETE' && !$id) clearMessages();
         else notFound();
         break;
 
@@ -140,13 +143,6 @@ switch ($resource) {
     case 'dashboard':
         require_once __DIR__ . '/endpoints/dashboard.php';
         getDashboardStats();
-        break;
-
-    // ── Event Volunteers (admin view) ────────────────────────
-    case 'volunteers':
-        require_once __DIR__ . '/endpoints/event-volunteers.php';
-        if ($method === 'GET' && $id) getEventVolunteers($id);
-        else notFound();
         break;
 
     // ── Categories ───────────────────────────────────────────
