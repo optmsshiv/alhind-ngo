@@ -19,15 +19,23 @@ function getPublicPosts(): void {
     ok($stmt->fetchAll());
 }
 
-/* ── Public: single post by slug ─────────────────────────── */
-function getPublicPost(string $slug): void {
-    $db   = getDB();
-    $stmt = $db->prepare("
-        SELECT id, title, slug, excerpt, content, cover_image,
-               category, tags, author, views, published_at, created_at
-        FROM blog_posts WHERE slug = ? AND is_published = 1 LIMIT 1
-    ");
-    $stmt->execute([$slug]);
+/* ── Public: single post by id OR slug ───────────────────── */
+function getPublicPost(string $idOrSlug): void {
+    $db = getDB();
+
+    // If it's a number, look up by id; otherwise by slug
+    if (ctype_digit($idOrSlug)) {
+        $sql   = "SELECT id, title, slug, excerpt, content, cover_image,
+                         category, tags, author, views, published_at, created_at
+                  FROM blog_posts WHERE id = ? AND is_published = 1 LIMIT 1";
+    } else {
+        $sql   = "SELECT id, title, slug, excerpt, content, cover_image,
+                         category, tags, author, views, published_at, created_at
+                  FROM blog_posts WHERE slug = ? AND is_published = 1 LIMIT 1";
+    }
+
+    $stmt = $db->prepare($sql);
+    $stmt->execute([$idOrSlug]);
     $post = $stmt->fetch();
     if (!$post) error('Post not found', 404);
 
