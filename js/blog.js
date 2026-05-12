@@ -40,7 +40,7 @@ function renderGrid(posts) {
       : '';
 
     return `
-      <a href="/blog/post.html?id=${p.id}" class="bl-card">
+      <a href="/blog/post.html?slug=${p.slug}" class="bl-card">
         ${p.cover_image
           ? `<img src="${esc(p.cover_image)}" alt="${esc(p.title)}" class="bl-card-img" loading="lazy">`
           : `<div class="bl-card-no-img"><i class="fa-solid fa-newspaper"></i></div>`}

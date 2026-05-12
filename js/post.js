@@ -19,8 +19,9 @@ function fmtDate(iso) {
 }
 
 /* ── Fetch post ──────────────────────────────────────────────── */
-async function fetchPost(id) {
-  const res  = await fetch(`${POST_API}/blog/${id}`);
+async function fetchPost(slug) {
+ // const res  = await fetch(`${POST_API}/blog/${id}`);
+  const res = await fetch(`${POST_API}/blog/${slug}`);
   const data = await res.json();
   if (!res.ok || !data.data) throw new Error(data.message || 'Not found');
   return data.data;
@@ -102,16 +103,16 @@ function sharePost(type) {
 /* ── Init ────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
-  const id     = params.get('id');
+  const slug     = params.get('slug'); // Using 'slug' instead of 'id' for better SEO URLs
 
-  if (!id) {
+  if (!slug) {
     document.getElementById('bl-post-loading').style.display = 'none';
     document.getElementById('bl-post-error').style.display   = 'block';
     return;
   }
 
   try {
-    const post = await fetchPost(id);
+    const post = await fetchPost(slug);
     document.getElementById('bl-post-loading').style.display = 'none';
     renderPost(post);
   } catch (e) {
