@@ -1,145 +1,422 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <title>Contact Us | AL Hind Educational and Charitable Trust</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* ── Multi-step form ─────────────────────────────── */
+        .msf-wrap { max-width:700px; margin:0 auto; }
+
+        /* Progress bar */
+        .msf-progress { display:flex; align-items:flex-start; margin-bottom:32px; }
+        .msf-step-dot { display:flex; flex-direction:column; align-items:center; flex:1; position:relative; }
+        .msf-step-dot::after {
+            content:''; position:absolute; top:16px; left:50%;
+            width:100%; height:2px; background:#e2e8f0; z-index:0;
+        }
+        .msf-step-dot:last-child::after { display:none; }
+        .msf-dot {
+            width:32px; height:32px; border-radius:50%;
+            background:#e2e8f0; color:#64748b; font-weight:700; font-size:13px;
+            display:flex; align-items:center; justify-content:center;
+            position:relative; z-index:1; transition:all .3s ease;
+        }
+        .msf-dot.active { background:var(--primary); color:#fff; }
+        .msf-dot.done   { background:#16a34a; color:#fff; }
+        .msf-dot.done::after { content:'✓'; }
+        .msf-dot.done span  { display:none; }
+        .msf-label { font-size:11px; color:#64748b; margin-top:5px; text-align:center; font-weight:600; }
+        .msf-step-dot.active .msf-label { color:var(--primary); }
+        .msf-step-dot.done   .msf-label { color:#16a34a; }
+
+        /* Panels */
+        .msf-panel { display:none; }
+        .msf-panel.active { display:block; }
+
+        /* Navigation buttons */
+        .msf-nav { display:flex; gap:12px; margin-top:24px; flex-wrap:wrap; }
+        .msf-btn { padding:11px 28px; border-radius:7px; font-weight:700; font-size:15px; border:none; cursor:pointer; transition:all .25s ease; }
+        .msf-btn-next   { background:var(--primary); color:#fff; }
+        .msf-btn-next:hover { background:#0d6660; }
+        .msf-btn-back   { background:#f1f5f9; color:#475569; }
+        .msf-btn-back:hover { background:#e2e8f0; }
+        .msf-btn-submit { background:#f9a826; color:#000; font-weight:700; }
+        .msf-btn-submit:hover { background:#e08e1b; }
+        .msf-btn-submit:disabled { background:#cbd5e1; color:#94a3b8; cursor:not-allowed; }
+
+        /* Step header */
+        .msf-step-title {
+            font-size:1.05rem; font-weight:700; color:var(--primary);
+            margin-bottom:18px; padding-bottom:10px;
+            border-bottom:2px solid #e0fdf4;
+        }
+
+        /* Input grids */
+        .fg-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+        .fg-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+        @media(max-width:600px){ .fg-2,.fg-3{ grid-template-columns:1fr; } }
+
+        .form-group label span.req { color:#ef4444; margin-left:2px; }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline:none; border-color:var(--primary);
+            box-shadow:0 0 0 3px rgba(15,118,110,.1);
+        }
+        .field-err { color:#ef4444; font-size:12px; margin-top:3px; display:block; }
+
+        /* Fee note */
+        .fee-note {
+            background:#f0fdf4; color:#065f46;
+            border:1px solid #10b981; border-left:4px solid #16a34a;
+            padding:12px 16px; font-size:.9rem; border-radius:6px; margin-top:4px;
+        }
+
+        /* Checkboxes area of interest */
+        .aoi-wrap { display:flex; flex-wrap:wrap; gap:10px; margin-top:6px; }
+        .aoi-wrap label {
+            font-weight:400 !important; display:flex; align-items:center;
+            gap:5px; cursor:pointer; padding:5px 10px;
+            border:1px solid #e2e8f0; border-radius:6px;
+            transition:all .2s ease; font-size:14px;
+        }
+        .aoi-wrap label:hover { border-color:var(--primary); background:#f0fdf4; }
+        .aoi-wrap input[type=checkbox] { accent-color:var(--primary); }
+
+        /* Summary */
+        .summary-grid {
+            display:grid; grid-template-columns:1fr 1fr;
+            gap:8px; margin-bottom:8px;
+        }
+        @media(max-width:600px){ .summary-grid{ grid-template-columns:1fr; } }
+        .sum-item { background:#f8fafc; border-radius:8px; padding:10px 14px; font-size:13px; }
+        .sum-label { color:#64748b; font-size:11px; font-weight:600; text-transform:uppercase; margin-bottom:2px; }
+        .sum-val   { font-weight:600; color:#1e293b; }
+        .sum-message { grid-column:1/-1; }
+
+        /* Consent */
+        .consent-box {
+            display:flex; gap:10px; align-items:flex-start;
+            background:#f0fdf4; border:1px solid #bbf7d0;
+            border-radius:8px; padding:14px; margin-top:16px;
+            font-size:13px; color:#064e3b;
+        }
+        .consent-box input[type=checkbox] {
+            width:17px; height:17px; margin-top:2px;
+            flex-shrink:0; accent-color:var(--primary);
+        }
+    </style>
 </head>
-
 <body>
-
     <div id="header"></div>
 
-    <!-- CONTACT US SECTION -->
     <section>
         <div class="container">
             <div class="card-grid-2">
 
-                <!-- LEFT CARD – JOIN WITH US FORM -->
+                <!-- LEFT — MULTI-STEP JOIN FORM -->
                 <div class="card">
                     <h3>Join Hands With Us</h3>
-                    <form class="ngo-form" method="POST">
-                        <!-- TWO COLUMN ROW -->
-                        <div class="form-row-2">
 
-                            <div class="form-group">
-                                <label>Your Name</label>
-                                <input type="text" name="name" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Email</label>
-                                <input type="email" name="email" required>
-                            </div>
-
+                    <!-- Progress -->
+                    <div class="msf-progress">
+                        <div class="msf-step-dot active" id="dot-1">
+                            <div class="msf-dot active"><span>1</span></div>
+                            <div class="msf-label">Basic Info</div>
                         </div>
+                        <div class="msf-step-dot" id="dot-2">
+                            <div class="msf-dot"><span>2</span></div>
+                            <div class="msf-label">Details</div>
+                        </div>
+                        <div class="msf-step-dot" id="dot-3">
+                            <div class="msf-dot"><span>3</span></div>
+                            <div class="msf-label">Review</div>
+                        </div>
+                    </div>
 
-                        <div class="form-row-2">
+                    <form class="ngo-form msf-wrap" id="joinForm" method="POST" novalidate>
 
-                            <div class="form-group">
-                                <label>Phone</label>
-                                <input type="text" name="phone" required>
+                        <!-- ══ STEP 1 — Basic Info ══ -->
+                        <div class="msf-panel active" id="step-1">
+                            <div class="msf-step-title">Step 1 — Basic Information</div>
+
+                            <div class="fg-2">
+                                <div class="form-group">
+                                    <label>Full Name <span class="req">*</span></label>
+                                    <input type="text" id="f-name" placeholder="As per Aadhaar">
+                                </div>
+                                <div class="form-group">
+                                    <label>Father's / Husband's Name <span class="req">*</span></label>
+                                    <input type="text" id="f-fathers-name" placeholder="S/O or W/O">
+                                </div>
                             </div>
 
-                            <!---
-                            <div class="form-group">
-                                <label>I want to</label>
-                                <select name="interest">
-                                    <option value="volunteer">Become Volunteer</option>
-                                    <option value="donor">Donate</option>
-                                    <option value="csr">CSR Partnership</option>
-                                    <option value="partner">Collaborate</option>
-                                </select>
-                            </div> -->
+                            <div class="fg-2">
+                                <div class="form-group">
+                                    <label>Date of Birth <span class="req">*</span></label>
+                                    <input type="date" id="f-dob">
+                                </div>
+                                <div class="form-group">
+                                    <label>Gender <span class="req">*</span></label>
+                                    <select id="f-gender">
+                                        <option value="">-- Select --</option>
+                                        <option>Male</option>
+                                        <option>Female</option>
+                                        <option>Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="fg-2">
+                                <div class="form-group">
+                                    <label>Mobile Number <span class="req">*</span></label>
+                                    <input type="tel" id="f-phone" placeholder="+91 XXXXX XXXXX">
+                                </div>
+                                <div class="form-group">
+                                    <label>Email Address</label>
+                                    <input type="email" id="f-email" placeholder="yourname@email.com">
+                                </div>
+                            </div>
+
+                            <div class="fg-2">
+                                <div class="form-group">
+                                    <label>Blood Group</label>
+                                    <select id="f-blood-group">
+                                        <option value="">-- Select --</option>
+                                        <option>A+</option><option>A-</option>
+                                        <option>B+</option><option>B-</option>
+                                        <option>O+</option><option>O-</option>
+                                        <option>AB+</option><option>AB-</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Aadhaar Number</label>
+                                    <input type="text" id="f-aadhaar" placeholder="XXXX XXXX XXXX" maxlength="14">
+                                </div>
+                            </div>
 
                             <div class="form-group">
-                                <label>I want to join as</label>
-                                <select name="interest" id="joinType" required>
-                                    <option value="">-- Select --</option>
-                                    <option value="volunteer">Volunteer</option>
-                                    <option value="team">Member</option>
+                                <label>I want to join as <span class="req">*</span></label>
+                                <select id="joinType">
+                                    <option value="">-- Select Role --</option>
+                                    <option value="volunteer">Volunteer (Free)</option>
+                                    <option value="team">Member (₹500 one-time)</option>
                                     <option value="partner">Partner / Collaborator</option>
                                     <option value="general">General Inquiry</option>
                                 </select>
                             </div>
+
+                            <div id="joinFeeBox" style="display:none;">
+                                <p class="fee-note">
+                                    <strong>Joining Contribution:</strong>
+                                    <span id="feeAmount"></span><br>
+                                    <small>This one-time contribution supports onboarding, ID card, training material, and program coordination.</small>
+                                </p>
+                            </div>
+
+                            <div class="msf-nav">
+                                <button type="button" class="msf-btn msf-btn-next" onclick="goStep(2)">Next →</button>
+                            </div>
                         </div>
 
-                        <!-- JOIN FEE INFO -->
-                        <div class="form-group" id="joinFeeBox" style="display:none;">
-                            <p class="fee-note trust-badge">
-                                <strong>Joining Contribution:</strong>
-                                <span id="feeAmount"></span><br>
-                                <small>
-                                    This one-time contribution supports onboarding,
-                                    ID card, training material, and program coordination.
-                                </small>
-                            </p>
+                        <!-- ══ STEP 2 — Role Details ══ -->
+                        <div class="msf-panel" id="step-2">
+                            <div class="msf-step-title" id="step2-title">Step 2 — Additional Details</div>
+
+                            <!-- Volunteer / Member fields -->
+                            <div id="fields-volunteer" style="display:none">
+                                <div class="fg-2">
+                                    <div class="form-group">
+                                        <label>City / District <span class="req">*</span></label>
+                                        <input type="text" id="f-city" placeholder="e.g. Madhepura">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>PIN Code</label>
+                                        <input type="text" id="f-pin" placeholder="852113" maxlength="6">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Full Address</label>
+                                    <input type="text" id="f-address" placeholder="House / Street / Locality">
+                                </div>
+                                <div class="fg-2">
+                                    <div class="form-group">
+                                        <label>Qualification <span class="req">*</span></label>
+                                        <select id="f-qualification">
+                                            <option value="">-- Select --</option>
+                                            <option>Below 10th</option>
+                                            <option>10th Pass</option>
+                                            <option>12th Pass</option>
+                                            <option>Graduate</option>
+                                            <option>Post Graduate</option>
+                                            <option>Doctorate</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Occupation</label>
+                                        <select id="f-occupation">
+                                            <option value="">-- Select --</option>
+                                            <option>Student</option>
+                                            <option>Government Employee</option>
+                                            <option>Private Employee</option>
+                                            <option>Self Employed / Business</option>
+                                            <option>Farmer</option>
+                                            <option>Homemaker</option>
+                                            <option>Retired</option>
+                                            <option>Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Area of Interest <span class="req">*</span></label>
+                                    <div class="aoi-wrap" id="aoi-checkboxes">
+                                        <label><input type="checkbox" name="area_of_interest[]" value="Education"> Education</label>
+                                        <label><input type="checkbox" name="area_of_interest[]" value="Health"> Health</label>
+                                        <label><input type="checkbox" name="area_of_interest[]" value="Environment"> Environment</label>
+                                        <label><input type="checkbox" name="area_of_interest[]" value="Women Empowerment"> Women Empowerment</label>
+                                        <label><input type="checkbox" name="area_of_interest[]" value="Skill Development"> Skill Development</label>
+                                        <label><input type="checkbox" name="area_of_interest[]" value="Child Welfare"> Child Welfare</label>
+                                        <label><input type="checkbox" name="area_of_interest[]" value="Relief Work"> Relief Work</label>
+                                    </div>
+                                </div>
+                                <div class="fg-2">
+                                    <div class="form-group">
+                                        <label>Availability</label>
+                                        <select id="f-availability">
+                                            <option value="">-- Select --</option>
+                                            <option>Weekdays</option>
+                                            <option>Weekends</option>
+                                            <option>Both Weekdays &amp; Weekends</option>
+                                            <option>Full Time</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>How did you hear about us?</label>
+                                        <select id="f-how-heard">
+                                            <option value="">-- Select --</option>
+                                            <option>Friend / Family</option>
+                                            <option>Social Media</option>
+                                            <option>Website</option>
+                                            <option>Event / Camp</option>
+                                            <option>Newspaper</option>
+                                            <option>Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Partner fields -->
+                            <div id="fields-partner" style="display:none">
+                                <div class="fg-2">
+                                    <div class="form-group">
+                                        <label>Organisation Name <span class="req">*</span></label>
+                                        <input type="text" id="f-org-name" placeholder="Your organisation">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Organisation Type <span class="req">*</span></label>
+                                        <select id="f-org-type">
+                                            <option value="">-- Select --</option>
+                                            <option>NGO / Trust</option>
+                                            <option>Corporate (CSR)</option>
+                                            <option>Government</option>
+                                            <option>Educational Institution</option>
+                                            <option>Individual / Freelancer</option>
+                                            <option>Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="fg-2">
+                                    <div class="form-group">
+                                        <label>Your Designation</label>
+                                        <input type="text" id="f-designation" placeholder="Director / Manager">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Website</label>
+                                        <input type="url" id="f-website" placeholder="https://yourorg.com">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Nature of Collaboration <span class="req">*</span></label>
+                                    <select id="f-collab-type">
+                                        <option value="">-- Select --</option>
+                                        <option>CSR / Funding</option>
+                                        <option>Co-program / Joint Event</option>
+                                        <option>Skill Sharing / Training</option>
+                                        <option>Research / Documentation</option>
+                                        <option>Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- General -->
+                            <div id="fields-general" style="display:none">
+                                <p style="color:#64748b;font-size:14px;margin-bottom:12px">
+                                    Please describe your inquiry and we'll get back to you within 24–48 hours.
+                                </p>
+                            </div>
+
+                            <!-- Message — all roles -->
+                            <div class="form-group" style="margin-top:10px">
+                                <label id="msg-label">Message / Motivation <span class="req">*</span></label>
+                                <textarea id="f-message" rows="4" placeholder="Tell us about yourself and why you want to join…"></textarea>
+                            </div>
+
+                            <div class="msf-nav">
+                                <button type="button" class="msf-btn msf-btn-back" onclick="goStep(1)">← Back</button>
+                                <button type="button" class="msf-btn msf-btn-next" onclick="goStep(3)">Review →</button>
+                            </div>
                         </div>
 
-
-
-
-                        <div class="form-group">
-                            <label>Message</label>
-                            <textarea name="message" rows="5" required></textarea>
+                        <!-- ══ STEP 3 — Review & Submit ══ -->
+                        <div class="msf-panel" id="step-3">
+                            <div class="msf-step-title">Step 3 — Review &amp; Submit</div>
+                            <div id="summary-content"></div>
+                            <div class="consent-box">
+                                <input type="checkbox" id="consent">
+                                <label for="consent">
+                                    I confirm that all information provided is accurate and I agree to AL Hind Trust's
+                                    terms of engagement. I understand my details will be used only for NGO communication purposes.
+                                </label>
+                            </div>
+                            <div class="msf-nav">
+                                <button type="button" class="msf-btn msf-btn-back" onclick="goStep(2)">← Back</button>
+                                <button type="submit" class="msf-btn msf-btn-submit" id="joinBtn">✓ Submit Application</button>
+                            </div>
                         </div>
 
-                        <button id="joinBtn" class="btn btn-primary">Send Message</button>
+                    </form>
                 </div>
-                </form>
 
-                <!-- RIGHT CARD – SINGLE CONTACT US -->
+                <!-- RIGHT — CONTACT INFO -->
                 <div class="card">
                     <h3>Contact Us</h3>
-                    <h3> AL Hind Education & Trust Charitable</h3>
-
-                    <p class="lead">
-                        We welcome donors, volunteers, partners, and
-                        well-wishers to connect with us.
-                    </p>
-
+                    <h3>AL Hind Educational &amp; Charitable Trust</h3>
+                    <p class="lead">We welcome donors, volunteers, partners, and well-wishers to connect with us.</p>
                     <hr>
-
-                    <p>
-                        <strong>Email</strong><br>
-                        <a href="mailto:alhindtrust@gmail.com">alhindtrust@gmail.com</a>
-                    </p>
-
-                    <p>
-                        <strong>Phone</strong><br>
-                        <a href="tel:+919263190568">+91-9263190568</a>
-                    </p>
-
-                    <p>
-                        <strong>Registered Office</strong><br>
+                    <p><strong>Email</strong><br>
+                        <a href="mailto:alhindtrust@gmail.com">alhindtrust@gmail.com</a></p>
+                    <p><strong>Phone</strong><br>
+                        <a href="tel:+919263190568">+91-9263190568</a></p>
+                    <p><strong>Registered Office</strong><br>
                         Kohinoor Complex, College Chowk,<br>
-                        Madhepura – 852113, Bihar
-                    </p>
-
-                    <p class="mt-30">
-                        Response time: <strong>24–48 hours</strong>
-                    </p>
-
+                        Madhepura – 852113, Bihar</p>
+                    <p class="mt-30">Response time: <strong>24–48 hours</strong></p>
                 </div>
 
             </div>
         </div>
     </section>
-    <!-- END CONTACT US SECTION -->
 
-    <!-- LOCATION MAP -->
+    <!-- MAP -->
     <div class="footer-map">
         <h4>Registered Office Location</h4>
-
         <div class="map-box">
-            <iframe src="https://www.google.com/maps?q=Madhepura,Bihar,India&output=embed" loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade">
-            </iframe>
+            <iframe src="https://www.google.com/maps?q=Madhepura,Bihar,India&output=embed"
+                loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         </div>
     </div>
-
 
     <div id="footer"></div>
 
@@ -147,10 +424,6 @@
     <script src="/js/main.js"></script>
     <script src="/js/header-animate.js"></script>
     <script src="/js/contact.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
 </body>
-
 </html>
