@@ -5364,6 +5364,83 @@
          <span style="opacity:.7;font-size:.74rem">${fmtDateTime(m.created_at)}</span>`;
 
       /* ── Body — info cards grid + message box ── */
+      // Build extra cards based on role
+      const role = m.interest_type || '';
+      const isVolMem  = role === 'volunteer' || role === 'team';
+      const isPartner = role === 'partner';
+
+      const extraCards = isVolMem ? `
+          <div class="msg-info-card">
+            <div class="mic-label"><i class="fa-solid fa-user" style="margin-right:4px"></i>Father's / Husband's Name</div>
+            <div class="mic-val">${esc(m.fathers_name || '—')}</div>
+          </div>
+          <div class="msg-info-card">
+            <div class="mic-label"><i class="fa-solid fa-cake-candles" style="margin-right:4px"></i>Date of Birth</div>
+            <div class="mic-val">${esc(m.dob || '—')}</div>
+          </div>
+          <div class="msg-info-card">
+            <div class="mic-label"><i class="fa-solid fa-venus-mars" style="margin-right:4px"></i>Gender</div>
+            <div class="mic-val">${esc(m.gender || '—')}</div>
+          </div>
+          <div class="msg-info-card">
+            <div class="mic-label"><i class="fa-solid fa-droplet" style="margin-right:4px"></i>Blood Group</div>
+            <div class="mic-val">${esc(m.blood_group || '—')}</div>
+          </div>
+          <div class="msg-info-card">
+            <div class="mic-label"><i class="fa-solid fa-id-card" style="margin-right:4px"></i>Aadhaar</div>
+            <div class="mic-val">${m.aadhaar ? '••••' + m.aadhaar.replace(/\s/g,'').slice(-4) : '—'}</div>
+          </div>
+          <div class="msg-info-card">
+            <div class="mic-label"><i class="fa-solid fa-location-dot" style="margin-right:4px"></i>City / District</div>
+            <div class="mic-val">${esc(m.city || '—')}${m.pin_code ? ' – ' + esc(m.pin_code) : ''}</div>
+          </div>
+          <div class="msg-info-card" style="grid-column:1/-1">
+            <div class="mic-label"><i class="fa-solid fa-map-pin" style="margin-right:4px"></i>Address</div>
+            <div class="mic-val" style="white-space:normal">${esc(m.address || '—')}</div>
+          </div>
+          <div class="msg-info-card">
+            <div class="mic-label"><i class="fa-solid fa-graduation-cap" style="margin-right:4px"></i>Qualification</div>
+            <div class="mic-val">${esc(m.qualification || '—')}</div>
+          </div>
+          <div class="msg-info-card">
+            <div class="mic-label"><i class="fa-solid fa-briefcase" style="margin-right:4px"></i>Occupation</div>
+            <div class="mic-val">${esc(m.occupation || '—')}</div>
+          </div>
+          <div class="msg-info-card" style="grid-column:1/-1">
+            <div class="mic-label"><i class="fa-solid fa-heart" style="margin-right:4px"></i>Area of Interest</div>
+            <div class="mic-val" style="white-space:normal">${esc(m.area_of_interest || '—')}</div>
+          </div>
+          <div class="msg-info-card">
+            <div class="mic-label"><i class="fa-solid fa-clock" style="margin-right:4px"></i>Availability</div>
+            <div class="mic-val">${esc(m.availability || '—')}</div>
+          </div>
+          <div class="msg-info-card">
+            <div class="mic-label"><i class="fa-solid fa-bullhorn" style="margin-right:4px"></i>How Heard</div>
+            <div class="mic-val">${esc(m.how_heard || '—')}</div>
+          </div>
+      ` : isPartner ? `
+          <div class="msg-info-card">
+            <div class="mic-label"><i class="fa-solid fa-building" style="margin-right:4px"></i>Organisation</div>
+            <div class="mic-val">${esc(m.org_name || '—')}</div>
+          </div>
+          <div class="msg-info-card">
+            <div class="mic-label"><i class="fa-solid fa-sitemap" style="margin-right:4px"></i>Org Type</div>
+            <div class="mic-val">${esc(m.org_type || '—')}</div>
+          </div>
+          <div class="msg-info-card">
+            <div class="mic-label"><i class="fa-solid fa-id-badge" style="margin-right:4px"></i>Designation</div>
+            <div class="mic-val">${esc(m.designation || '—')}</div>
+          </div>
+          <div class="msg-info-card">
+            <div class="mic-label"><i class="fa-solid fa-globe" style="margin-right:4px"></i>Website</div>
+            <div class="mic-val">${m.website ? `<a href="${esc(m.website)}" target="_blank">${esc(m.website)}</a>` : '—'}</div>
+          </div>
+          <div class="msg-info-card" style="grid-column:1/-1">
+            <div class="mic-label"><i class="fa-solid fa-handshake" style="margin-right:4px"></i>Nature of Collaboration</div>
+            <div class="mic-val">${esc(m.collab_type || '—')}</div>
+          </div>
+      ` : '';
+
       document.getElementById('msg-detail-body').innerHTML = `
         <div class="msg-info-grid">
 
@@ -5392,6 +5469,8 @@
             <div class="mic-label"><i class="fa-solid fa-indian-rupee-sign" style="margin-right:4px"></i>Fee</div>
             <div class="mic-val">${feeDisplay}</div>
           </div>
+
+          ${extraCards}
 
         </div>
 
