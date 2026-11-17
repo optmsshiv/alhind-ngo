@@ -1,0 +1,71 @@
+# ============================================================
+# Alhind Trust - .htaccess
+# Root: index.html, blog.html, 404.html, .htaccess
+# Pages folder: /pages/*.html
+# ============================================================
+
+RewriteEngine On
+RewriteBase /
+
+# 1. CUSTOM 404 PAGE
+ErrorDocument 404 /404.html
+
+# 2. REMOVE TRAILING SLASH - /about/ -> /about
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)/$ /$1 [L,R=301]
+
+# 3. HIDE .html EXTENSION
+# / -> index.html
+RewriteRule ^$ index.html [L]
+
+# Root files: /blog -> /blog.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+RewriteRule ^(index|blog|404)$ $1.html [L]
+
+# Pages folder: /about -> /pages/about.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/pages/$1.html -f
+RewriteRule ^([^/]+)$ pages/$1.html [L]
+
+# Sub-pages inside /pages/ also work without .html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/pages/$1.html -f
+RewriteRule ^pages/(.+)$ pages/$1.html [L]
+
+# 4. REDIRECT OLD .html URLS TO CLEAN URLS
+# /blog.html -> /blog
+RewriteCond %{THE_REQUEST} \s/+(index|blog|404)\.html[\s?] [NC]
+RewriteRule ^(index|blog|404)\.html$ /$1 [R=301,L]
+
+# /index.html -> /
+RewriteCond %{THE_REQUEST} \s/+index\.html[\s?] [NC]
+RewriteRule ^index\.html$ / [R=301,L]
+
+# /pages/about.html -> /about
+RewriteCond %{THE_REQUEST} \s/+pages/([^/]+)\.html[\s?] [NC]
+RewriteRule ^pages/([^/]+)\.html$ /$1 [R=301,L]
+
+# 5. SECURITY + PERFORMANCE
+Options -Indexes
+
+<FilesMatch "^\.ht">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType image/svg+xml "access plus 1 month"
+</IfModule>
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript text/plain
+</IfModule>
