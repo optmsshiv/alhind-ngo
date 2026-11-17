@@ -19,8 +19,8 @@ RewriteRule ^(.*)/$ /$1 [L,R=301]
 RewriteRule ^$ index.html [L]
 
 # Root files: /blog -> /blog.html
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{DOCUMENT_ROOT}/$1.html -f
 RewriteRule ^(index|blog|404)$ $1.html [L]
 
